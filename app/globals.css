@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../vendor/shadcn-tailwind-4.13.0.css";
+
+:root {
+  --ink: #102247; --muted-ink: #72809a; --line: #e4e9f2; --canvas: #f3f6fa; --panel: #fff;
+  --blue: #397ff6; --green: #18a567; --orange: #f09a18; --red: #ed4859; --radius: 15px;
+  --background: #fff; --foreground: #102247; --card: #fff; --card-foreground: #102247;
+  --popover: #fff; --popover-foreground: #102247; --primary: #2867e7; --primary-foreground: #fff;
+  --secondary: #f2f5f9; --secondary-foreground: #102247; --muted: #f2f5f9; --muted-foreground: #72809a;
+  --accent: #edf3ff; --accent-foreground: #2867e7; --destructive: #ed4859; --border: #e4e9f2; --input: #e4e9f2; --ring: #397ff6;
+}
+
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-destructive: var(--destructive); --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --font-sans: "MiSans", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--canvas); }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: "MiSans", "PingFang SC", "Microsoft YaHei", Arial, sans-serif; }
+button, input { font: inherit; } button { color: inherit; }
+
+.app-shell { min-height: 100vh; display: flex; }
+.sidebar { position: fixed; inset: 0 auto 0 0; width: 204px; padding: 25px 17px; background: #0d2047; color: #fff; display: flex; flex-direction: column; z-index: 20; }
+.brand { display: flex; align-items: center; gap: 11px; padding: 0 7px 29px; }
+.brand-mark { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: #3478ef; font-size: 14px; font-weight: 850; box-shadow: 0 8px 20px #06132e77; }
+.brand strong { display: block; font-size: 15px; }.brand small { display: block; margin-top: 4px; color: #8499c0; font-size: 8px; letter-spacing: 1.25px; }
+.side-nav { display: grid; gap: 6px; }.nav-item { border: 0; background: transparent; color: #98aad0; display: flex; align-items: center; gap: 11px; padding: 11px 13px; border-radius: 9px; cursor: pointer; text-align: left; transition: .18s ease; font-size: 12px; }
+.nav-item:hover { color: #fff; background: #ffffff0b; }.nav-item.active { color: #fff; background: #2e68df; box-shadow: 0 8px 22px #06142f66; }
+.sidebar-bottom { margin-top: auto; padding: 15px 13px; border-top: 1px solid #ffffff13; }.sidebar-bottom span, .sidebar-bottom small { display: block; color: #7f93ba; font-size: 9px; }.sidebar-bottom strong { display: block; margin: 6px 0 17px; font-size: 13px; letter-spacing: .5px; }
+
+.main-content { width: calc(100% - 204px); margin-left: 204px; padding: 27px 34px 25px; max-width: 1720px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 20px; }
+.eyebrow, .section-kicker { display: flex; align-items: center; gap: 6px; color: var(--blue); font-size: 9px; font-weight: 800; letter-spacing: 1.5px; }
+.topbar h1 { margin: 5px 0 2px; font-size: clamp(24px, 2.2vw, 34px); letter-spacing: -1.1px; }.topbar p { margin: 0; color: #78869f; font-size: 11px; }
+.top-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }.period-tabs { background: #e9eef6 !important; border-radius: 10px !important; padding: 3px !important; height: 38px !important; }.period-tabs button { min-width: 51px; border-radius: 7px !important; font-size: 11px !important; }
+.update-time { display: flex; align-items: center; gap: 6px; color: #8996ab; font-size: 9px; }.update-time strong { color: #56647d; font-weight: 650; }.icon-button { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: #78869d; cursor: pointer; }
+.period-badge { height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 9px; color: #2867e7; background: #edf3ff; font-size: 10px; font-weight: 750; }
+.full-version-link { height: 34px; display: inline-flex; align-items: center; gap: 6px; padding: 0 3px; border: 0; background: transparent; color: #2867e7; font-size: 10px; font-weight: 750; white-space: nowrap; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.full-version-link:hover { color: #174fc3; }.full-version-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+.confirmation-date { height: 36px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: #65738b; font-size: 10px; white-space: nowrap; }
+
+.full-version-backdrop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; background: #07142c99; backdrop-filter: blur(4px); animation: modal-fade-in .16s ease-out; }
+.full-version-modal { position: relative; width: min(440px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 28px 34px 30px; border: 1px solid #dbe3ef; border-radius: 18px; background: #fff; color: var(--ink); text-align: center; box-shadow: 0 24px 70px #06132e55; animation: modal-rise-in .18s ease-out; }
+.modal-close { position: absolute; top: 13px; right: 13px; width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 9px; background: #f1f4f9; color: #72809a; cursor: pointer; }.modal-close:hover { color: var(--ink); background: #e8edf5; }
+.modal-icon { width: 45px; height: 45px; margin: 0 auto 12px; display: grid; place-items: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #397ff6, #1c5bd0); box-shadow: 0 8px 20px #397ff633; }
+.full-version-modal h2 { margin: 0 0 15px; font-size: 22px; }.full-version-modal > p { margin: 5px 0; color: #64728a; font-size: 13px; line-height: 1.7; }
+.wechat-contact { margin: 18px 0 11px; display: grid; gap: 4px; }.wechat-contact strong { font-size: 14px; }.wechat-contact span { color: #7c899e; font-size: 11px; }
+.wechat-qr { display: block; width: min(280px, 100%); height: auto; margin: 0 auto; border: 1px solid #edf0f5; border-radius: 12px; }
+@keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-rise-in { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.filterbar { display: flex; align-items: stretch; gap: 10px; margin-bottom: 12px; overflow-x: auto; }
+.region-tabs { height: 38px; flex: 0 0 auto; display: flex; align-items: center; gap: 2px; padding: 3px; background: #e8edf5; border: 1px solid #e0e6ef; border-radius: 9px; }.region-tabs button { height: 30px; border: 0; background: transparent; color: #77849a; padding: 0 13px; border-radius: 7px; white-space: nowrap; cursor: pointer; font-size: 11px; }.region-tabs button.active { background: #fff; color: var(--ink); font-weight: 750; box-shadow: 0 2px 7px #19315c12; }
+.stage-distribution { height: 38px; min-width: 410px; flex: 1 1 520px; padding: 3px; background: #fff; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 3px 12px #1c376308; }
+.distribution-bar { width: 100%; height: 30px; display: flex; gap: 2px; overflow: hidden; border-radius: 6px; background: var(--canvas); }
+.distribution-segment { position: relative; min-width: 0; flex: 1 1 0; border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; color: var(--ink); background: var(--canvas); display: flex; align-items: center; justify-content: space-between; gap: 5px; overflow: hidden; cursor: pointer; text-align: left; transition: filter .18s ease, transform .18s ease, box-shadow .18s ease; }
+.distribution-fill { position: absolute; inset: 0 0 0 auto; min-width: 0; border-radius: 4px; pointer-events: none; transition: width .28s ease, opacity .18s ease; }
+.distribution-segment:hover { filter: brightness(1.04); transform: translateY(-1px); }.distribution-segment.selected { box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px #102247; }.distribution-segment.muted .distribution-fill { opacity: .18; filter: saturate(.35); }.distribution-segment.muted .distribution-label, .distribution-segment.muted .distribution-value { opacity: .48; }
+.distribution-label, .distribution-value { position: relative; z-index: 1; min-width: 0; display: flex; align-items: center; }.distribution-label b { font-size: 11px; line-height: 1; text-shadow: 0 1px 1px #fff; }.distribution-value { flex: 0 0 auto; }.distribution-value strong { padding: 2px 4px; border-radius: 4px; color: var(--ink); background: #ffffffd9; font-size: 10px; line-height: 1; box-shadow: 0 1px 2px #10224712; }
+
+.map-panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 6px 20px #1c376308; }
+.map-panel { padding: 18px; margin-bottom: 12px; }.map-panel-head { padding: 0 2px 13px; }.map-panel-head h2 { margin: 4px 0 2px; font-size: 17px; }.map-panel-head p { margin: 0; color: #8995a9; font-size: 9px; }
+.market-map { height: clamp(570px, 62vh, 720px); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(8, minmax(0, 1fr)); gap: 5px; padding: 5px; border-radius: 10px; background: #0a1427; }
+.map-group { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #263550; background: #101d32; }.map-group > header { height: 28px; flex: 0 0 28px; padding: 0 9px; display: flex; justify-content: space-between; align-items: center; color: #d8e1f1; background: #13223a; }.map-group > header strong { font-size: 10px; }.map-group > header span { color: #7183a1; font-size: 8px; }
+.map-美股 { grid-area: 1 / 1 / 5 / 7; }.map-A股 { grid-area: 1 / 7 / 6 / 13; }.map-港股 { grid-area: 5 / 1 / 9 / 4; }.map-大宗-宏观 { grid-area: 5 / 4 / 9 / 7; }.map-加密 { grid-area: 6 / 7 / 9 / 13; }
+.view-crypto7 .map-美股 { grid-area: 1 / 1 / 9 / 8; }.view-crypto7 .map-加密 { grid-area: 1 / 8 / 9 / 13; }
+.view-usSelected .map-美股 { grid-area: 1 / 1 / 9 / 11; }.view-usSelected .map-大宗-宏观 { grid-area: 1 / 11 / 9 / 13; }
+.view-chinaIndices .map-A股 { grid-area: 1 / 1 / 9 / 13; }
+.map-tiles { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); grid-auto-flow: dense; gap: 2px; padding: 2px; }.map-tile { position: relative; overflow: hidden; min-width: 0; min-height: 0; border: 0; padding: 9px; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; cursor: pointer; transition: filter .16s ease, opacity .16s ease, transform .16s ease; box-shadow: inset 0 0 0 1px #ffffff17; }.map-tile:hover { z-index: 3; filter: brightness(1.13); transform: scale(.985); }.tile-s1 { background: linear-gradient(145deg, #397ff6, #1c5bd0); }.tile-s2 { background: linear-gradient(145deg, #19a768, #087849); }.tile-s3 { background: linear-gradient(145deg, #f0a022, #c56f00); }.tile-s4 { background: linear-gradient(145deg, #ed4c5d, #bd2638); }.map-tile.tile-faded { opacity: .13; filter: saturate(.35); }.map-tile > strong { font-size: clamp(13px, 1.25vw, 21px); letter-spacing: -.4px; text-shadow: 0 1px 3px #0005; }.map-tile > span { margin-top: 3px; color: #ffffffbf; font-size: clamp(8px, .67vw, 10px); }.map-tile div { display: flex; align-items: center; gap: 6px; margin-top: 7px; }.map-tile b { padding: 3px 6px; border-radius: 999px; background: #0a14272b; border: 1px solid #ffffff24; font-size: 8px; }.map-tile em { color: #ffffffb0; font-size: 8px; font-style: normal; }
+.single-map { display: block; height: 560px; }.single-map .map-group { width: 100%; height: 100%; }.single-map .map-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); }.single-map .map-tile > strong { font-size: clamp(18px, 2vw, 28px); }
+.view-usSelected .map-美股 .map-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+.view-usSelected:not(.single-map) .map-大宗-宏观 .map-tiles { grid-template-columns: 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.view-chinaIndices:not(.single-map) .map-A股 .map-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); }
+.map-foot { display: flex; align-items: center; gap: 18px; padding: 10px 3px 0; color: #69778f; font-size: 9px; }.map-foot span { display: flex; align-items: center; gap: 6px; }.map-foot span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #91a0b7; }.map-foot span:first-child::before { background: var(--blue); }
+.market-hover-card { position: fixed; z-index: 100; width: min(350px, calc(100vw - 16px)); pointer-events: none; overflow: hidden; border: 1px solid #4b566b; border-radius: 12px; color: #edf2fa; background: #202735; box-shadow: 0 18px 48px #02081766; animation: hover-card-in .12s ease-out; }
+.hover-card-title { height: 43px; padding: 0 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #384255; color: #dce4f1; font-size: 12px; font-weight: 800; }.hover-card-title span { width: 8px; height: 8px; border-radius: 2px; box-shadow: 0 0 0 3px #ffffff13; }
+.hover-close { margin-left: auto; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 8px; background: #ffffff0d; color: #b8c3d5; cursor: pointer; }.hover-close:hover { color: #fff; background: #ffffff18; }
+.market-hover-card dl { margin: 0; padding: 6px 0; }.market-hover-card dl > div { min-height: 36px; padding: 8px 15px; display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 10px; }.market-hover-card dl > div + div { border-top: 1px solid #343d4f; }.market-hover-card dt { color: #9da9bd; font-size: 10px; }.market-hover-card dd { margin: 0; color: #f4f7fb; font-size: 11px; font-weight: 650; }.market-hover-card dd b { font-weight: 850; }
+@keyframes hover-card-in { from { opacity: 0; transform: translateY(4px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+footer { display: flex; justify-content: space-between; gap: 18px; padding: 9px 3px 0; color: #9aa5b7; font-size: 8px; }
+
+@media (max-width: 1180px) {
+  .sidebar { width: 184px; }.main-content { width: calc(100% - 184px); margin-left: 184px; padding: 24px; }.market-map { height: 620px; }.map-tile > strong { font-size: 14px; }.map-tile > span { font-size: 8px; }
+}
+@media (max-width: 780px) {
+  .app-shell { display: block; }.sidebar { position: static; width: 100%; height: 66px; padding: 13px 16px; flex-direction: row; align-items: center; }.brand { padding: 0; }.brand-mark { width: 36px; height: 36px; }.side-nav { margin-left: auto; display: flex; }.nav-item { width: 36px; height: 36px; padding: 0; justify-content: center; }.nav-item span { display: none; }.sidebar-bottom { display: none; }.main-content { width: 100%; margin: 0; padding: 20px 14px; }.topbar { align-items: flex-end; }.topbar p, .update-time, .icon-button { display: none; }.filterbar { flex-direction: column; overflow: visible; }.region-tabs { width: 100%; overflow-x: auto; }.stage-distribution { width: 100%; min-width: 0; flex: 0 0 38px; }.market-map { height: auto; display: grid; grid-template-columns: 1fr; grid-template-rows: none; gap: 5px; background: #0a1427; }.map-group, .map-美股, .map-A股, .map-港股, .map-大宗-宏观, .map-加密, .view-crypto7 .map-美股, .view-crypto7 .map-加密, .view-usSelected .map-美股, .view-usSelected .map-大宗-宏观, .view-chinaIndices .map-A股 { grid-area: auto; height: 270px; }.map-group:has(.map-tile:only-child) { height: 150px; }.map-tile > strong { font-size: 14px; }.map-foot { flex-wrap: wrap; gap: 7px 14px; }.market-hover-card.touch-card { inset: auto 12px 12px !important; width: auto; max-height: calc(100vh - 24px); overflow-y: auto; pointer-events: auto; } footer { display: block; line-height: 1.8; }
+  .view-usSelected .map-美股 { height: 520px; }.view-usSelected .map-美股 .map-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .brand small { display: none; }.brand strong { font-size: 13px; }.side-nav { gap: 2px; }.topbar { display: block; }.top-actions { margin-top: 12px; justify-content: flex-start; }.confirmation-date { order: -1; }.full-version-link { order: -2; flex-basis: 100%; justify-content: flex-start; }.full-version-modal { padding: 26px 20px 24px; }.map-panel { padding: 12px; }.map-group { height: 250px; }
+}
