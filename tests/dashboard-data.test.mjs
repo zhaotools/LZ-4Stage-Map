@@ -9,7 +9,7 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.deepEqual(appDashboard, dashboard);
   assert.equal(dashboard.schemaVersion, "lz-4stage-map-v2");
   assert.equal(dashboard.analysisPeriod, "weekly-completed-bars");
-  assert.equal(dashboard.markets.length, 49);
+  assert.equal(dashboard.markets.length, 64);
   assert.equal(dashboard.markets.filter((market) => market.collections.includes("global")).length, 16);
   assert.ok(dashboard.markets.find((market) => market.code === "ETH-USD")?.collections.includes("global"));
   const us10y = dashboard.markets.find((market) => market.code === "US10Y");
@@ -24,10 +24,12 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.equal(dashboard.markets.filter((market) => market.collections.includes("usSelected") && market.region === "美股").length, 18);
   const chinaIndexCodes = dashboard.markets.filter((market) => market.collections.includes("chinaIndices")).map((market) => market.code).sort();
   assert.deepEqual(chinaIndexCodes, ["000016.SH", "000300.SH", "000688.SH", "000905.SH", "399933.SZ", "399967.SZ", "399975.SZ", "399976.SZ", "399986.SZ", "399997.SZ", "399998.SZ", "930708.CSI", "931151.CSI", "931865.CSI", "SH000001", "SZ399006"]);
+  const hkSelectedCodes = dashboard.markets.filter((market) => market.collections.includes("hkSelected")).map((market) => market.code).sort();
+  assert.deepEqual(hkSelectedCodes, ["1211.HK", "1299.HK", "1810.HK", "2318.HK", "3690.HK", "388.HK", "5.HK", "700.HK", "883.HK", "939.HK", "941.HK", "9618.HK", "9988.HK", "HSCEI", "HSI", "HSTECH"]);
   for (const market of dashboard.markets) {
     assert.match(market.stage, /^S[1-4]$/);
     assert.match(market.subStage, /^S[1-4](?:A|B|-|B-)?$/);
-    assert.match(market.observationStage, /^S[1-4](?:A|B|-|B-)?$/);
+    assert.match(market.observationStage, /^(?:S[1-4](?:A|B|-|B-)?|UNCONFIRMED)$/);
     assert.ok(market.stageDetail.length > 0);
     assert.ok(market.weeks >= 1);
     assert.ok(Number.isFinite(market.momentum));
@@ -35,7 +37,7 @@ test("dashboard contains complete real weekly analysis", () => {
     assert.match(market.stageAsOf, /^\d{4}-\d{2}-\d{2}$/);
     assert.match(market.marketAsOf, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(["live", "cache"].includes(market.dataStatus));
-    assert.ok(market.collections.every((collection) => ["global", "crypto7", "usSelected", "chinaIndices"].includes(collection)));
+    assert.ok(market.collections.every((collection) => ["global", "crypto7", "usSelected", "chinaIndices", "hkSelected"].includes(collection)));
   }
   const btc = dashboard.markets.find((market) => market.code === "BTC-USD");
   assert.equal(btc.observationStage, "S2A");

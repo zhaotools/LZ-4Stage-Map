@@ -3,6 +3,7 @@
 import { type PointerEvent, useEffect, useMemo, useState } from "react";
 import {
   BarChart3,
+  Building2,
   CalendarDays,
   Clock3,
   Globe2,
@@ -16,7 +17,7 @@ import {
 
 import dashboardData from "@/data/dashboard.json";
 type Stage = "S1" | "S2" | "S3" | "S4";
-type View = "global" | "crypto7" | "usSelected" | "chinaIndices";
+type View = "global" | "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
 type Region = "全球" | "美股" | "A股" | "港股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
 
@@ -94,10 +95,12 @@ const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: stri
   crypto7: { eyebrow: "CRYPTO BLUE CHIP STAGES", subtitle: "加密蓝筹阶段看板", mapTitle: "加密蓝筹阶段地图", regions: ["全球", "美股", "加密"], groups: ["美股", "加密"] },
   usSelected: { eyebrow: "US SELECTED STAGES", subtitle: "美股精选阶段看板", mapTitle: "美股精选阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数阶段地图", regions: ["全球", "A股"], groups: ["A股"] },
+  hkSelected: { eyebrow: "HONG KONG SELECTED STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股精选阶段地图", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   usSelected: ["GSPC.INDEX", "NDQ", "IWM", "SOXX", "VIX"],
   chinaIndices: ["SH000001", "000016.SH", "000300.SH", "000905.SH", "SZ399006", "000688.SH", "931865.CSI", "399967.SZ", "399976.SZ", "931151.CSI", "399986.SZ", "399975.SZ", "930708.CSI", "399998.SZ", "399997.SZ", "399933.SZ"],
+  hkSelected: ["HSI", "HSTECH", "HSCEI", "700.HK", "9988.HK", "5.HK", "939.HK", "941.HK", "1299.HK", "388.HK", "1810.HK", "3690.HK", "2318.HK", "1211.HK", "883.HK", "9618.HK"],
 };
 function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
@@ -123,7 +126,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
         <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationDate} 4AM UTC+8</dd></div>
-        <div><dt>本周观察</dt><dd>{market.observationStage}</dd></div>
+        <div><dt>本周观察</dt><dd>{market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage}</dd></div>
         <div><dt>MA30趋势</dt><dd>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
       </dl>
     </div>
@@ -168,7 +171,7 @@ function MarketMapGroup({ group, items, stageFilter, compact, dense, onMarketMov
 
 function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, element: HTMLButtonElement) => void }) {
   const groups = region === "全球" ? viewMeta[view].groups : [region as MarketRegion];
-  const dense = view === "usSelected" || view === "chinaIndices";
+  const dense = view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
   return (
     <div className={`market-map view-${view} ${region !== "全球" ? "single-map" : ""}`}>
       {groups.map((group) => <MarketMapGroup key={group} group={group} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
@@ -262,6 +265,7 @@ export default function Home() {
             <button className={`nav-item ${view === "crypto7" ? "active" : ""}`} onClick={() => switchView("crypto7")} aria-pressed={view === "crypto7"}><BarChart3 size={18} /><span>加密蓝筹</span></button>
             <button className={`nav-item ${view === "usSelected" ? "active" : ""}`} onClick={() => switchView("usSelected")} aria-pressed={view === "usSelected"}><TrendingUp size={18} /><span>美股精选</span></button>
             <button className={`nav-item ${view === "chinaIndices" ? "active" : ""}`} onClick={() => switchView("chinaIndices")} aria-pressed={view === "chinaIndices"}><Landmark size={18} /><span>A股指数</span></button>
+            <button className={`nav-item ${view === "hkSelected" ? "active" : ""}`} onClick={() => switchView("hkSelected")} aria-pressed={view === "hkSelected"}><Building2 size={18} /><span>港股精选</span></button>
           </nav>
           <div className="sidebar-bottom"><span>数据周期</span><strong>{week.year} · W{String(week.week).padStart(2, "0")}</strong><small>仅作为市场观察工具</small></div>
         </aside>
