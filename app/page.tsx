@@ -114,6 +114,14 @@ function isoWeek(dateText: string) {
   return { year: date.getUTCFullYear(), week: Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7) };
 }
 
+function displayConfirmationDate(market: Market) {
+  if (market.region !== "加密") return market.stageAsOf;
+  const date = new Date(`${market.stageAsOf}T00:00:00Z`);
+  const day = date.getUTCDay();
+  date.setUTCDate(date.getUTCDate() + (day === 1 ? 7 : (8 - day) % 7));
+  return date.toISOString().slice(0, 10);
+}
+
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
   const maDirection = market.momentum >= 0 ? "上升" : "下降";
@@ -211,6 +219,7 @@ export default function Home() {
     return result;
   }, [regionData]);
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? dashboardData.commonStageAsOf;
+  const commonConfirmationDate = activeUniverse.map(displayConfirmationDate).sort()[0] ?? commonStageAsOf;
   const week = isoWeek(commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定").slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
@@ -276,7 +285,7 @@ export default function Home() {
             <div className="top-actions">
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>
-              <span className="confirmation-date"><CalendarDays size={16} />共同确认至 {commonStageAsOf}</span>
+              <span className="confirmation-date"><CalendarDays size={16} />共同确认至 {commonConfirmationDate}</span>
               <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(dashboardData.generatedAt)}</strong></span></div>
               <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
             </div>
