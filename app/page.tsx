@@ -1,6 +1,6 @@
 "use client";
 
-import { type PointerEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, type PointerEvent, useEffect, useMemo, useState } from "react";
 import {
   BarChart3,
   Building2,
@@ -9,6 +9,7 @@ import {
   Globe2,
   Grid2X2,
   Landmark,
+  LockKeyhole,
   MousePointerClick,
   RefreshCw,
   TrendingUp,
@@ -42,6 +43,15 @@ type Market = {
   cols: number;
   rows: number;
 };
+
+const ACCESS_STORAGE_KEY = "lz-4stage-map-access-v1";
+const ACCESS_PASSWORD_HASH = "59301bd9d2f98ebd8ec731e34903d3cd1f4557954257680102b2e1b81ab7bf5d";
+
+async function hashText(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
 
 const displayMeta: Record<string, { shortCode: string; cols: number; rows: number }> = {
   "GSPC.INDEX": { shortCode: "SPX", cols: 3, rows: 2 },
@@ -188,6 +198,10 @@ function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMar
 }
 
 export default function Home() {
+  const [accessGranted, setAccessGranted] = useState(() => typeof window !== "undefined" && window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
+  const [checkingPassword, setCheckingPassword] = useState(false);
   const [view, setView] = useState<View>("global");
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
@@ -204,6 +218,28 @@ export default function Home() {
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [showFullVersion]);
+
+  useEffect(() => {
+    if (accessGranted) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [accessGranted]);
+
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setCheckingPassword(true);
+    const valid = await hashText(password) === ACCESS_PASSWORD_HASH;
+    setCheckingPassword(false);
+    if (!valid) {
+      setLoginError(true);
+      setPassword("");
+      return;
+    }
+    window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
+    setLoginError(false);
+    setAccessGranted(true);
+  };
 
   const activeUniverse = useMemo(() => {
     const selected = markets.filter((item) => item.collections.includes(view));
@@ -266,7 +302,8 @@ export default function Home() {
   const activeViewMeta = viewMeta[view];
 
   return (
-      <div className="app-shell">
+    <>
+      <div className={`app-shell ${accessGranted ? "" : "access-locked"}`} aria-hidden={!accessGranted}>
         <aside className="sidebar">
           <div className="brand"><div className="brand-mark">LZ</div><div><strong>LZ-4Stage</strong><small>MARKET TOOLKIT</small></div></div>
           <nav className="side-nav" aria-label="主要导航">
@@ -343,5 +380,33 @@ export default function Home() {
           </div>
         )}
       </div>
+      {!accessGranted && (
+        <div className="access-gate-backdrop">
+          <section className="access-gate" role="dialog" aria-modal="true" aria-labelledby="access-gate-title">
+            <div className="access-gate-icon"><LockKeyhole size={23} /></div>
+            <span className="access-gate-kicker">PRIVATE ACCESS</span>
+            <h2 id="access-gate-title">需要登录</h2>
+            <p>LZ 4Stage Map 为受限访问的市场观察工具，请输入访问密码后继续。</p>
+            <form onSubmit={handleLogin}>
+              <label htmlFor="access-password">访问密码</label>
+              <input
+                id="access-password"
+                type="password"
+                value={password}
+                onChange={(event) => { setPassword(event.target.value); setLoginError(false); }}
+                placeholder="请输入密码"
+                autoComplete="current-password"
+                autoFocus
+                aria-invalid={loginError}
+                aria-describedby={loginError ? "access-error" : "access-note"}
+              />
+              {loginError && <span className="access-error" id="access-error" role="alert">密码不正确，请重新输入</span>}
+              <button type="submit" disabled={!password || checkingPassword}>{checkingPassword ? "正在验证…" : "进入市场地图"}</button>
+            </form>
+            <small id="access-note">验证成功后，此浏览器将保持登录状态。</small>
+          </section>
+        </div>
+      )}
+    </>
   );
 }
