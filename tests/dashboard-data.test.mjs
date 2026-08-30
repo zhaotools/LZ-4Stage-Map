@@ -9,6 +9,9 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.deepEqual(appDashboard, dashboard);
   assert.equal(dashboard.schemaVersion, "lz-4stage-map-v2");
   assert.equal(dashboard.analysisPeriod, "weekly-completed-bars");
+  assert.ok(["all", "traditional", "crypto"].includes(dashboard.updateScope));
+  assert.match(dashboard.lastUpdatedAt.traditional, /^\d{4}-\d{2}-\d{2}T/);
+  assert.match(dashboard.lastUpdatedAt.crypto, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(dashboard.markets.length, 64);
   assert.equal(dashboard.markets.filter((market) => market.collections.includes("global")).length, 16);
   assert.ok(dashboard.markets.find((market) => market.code === "ETH-USD")?.collections.includes("global"));
