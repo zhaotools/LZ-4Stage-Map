@@ -345,7 +345,7 @@ export default function Home() {
                   aria-label={`${stage} ${stageMeta[stage].title}，占比 ${percent}%，${counts[stage]} 个指数`}
                 >
                   <span className="distribution-fill" aria-hidden="true" style={{ width: `${percent}%`, background: `linear-gradient(135deg, ${stageMeta[stage].color}, ${stageMeta[stage].dark})` }} />
-                  <span className="distribution-label"><b style={{ color: stageMeta[stage].color }}>{stage}</b></span>
+                  <span className="distribution-label"><b style={{ color: stageMeta[stage].color }}>{stage} {stageMeta[stage].season}季</b></span>
                   <span className="distribution-value"><strong>{percent}%</strong></span>
                 </button>;
               })}
