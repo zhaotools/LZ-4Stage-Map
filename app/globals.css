@@ -82,7 +82,7 @@ button, input { font: inherit; } button { color: inherit; }
 .map-panel { padding: 18px; margin-bottom: 12px; }.map-panel-head { padding: 0 2px 13px; }.map-panel-head h2 { margin: 4px 0 2px; font-size: 17px; }.map-panel-head p { margin: 0; color: #8995a9; font-size: 9px; }
 .market-map { height: clamp(570px, 62vh, 720px); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(8, minmax(0, 1fr)); gap: 5px; padding: 5px; border-radius: 10px; background: #0a1427; }
 .map-group { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #263550; background: #101d32; }.map-group > header { height: 28px; flex: 0 0 28px; padding: 0 9px; display: flex; justify-content: space-between; align-items: center; color: #d8e1f1; background: #13223a; }.map-group > header strong { font-size: 10px; }.map-group > header span { color: #7183a1; font-size: 8px; }
-.map-美股 { grid-area: 1 / 1 / 5 / 7; }.map-A股 { grid-area: 1 / 7 / 6 / 13; }.map-港股 { grid-area: 5 / 1 / 9 / 4; }.map-大宗-宏观 { grid-area: 5 / 4 / 9 / 7; }.map-加密 { grid-area: 6 / 7 / 9 / 13; }
+.map-美股 { grid-area: 1 / 1 / 5 / 7; }.map-A股 { grid-area: 1 / 7 / 6 / 13; }.map-港股 { grid-area: 5 / 4 / 9 / 7; }.map-大宗-宏观 { grid-area: 5 / 1 / 9 / 4; }.map-加密 { grid-area: 6 / 7 / 9 / 13; }
 .view-crypto7 .map-美股 { grid-area: 1 / 1 / 9 / 8; }.view-crypto7 .map-加密 { grid-area: 1 / 8 / 9 / 13; }
 .view-usSelected .map-美股 { grid-area: 1 / 1 / 9 / 11; }.view-usSelected .map-大宗-宏观 { grid-area: 1 / 11 / 9 / 13; }
 .view-chinaIndices .map-A股 { grid-area: 1 / 1 / 9 / 13; }
