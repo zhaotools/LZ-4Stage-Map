@@ -33,7 +33,7 @@ test("renders the real-data trend map", async () => {
   assert.match(html, /全球市场阶段地图/);
   assert.match(html, /阶段分布/);
   assert.match(html, /<span>全球指数<\/span>/);
-  assert.match(html, /<span>加密指数<\/span>/);
+  assert.match(html, /<span>加密市场<\/span>/);
   assert.match(html, /<span>美股指数<\/span>/);
   assert.match(html, /<span>港股指数<\/span>/);
   assert.match(html, /<span>A股指数<\/span>/);

@@ -12,7 +12,7 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.ok(["all", "traditional", "crypto"].includes(dashboard.updateScope));
   assert.match(dashboard.lastUpdatedAt.traditional, /^\d{4}-\d{2}-\d{2}T/);
   assert.match(dashboard.lastUpdatedAt.crypto, /^\d{4}-\d{2}-\d{2}T/);
-  assert.equal(dashboard.markets.length, 63);
+  assert.equal(dashboard.markets.length, 64);
   const globalCodes = dashboard.markets.filter((market) => market.collections.includes("global")).map((market) => market.code).sort();
   assert.deepEqual(globalCodes, ["000300.SH", "BTC-USD", "CL", "DXY", "ETH-USD", "GSPC.INDEX", "HSI", "HSTECH", "N225", "NDQ", "SOXX", "STOXX50E", "SZ399006", "US10Y", "VIX", "XAU"]);
   assert.ok(dashboard.markets.find((market) => market.code === "ETH-USD")?.collections.includes("global"));
@@ -24,7 +24,8 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.equal(us10y?.region, "大宗·宏观");
   assert.ok(us10y?.collections.includes("global"));
   const crypto7Codes = dashboard.markets.filter((market) => market.collections.includes("crypto7")).map((market) => market.code).sort();
-  assert.deepEqual(crypto7Codes, ["BTC-USD", "COIN", "CRCL", "ETH-USD", "HOOD", "HYPE-USD", "MSTR"]);
+  assert.deepEqual(crypto7Codes, ["BTC-USD", "COIN", "CRCL", "ETH-USD", "HOOD", "HYPE-USD", "MSTR", "SOL-USD"]);
+  assert.equal(dashboard.markets.find((market) => market.code === "SOL-USD")?.providerSymbol, "SOLUSDT");
   const usSelectedCodes = dashboard.markets.filter((market) => market.collections.includes("usSelected")).map((market) => market.code).sort();
   assert.deepEqual(usSelectedCodes, ["AAPL", "AMZN", "BRK.B", "DXY", "GOOG", "GSPC.INDEX", "IWM", "JPM", "META", "MSFT", "NDQ", "NVDA", "SOXX", "TSLA", "US10Y", "VIX", "WMT", "XLE", "XLF", "XLV"]);
   assert.equal(dashboard.markets.filter((market) => market.collections.includes("usSelected") && market.region === "美股").length, 18);
