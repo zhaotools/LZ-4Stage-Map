@@ -12,9 +12,12 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.ok(["all", "traditional", "crypto"].includes(dashboard.updateScope));
   assert.match(dashboard.lastUpdatedAt.traditional, /^\d{4}-\d{2}-\d{2}T/);
   assert.match(dashboard.lastUpdatedAt.crypto, /^\d{4}-\d{2}-\d{2}T/);
-  assert.equal(dashboard.markets.length, 64);
-  assert.equal(dashboard.markets.filter((market) => market.collections.includes("global")).length, 16);
+  assert.equal(dashboard.markets.length, 63);
+  const globalCodes = dashboard.markets.filter((market) => market.collections.includes("global")).map((market) => market.code).sort();
+  assert.deepEqual(globalCodes, ["000300.SH", "BTC-USD", "CL", "DXY", "ETH-USD", "GSPC.INDEX", "HSI", "HSTECH", "N225", "NDQ", "SOXX", "STOXX50E", "SZ399006", "US10Y", "VIX", "XAU"]);
   assert.ok(dashboard.markets.find((market) => market.code === "ETH-USD")?.collections.includes("global"));
+  assert.equal(dashboard.markets.find((market) => market.code === "N225")?.providerSymbol, "^N225");
+  assert.equal(dashboard.markets.find((market) => market.code === "STOXX50E")?.providerSymbol, "^STOXX50E");
   const us10y = dashboard.markets.find((market) => market.code === "US10Y");
   assert.equal(us10y?.providerSymbol, "^TNX");
   assert.equal(us10y?.source, "Yahoo Finance");

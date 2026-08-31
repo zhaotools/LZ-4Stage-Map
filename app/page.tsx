@@ -19,7 +19,7 @@ import {
 import dashboardData from "@/data/dashboard.json";
 type Stage = "S1" | "S2" | "S3" | "S4";
 type View = "global" | "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
-type Region = "全球" | "美股" | "A股" | "港股" | "大宗·宏观" | "加密";
+type Region = "全球" | "美股" | "A股" | "港股" | "日股" | "欧股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
 
 type Market = {
@@ -55,15 +55,19 @@ async function hashText(value: string) {
 
 const displayMeta: Record<string, { shortCode: string; cols: number; rows: number }> = {
   "GSPC.INDEX": { shortCode: "SPX", cols: 3, rows: 2 },
-  "IXIC.INDEX": { shortCode: "NASDAQ", cols: 3, rows: 2 },
-  SOXX: { shortCode: "SOXX", cols: 4, rows: 2 },
-  VIX: { shortCode: "VIX", cols: 2, rows: 2 },
+  NDQ: { shortCode: "NDX", cols: 3, rows: 2 },
+  SOXX: { shortCode: "SOXX", cols: 3, rows: 2 },
+  VIX: { shortCode: "VIX", cols: 3, rows: 2 },
   SH000001: { shortCode: "000001", cols: 3, rows: 2 },
   "510300.SH": { shortCode: "沪深300", cols: 3, rows: 2 },
   "510500.SH": { shortCode: "中证500", cols: 2, rows: 2 },
-  SZ399006: { shortCode: "创业板", cols: 2, rows: 2 },
+  "000300.SH": { shortCode: "000300", cols: 6, rows: 2 },
+  SZ399006: { shortCode: "399006", cols: 6, rows: 2 },
   "000688.SH": { shortCode: "科创50", cols: 2, rows: 2 },
-  HSTECH: { shortCode: "HSTECH", cols: 6, rows: 4 },
+  HSI: { shortCode: "HSI", cols: 6, rows: 2 },
+  HSTECH: { shortCode: "HSTECH", cols: 6, rows: 2 },
+  N225: { shortCode: "N225", cols: 6, rows: 4 },
+  STOXX50E: { shortCode: "STOXX50", cols: 6, rows: 4 },
   DXY: { shortCode: "DXY", cols: 3, rows: 2 },
   US10Y: { shortCode: "US10Y", cols: 3, rows: 2 },
   CL: { shortCode: "OIL", cols: 3, rows: 2 },
@@ -98,8 +102,8 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
   S4: { title: "下降阶段", season: "冬", color: "#ed4859", dark: "#bd2638" },
 };
 
-const regions: Region[] = ["全球", "美股", "A股", "港股", "大宗·宏观", "加密"];
-const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "大宗·宏观", "加密"];
+const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
+const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { eyebrow: "GLOBAL INDEX STAGES", subtitle: "全球指数趋势看板", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
   crypto7: { eyebrow: "CRYPTO BLUE CHIP STAGES", subtitle: "加密蓝筹阶段看板", mapTitle: "加密蓝筹阶段地图", regions: ["全球", "美股", "加密"], groups: ["美股", "加密"] },
@@ -108,6 +112,7 @@ const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: stri
   hkSelected: { eyebrow: "HONG KONG SELECTED STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股精选阶段地图", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
+  global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
   usSelected: ["GSPC.INDEX", "NDQ", "IWM", "SOXX", "VIX"],
   chinaIndices: ["SH000001", "000016.SH", "000300.SH", "000905.SH", "SZ399006", "000688.SH", "931865.CSI", "399967.SZ", "399976.SZ", "931151.CSI", "399986.SZ", "399975.SZ", "930708.CSI", "399998.SZ", "399997.SZ", "399933.SZ"],
   hkSelected: ["HSI", "HSTECH", "HSCEI", "700.HK", "9988.HK", "5.HK", "939.HK", "941.HK", "1299.HK", "388.HK", "1810.HK", "3690.HK", "2318.HK", "1211.HK", "883.HK", "9618.HK"],

@@ -15,6 +15,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /美股精选阶段地图/);
   assert.match(pageSource, /A股指数阶段地图/);
   assert.match(pageSource, /港股精选阶段地图/);
+  assert.match(pageSource, /"日股" \| "欧股"/);
+  assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
   assert.match(pageSource, /usSelected: \["GSPC\.INDEX", "NDQ", "IWM", "SOXX", "VIX"\]/);
   assert.match(pageSource, /chinaIndices: \["SH000001", "000016\.SH", "000300\.SH", "000905\.SH"/);
   assert.match(pageSource, /hkSelected: \["HSI", "HSTECH", "HSCEI", "700\.HK"/);
@@ -32,6 +34,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /style=\{\{ width: `\$\{percent\}%`/);
   assert.match(cssSource, /\.distribution-segment \{[^}]*flex: 1 1 0;/);
   assert.match(cssSource, /\.distribution-fill \{[^}]*inset: 0 0 0 auto;/);
-  assert.match(cssSource, /\.map-大宗-宏观 \{ grid-area: 5 \/ 4 \/ 9 \/ 7; \}/);
-  assert.match(cssSource, /\.map-加密 \{ grid-area: 6 \/ 7 \/ 9 \/ 13; \}/);
+  assert.match(cssSource, /\.map-大宗-宏观 \{ grid-area: 5 \/ 1 \/ 9 \/ 5; \}/);
+  assert.match(cssSource, /\.map-加密 \{ grid-area: 5 \/ 5 \/ 9 \/ 8; \}/);
+  assert.match(cssSource, /\.map-日股 \{ grid-area: 5 \/ 8 \/ 9 \/ 10; \}/);
+  assert.match(cssSource, /\.map-欧股 \{ grid-area: 5 \/ 10 \/ 9 \/ 13; \}/);
 });
