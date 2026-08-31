@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-08-31T23:02:35.018Z",
+  "generatedAt": "2026-08-31T23:36:17.935Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-08-31T23:02:35.018Z",
-    "crypto": "2026-08-31T23:02:35.018Z"
+    "traditional": "2026-08-31T23:36:17.935Z",
+    "crypto": "2026-08-31T23:36:17.935Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-24",
@@ -102,7 +102,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S1",
@@ -130,7 +130,7 @@
         "global",
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S2",
@@ -157,7 +157,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S2",
@@ -335,7 +335,7 @@
       "momentum": 4.62,
       "distance": -2.62,
       "confidence": 68,
-      "close": 86.2300033569336,
+      "close": 86.4000015258789,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -362,7 +362,7 @@
       "momentum": -0.88,
       "distance": -1.6,
       "confidence": 84,
-      "close": 4495.60009765625,
+      "close": 4492.7001953125,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -390,7 +390,7 @@
       "momentum": -4.28,
       "distance": 11.89,
       "confidence": 35,
-      "close": 78502,
+      "close": 78563.99,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -418,7 +418,7 @@
       "momentum": -6.31,
       "distance": 19.57,
       "confidence": 35,
-      "close": 2466.15,
+      "close": 2466.6,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -445,7 +445,7 @@
       "momentum": -7.84,
       "distance": 23.93,
       "confidence": 35,
-      "close": 103.02,
+      "close": 103.1,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -469,12 +469,12 @@
       "observationStage": "S2",
       "observation": "正常推进",
       "signal": "稳定",
-      "momentum": 14.86,
-      "distance": 58.47,
+      "momentum": 15.05,
+      "distance": 63.12,
       "confidence": 95,
-      "close": 84.2699966430664,
+      "close": 84.16000366210938,
       "marketAsOf": "2026-08-31",
-      "stageAsOf": "2026-08-28",
+      "stageAsOf": "2026-08-29",
       "hasProvisionalBar": true
     },
     {
@@ -641,6 +641,33 @@
       "hasProvisionalBar": true
     },
     {
+      "code": "RSP",
+      "providerSymbol": "RSP",
+      "name": "Invesco标普500等权ETF",
+      "region": "美股",
+      "exchange": "NYSEARCA",
+      "collections": [
+        "usSelected"
+      ],
+      "source": "Yahoo Finance",
+      "dataStatus": "live",
+      "dataWarning": null,
+      "stage": "S2",
+      "subStage": "S2",
+      "stageDetail": "正常推进",
+      "weeks": 14,
+      "observationStage": "S2",
+      "observation": "正常推进",
+      "signal": "稳定",
+      "momentum": 1.87,
+      "distance": 6.79,
+      "confidence": 95,
+      "close": 219.38999938964844,
+      "marketAsOf": "2026-08-31",
+      "stageAsOf": "2026-08-28",
+      "hasProvisionalBar": true
+    },
+    {
       "code": "XLF",
       "providerSymbol": "XLF",
       "name": "金融精选行业ETF",
@@ -717,6 +744,60 @@
       "distance": 10.43,
       "confidence": 95,
       "close": 170.5399932861328,
+      "marketAsOf": "2026-08-31",
+      "stageAsOf": "2026-08-28",
+      "hasProvisionalBar": true
+    },
+    {
+      "code": "XLI",
+      "providerSymbol": "XLI",
+      "name": "工业精选行业ETF",
+      "region": "美股",
+      "exchange": "NYSEARCA",
+      "collections": [
+        "usSelected"
+      ],
+      "source": "Yahoo Finance",
+      "dataStatus": "live",
+      "dataWarning": null,
+      "stage": "S2",
+      "subStage": "S2B-",
+      "stageDetail": "趋势减速",
+      "weeks": 67,
+      "observationStage": "S2B-",
+      "observation": "趋势减速",
+      "signal": "减速",
+      "momentum": 1.79,
+      "distance": 1.22,
+      "confidence": 95,
+      "close": 175.1300048828125,
+      "marketAsOf": "2026-08-31",
+      "stageAsOf": "2026-08-28",
+      "hasProvisionalBar": true
+    },
+    {
+      "code": "XLY",
+      "providerSymbol": "XLY",
+      "name": "可选消费精选行业ETF",
+      "region": "美股",
+      "exchange": "NYSEARCA",
+      "collections": [
+        "usSelected"
+      ],
+      "source": "Yahoo Finance",
+      "dataStatus": "live",
+      "dataWarning": null,
+      "stage": "S1",
+      "subStage": "S1",
+      "stageDetail": "筑底阶段",
+      "weeks": 13,
+      "observationStage": "S1",
+      "observation": "S1",
+      "signal": "稳定",
+      "momentum": -0.57,
+      "distance": 1.21,
+      "confidence": 84,
+      "close": 116.58999633789062,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -803,33 +884,6 @@
       "hasProvisionalBar": true
     },
     {
-      "code": "GOOG",
-      "providerSymbol": "GOOG",
-      "name": "Alphabet",
-      "region": "美股",
-      "exchange": "NASDAQ",
-      "collections": [
-        "usSelected"
-      ],
-      "source": "Yahoo Finance",
-      "dataStatus": "live",
-      "dataWarning": null,
-      "stage": "S3",
-      "subStage": "S3",
-      "stageDetail": "筑顶阶段",
-      "weeks": 1,
-      "observationStage": "S3",
-      "observation": "S3",
-      "signal": "稳定",
-      "momentum": 0.96,
-      "distance": 0.95,
-      "confidence": 95,
-      "close": 335.4100036621094,
-      "marketAsOf": "2026-08-31",
-      "stageAsOf": "2026-08-28",
-      "hasProvisionalBar": true
-    },
-    {
       "code": "AMZN",
       "providerSymbol": "AMZN",
       "name": "Amazon",
@@ -857,33 +911,6 @@
       "hasProvisionalBar": true
     },
     {
-      "code": "META",
-      "providerSymbol": "META",
-      "name": "Meta Platforms",
-      "region": "美股",
-      "exchange": "NASDAQ",
-      "collections": [
-        "usSelected"
-      ],
-      "source": "Yahoo Finance",
-      "dataStatus": "live",
-      "dataWarning": null,
-      "stage": "S4",
-      "subStage": "S4",
-      "stageDetail": "正常下降",
-      "weeks": 5,
-      "observationStage": "S4",
-      "observation": "正常下降",
-      "signal": "稳定",
-      "momentum": -2.31,
-      "distance": -5.11,
-      "confidence": 95,
-      "close": 572.3400268554688,
-      "marketAsOf": "2026-08-31",
-      "stageAsOf": "2026-08-28",
-      "hasProvisionalBar": true
-    },
-    {
       "code": "TSLA",
       "providerSymbol": "TSLA",
       "name": "Tesla",
@@ -906,33 +933,6 @@
       "distance": -9.15,
       "confidence": 95,
       "close": 367.95001220703125,
-      "marketAsOf": "2026-08-31",
-      "stageAsOf": "2026-08-28",
-      "hasProvisionalBar": true
-    },
-    {
-      "code": "JPM",
-      "providerSymbol": "JPM",
-      "name": "JPMorgan Chase",
-      "region": "美股",
-      "exchange": "NYSE",
-      "collections": [
-        "usSelected"
-      ],
-      "source": "Yahoo Finance",
-      "dataStatus": "live",
-      "dataWarning": null,
-      "stage": "S2",
-      "subStage": "S2",
-      "stageDetail": "正常推进",
-      "weeks": 9,
-      "observationStage": "S2",
-      "observation": "正常推进",
-      "signal": "稳定",
-      "momentum": 2.25,
-      "distance": 12.3,
-      "confidence": 95,
-      "close": 356.0199890136719,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -1406,7 +1406,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1434,7 +1434,7 @@
         "global",
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S3",
@@ -1461,7 +1461,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1488,7 +1488,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1515,7 +1515,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1543,8 +1543,8 @@
         "chinaIndices"
       ],
       "source": "东方财富 · 前复权",
-      "dataStatus": "cache",
-      "dataWarning": "fetch failed; curl: Command failed: curl -sS -L --fail --max-time 25 -A Mozilla/5.0 https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=2.931865&klt=101&fqt=1&lmt=1800&end=20500101&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf61\ncurl: (52) Empty reply from server\n",
+      "dataStatus": "live",
+      "dataWarning": null,
       "stage": "S2",
       "subStage": "S2B-",
       "stageDetail": "趋势减速",
@@ -1570,8 +1570,8 @@
         "chinaIndices"
       ],
       "source": "东方财富 · 前复权",
-      "dataStatus": "cache",
-      "dataWarning": "fetch failed; curl: Command failed: curl -sS -L --fail --max-time 25 -A Mozilla/5.0 https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=2.930651&klt=101&fqt=1&lmt=1800&end=20500101&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf61\ncurl: (52) Empty reply from server\n",
+      "dataStatus": "live",
+      "dataWarning": null,
       "stage": "S4",
       "subStage": "S4",
       "stageDetail": "下降减速",
@@ -1596,7 +1596,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S1",
@@ -1623,7 +1623,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1651,8 +1651,8 @@
         "chinaIndices"
       ],
       "source": "东方财富 · 前复权",
-      "dataStatus": "cache",
-      "dataWarning": "fetch failed; curl: Command failed: curl -sS -L --fail --max-time 25 -A Mozilla/5.0 https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=2.930708&klt=101&fqt=1&lmt=1800&end=20500101&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf61\ncurl: (52) Empty reply from server\n",
+      "dataStatus": "live",
+      "dataWarning": null,
       "stage": "S4",
       "subStage": "S4-",
       "stageDetail": "正常下降",
@@ -1677,7 +1677,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1704,7 +1704,7 @@
       "collections": [
         "chinaIndices"
       ],
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -1732,8 +1732,8 @@
         "chinaIndices"
       ],
       "source": "东方财富 · 前复权",
-      "dataStatus": "cache",
-      "dataWarning": "fetch failed; curl: Command failed: curl -sS -L --fail --max-time 25 -A Mozilla/5.0 https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=2.930997&klt=101&fqt=1&lmt=1800&end=20500101&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf61\ncurl: (52) Empty reply from server\n",
+      "dataStatus": "live",
+      "dataWarning": null,
       "stage": "S4",
       "subStage": "S4",
       "stageDetail": "正常下降",
