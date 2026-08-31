@@ -186,9 +186,17 @@ function displayConfirmationDate(market: Market) {
   return date.toISOString().slice(0, 10);
 }
 
+function momentumDirection(momentum: number) {
+  return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
+}
+
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
-  const maDirection = market.momentum >= 0 ? "上升" : "下降";
+  const maDirection = momentumDirection(market.momentum);
+  const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
+  const observationLabel = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
+  const observationStage = observationLabel.match(/^S[1-4]/)?.[0] as Stage | undefined;
+  const observationColor = observationStage ? stageMeta[observationStage].color : undefined;
   const stageConfirmedAt = new Date(`${market.stageAsOf}T00:00:00Z`);
   stageConfirmedAt.setUTCDate(stageConfirmedAt.getUTCDate() + 1 - (market.weeks - 1) * 7);
   const confirmationDate = stageConfirmedAt.toISOString().slice(0, 10);
@@ -198,8 +206,8 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
         <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationDate} 4AM UTC+8</dd></div>
-        <div><dt>本周观察</dt><dd>{market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage}</dd></div>
-        <div><dt>MA30趋势</dt><dd>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
+        <div><dt>本周观察</dt><dd style={{ color: observationColor }}>{observationLabel}</dd></div>
+        <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
       </dl>
     </div>
   );
@@ -223,7 +231,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
               key={item.code}
               className={`map-tile tile-${item.stage.toLowerCase()} ${faded ? "tile-faded" : ""}`}
               style={{ gridColumn: `span ${tileCols}`, gridRow: `span ${tileRows}` }}
-              aria-label={`${item.shortCode}，${item.name}，${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${item.momentum >= 0 ? "上升" : "下降"}${item.momentum.toFixed(2)}%`}
+              aria-label={`${item.shortCode}，${item.name}，${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onClick={(event) => onMarketTap(item, event.currentTarget)}
               onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
