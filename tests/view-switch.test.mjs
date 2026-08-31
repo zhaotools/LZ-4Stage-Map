@@ -49,6 +49,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(cssSource, /\.view-usSelected \.map-us-market \.map-tiles \{ grid-template-columns: repeat\(5,/);
   assert.match(cssSource, /\.view-usSelected \.map-us-sector \.map-tiles \{ grid-template-columns: repeat\(6,/);
   assert.match(cssSource, /\.view-usSelected \.map-us-leaders \.map-tiles \{ grid-template-columns: repeat\(7,/);
+  assert.match(cssSource, /\.view-usSelected\.single-map \.map-大宗-宏观 \.map-tiles \{ grid-template-columns: repeat\(2,/);
   assert.match(cssSource, /\.view-chinaIndices \.map-A股/);
   assert.match(cssSource, /\.view-hkSelected \.map-港股/);
   assert.match(cssSource, /\.view-hkSelected \.map-港股 \.map-tiles \{ grid-template-columns: repeat\(4,/);
