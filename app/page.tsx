@@ -106,10 +106,10 @@ const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧�
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { eyebrow: "GLOBAL INDEX STAGES", subtitle: "全球指数趋势看板", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
-  crypto7: { eyebrow: "CRYPTO BLUE CHIP STAGES", subtitle: "加密蓝筹阶段看板", mapTitle: "加密指数阶段地图", regions: ["全球", "美股", "加密"], groups: ["美股", "加密"] },
-  usSelected: { eyebrow: "US SELECTED STAGES", subtitle: "美股精选阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  crypto7: { eyebrow: "CRYPTO INDEX STAGES", subtitle: "加密蓝筹阶段看板", mapTitle: "加密指数阶段地图", regions: ["全球", "美股", "加密"], groups: ["美股", "加密"] },
+  usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股精选阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数阶段地图", regions: ["全球", "A股"], groups: ["A股"] },
-  hkSelected: { eyebrow: "HONG KONG SELECTED STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数阶段地图", regions: ["全球", "港股"], groups: ["港股"] },
+  hkSelected: { eyebrow: "HONG KONG INDEX STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数阶段地图", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
