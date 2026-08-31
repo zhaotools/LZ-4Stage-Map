@@ -56,8 +56,16 @@ async function hashText(value: string) {
 const displayMeta: Record<string, { shortCode: string; cols: number; rows: number }> = {
   "GSPC.INDEX": { shortCode: "SPX", cols: 3, rows: 2 },
   NDQ: { shortCode: "NDX", cols: 3, rows: 2 },
+  RSP: { shortCode: "RSP", cols: 2, rows: 1 },
+  IWM: { shortCode: "IWM", cols: 2, rows: 1 },
   SOXX: { shortCode: "SOXX", cols: 3, rows: 2 },
   VIX: { shortCode: "VIX", cols: 3, rows: 2 },
+  XLF: { shortCode: "XLF", cols: 2, rows: 1 },
+  XLE: { shortCode: "XLE", cols: 2, rows: 1 },
+  XLV: { shortCode: "XLV", cols: 2, rows: 1 },
+  XLI: { shortCode: "XLI", cols: 2, rows: 1 },
+  XLY: { shortCode: "XLY", cols: 2, rows: 1 },
+  "BRK.B": { shortCode: "BRK", cols: 2, rows: 1 },
   "000510.SH": { shortCode: "000510", cols: 2, rows: 1 },
   "000300.SH": { shortCode: "000300", cols: 6, rows: 2 },
   "000905.SH": { shortCode: "000905", cols: 2, rows: 1 },
@@ -132,17 +140,23 @@ const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "�
 const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { eyebrow: "GLOBAL INDEX STAGES", subtitle: "全球指数趋势看板", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
   crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场阶段地图", regions: ["全球", "美股", "加密"], groups: ["美股", "加密"] },
-  usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股精选阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股指数阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数阶段地图", regions: ["全球", "A股"], groups: ["A股"] },
   hkSelected: { eyebrow: "HONG KONG INDEX STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数阶段地图", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
   crypto7: ["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"],
-  usSelected: ["GSPC.INDEX", "NDQ", "IWM", "SOXX", "VIX"],
+  usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
   chinaIndices: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000016.SH", "SZ399006", "000688.SH", "000985.SH", "931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"],
   hkSelected: ["HSI", "HSTECH", "700.HK", "9988.HK", "1810.HK", "3690.HK", "5.HK", "1299.HK", "388.HK", "939.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"],
 };
+const usMapGroups = [
+  { label: "MARKET｜市场", className: "map-us-market", codes: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX"] },
+  { label: "SECTOR｜行业", className: "map-us-sector", codes: ["SOXX", "XLF", "XLE", "XLV", "XLI", "XLY"] },
+  { label: "LEADERS｜核心资产", className: "map-us-leaders", codes: ["NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT"] },
+] as const;
+const usMacroCodes = ["DXY", "US10Y"];
 function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
 }
@@ -182,10 +196,10 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
   );
 }
 
-function MarketMapGroup({ group, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: MarketRegion; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, element: HTMLButtonElement) => void }) {
+function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, element: HTMLButtonElement) => void }) {
   if (!items.length) return null;
   return (
-    <section className={`map-group map-${group.replace("·", "-")} ${compact ? "map-group-full" : ""}`}>
+    <section className={`map-group ${className ?? `map-${group.replace("·", "-")}`} ${compact ? "map-group-full" : ""}`}>
       <header><strong>{group}</strong><span>{items.length} 个资产</span></header>
       <div className="map-tiles">
         {items.map((item) => {
@@ -221,6 +235,14 @@ function MarketMapGroup({ group, items, stageFilter, compact, dense, onMarketMov
 function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, element: HTMLButtonElement) => void }) {
   const groups = region === "全球" ? viewMeta[view].groups : [region as MarketRegion];
   const dense = view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
+  if (view === "usSelected" && region === "全球") {
+    return (
+      <div className="market-map view-usSelected">
+        {usMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+        <MarketMapGroup group="MACRO｜宏观" className="map-us-macro" items={source.filter((item) => usMacroCodes.includes(item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />
+      </div>
+    );
+  }
   return (
     <div className={`market-map view-${view} ${region !== "全球" ? "single-map" : ""}`}>
       {groups.map((group) => <MarketMapGroup key={group} group={group} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}

@@ -27,7 +27,7 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.deepEqual(crypto7Codes, ["BTC-USD", "COIN", "CRCL", "ETH-USD", "HOOD", "HYPE-USD", "MSTR", "SOL-USD"]);
   assert.equal(dashboard.markets.find((market) => market.code === "SOL-USD")?.providerSymbol, "SOLUSDT");
   const usSelectedCodes = dashboard.markets.filter((market) => market.collections.includes("usSelected")).map((market) => market.code).sort();
-  assert.deepEqual(usSelectedCodes, ["AAPL", "AMZN", "BRK.B", "DXY", "GOOG", "GSPC.INDEX", "IWM", "JPM", "META", "MSFT", "NDQ", "NVDA", "SOXX", "TSLA", "US10Y", "VIX", "WMT", "XLE", "XLF", "XLV"]);
+  assert.deepEqual(usSelectedCodes, ["AAPL", "AMZN", "BRK.B", "DXY", "GSPC.INDEX", "IWM", "MSFT", "NDQ", "NVDA", "RSP", "SOXX", "TSLA", "US10Y", "VIX", "WMT", "XLE", "XLF", "XLI", "XLV", "XLY"]);
   assert.equal(dashboard.markets.filter((market) => market.collections.includes("usSelected") && market.region === "美股").length, 18);
   const chinaIndexCodes = dashboard.markets.filter((market) => market.collections.includes("chinaIndices")).map((market) => market.code).sort();
   assert.deepEqual(chinaIndexCodes, ["000016.SH", "000300.SH", "000510.SH", "000688.SH", "000852.SH", "000905.SH", "000985.SH", "399933.SZ", "399975.SZ", "399986.SZ", "399997.SZ", "930651.CSI", "930708.CSI", "930997.CSI", "931865.CSI", "SZ399006"]);
