@@ -24,7 +24,10 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /"SOL-USD": \{ shortCode: "SOL", cols: 3, rows: 2 \}/);
   assert.doesNotMatch(pageSource, /item\.code === "BTC-USD" \? 6/);
   assert.match(pageSource, /usSelected: \["GSPC\.INDEX", "NDQ", "IWM", "SOXX", "VIX"\]/);
-  assert.match(pageSource, /chinaIndices: \["SH000001", "000016\.SH", "000300\.SH", "000905\.SH"/);
+  assert.match(pageSource, /chinaIndices: \["000510\.SH", "000300\.SH", "000905\.SH", "000852\.SH", "000016\.SH", "SZ399006", "000688\.SH", "000985\.SH", "931865\.CSI", "930651\.CSI", "399975\.SZ", "399986\.SZ", "930708\.CSI", "399933\.SZ", "399997\.SZ", "930997\.CSI"\]/);
+  assert.match(pageSource, /"931865\.CSI": \{ shortCode: "半导体"/);
+  assert.match(pageSource, /"930651\.CSI": \{ shortCode: "计算机"/);
+  assert.match(pageSource, /"930997\.CSI": \{ shortCode: "新能源车"/);
   assert.match(pageSource, /hkSelected: \["HSI", "HSTECH", "HSCEI", "700\.HK"/);
   assert.match(pageSource, /item\.collections\.includes\(view\)/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股/);

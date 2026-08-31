@@ -30,7 +30,10 @@ test("dashboard contains complete real weekly analysis", () => {
   assert.deepEqual(usSelectedCodes, ["AAPL", "AMZN", "BRK.B", "DXY", "GOOG", "GSPC.INDEX", "IWM", "JPM", "META", "MSFT", "NDQ", "NVDA", "SOXX", "TSLA", "US10Y", "VIX", "WMT", "XLE", "XLF", "XLV"]);
   assert.equal(dashboard.markets.filter((market) => market.collections.includes("usSelected") && market.region === "美股").length, 18);
   const chinaIndexCodes = dashboard.markets.filter((market) => market.collections.includes("chinaIndices")).map((market) => market.code).sort();
-  assert.deepEqual(chinaIndexCodes, ["000016.SH", "000300.SH", "000688.SH", "000905.SH", "399933.SZ", "399967.SZ", "399975.SZ", "399976.SZ", "399986.SZ", "399997.SZ", "399998.SZ", "930708.CSI", "931151.CSI", "931865.CSI", "SH000001", "SZ399006"]);
+  assert.deepEqual(chinaIndexCodes, ["000016.SH", "000300.SH", "000510.SH", "000688.SH", "000852.SH", "000905.SH", "000985.SH", "399933.SZ", "399975.SZ", "399986.SZ", "399997.SZ", "930651.CSI", "930708.CSI", "930997.CSI", "931865.CSI", "SZ399006"]);
+  assert.equal(dashboard.markets.find((market) => market.code === "000510.SH")?.providerSymbol, "000510.SH");
+  assert.equal(dashboard.markets.find((market) => market.code === "930651.CSI")?.providerSymbol, "930651.CSI");
+  assert.equal(dashboard.markets.find((market) => market.code === "930997.CSI")?.providerSymbol, "930997.CSI");
   const hkSelectedCodes = dashboard.markets.filter((market) => market.collections.includes("hkSelected")).map((market) => market.code).sort();
   assert.deepEqual(hkSelectedCodes, ["1211.HK", "1299.HK", "1810.HK", "2318.HK", "3690.HK", "388.HK", "5.HK", "700.HK", "883.HK", "939.HK", "941.HK", "9618.HK", "9988.HK", "HSCEI", "HSI", "HSTECH"]);
   for (const market of dashboard.markets) {
