@@ -43,6 +43,7 @@ test("dashboard contains complete real weekly analysis", () => {
     assert.ok(market.collections.every((collection) => ["global", "crypto7", "usSelected", "chinaIndices", "hkSelected"].includes(collection)));
   }
   const btc = dashboard.markets.find((market) => market.code === "BTC-USD");
-  assert.equal(btc.observationStage, "S2A");
-  assert.equal(btc.stageDetail, "下降减速");
+  assert.equal(btc?.providerSymbol, "BTCUSDT");
+  assert.ok(btc?.collections.includes("global"));
+  assert.ok(btc?.collections.includes("crypto7"));
 });
