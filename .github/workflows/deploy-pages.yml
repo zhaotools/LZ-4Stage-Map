@@ -20,6 +20,7 @@ jobs:
     env:
       VITE_SUPABASE_URL: https://zcvazhbmkalmfgedfpaz.supabase.co
       VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_jhykhNKqSydQN2iUDI9z_Q_p98Fafsv
+      VITE_TURNSTILE_SITE_KEY: 0x4AAAAAAEkJSSJBMDInU2Cg
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

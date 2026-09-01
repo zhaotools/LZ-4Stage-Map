@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, type PointerEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   BarChart3,
   Building2,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import dashboardData from "@/data/dashboard.json";
+import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import {
   getMemberProfile,
   getMemberSession,
@@ -59,6 +60,7 @@ type Market = {
 };
 
 const memberOnlyViews = new Set<MemberView>(["crypto7", "usSelected", "chinaIndices", "hkSelected"]);
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? "";
 
 function isMemberView(view: View): view is MemberView {
   return memberOnlyViews.has(view as MemberView);
@@ -310,6 +312,8 @@ export default function Home() {
   const [pendingView, setPendingView] = useState<View | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
   const [memberPassword, setMemberPassword] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [checkingCredentials, setCheckingCredentials] = useState(false);
   const [loadingMemberView, setLoadingMemberView] = useState<MemberView | null>(null);
@@ -322,6 +326,7 @@ export default function Home() {
   const [showFullVersion, setShowFullVersion] = useState(false);
   const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
   const memberDisplayName = memberProfile?.display_name || "会员";
+  const handleCaptchaToken = useCallback((token: string | null) => setCaptchaToken(token), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -404,19 +409,23 @@ export default function Home() {
 
     let profile: MemberProfile;
     try {
-      await signInMember(memberEmail, memberPassword);
+      await signInMember(memberEmail, memberPassword, captchaToken ?? undefined);
       profile = await getMemberProfile();
       if (!isProfileActive(profile)) {
         await signOutMember();
         setLoginError("会员账号尚未激活、已暂停或已到期，请联系管理员");
         setMemberPassword("");
+        setCaptchaToken(null);
+        setCaptchaResetKey((current) => current + 1);
         setCheckingCredentials(false);
         return;
       }
     } catch {
       await signOutMember().catch(() => undefined);
-      setLoginError("邮箱或密码错误，请重新输入");
+      setLoginError("邮箱、密码或安全验证错误，请重新输入");
       setMemberPassword("");
+      setCaptchaToken(null);
+      setCaptchaResetKey((current) => current + 1);
       setCheckingCredentials(false);
       return;
     }
@@ -435,6 +444,7 @@ export default function Home() {
     setMemberDialog(null);
     setMemberEmail("");
     setMemberPassword("");
+    setCaptchaToken(null);
     setPendingView(null);
     setCheckingCredentials(false);
   };
@@ -525,12 +535,15 @@ export default function Home() {
     setLoginError(null);
     setMemberEmail("");
     setMemberPassword("");
+    setCaptchaToken(null);
   };
   const openMemberLogin = () => {
     setPendingView(null);
     setLoginError(null);
     setMemberEmail("");
     setMemberPassword("");
+    setCaptchaToken(null);
+    setCaptchaResetKey((current) => current + 1);
     setMemberDialog("login");
     closeMarketCard();
   };
@@ -691,7 +704,8 @@ export default function Home() {
                     aria-describedby={loginError ? "access-error" : "access-note"}
                   />
                   {loginError && <span className="access-error" id="access-error" role="alert">{loginError}</span>}
-                  <button type="submit" disabled={!memberEmail.trim() || !memberPassword || checkingCredentials}>{checkingCredentials ? (loadingMemberView ? "正在加载会员数据…" : "正在登录…") : "登录并查看"}</button>
+                  {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} resetKey={captchaResetKey} onToken={handleCaptchaToken} />}
+                  <button type="submit" disabled={!memberEmail.trim() || !memberPassword || (Boolean(turnstileSiteKey) && !captchaToken) || checkingCredentials}>{checkingCredentials ? (loadingMemberView ? "正在加载会员数据…" : "正在登录…") : "登录并查看"}</button>
                 </form>
                 <small id="access-note">登录成功后，此浏览器将保持会员状态。</small>
               </>

@@ -30,7 +30,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /setMemberDialog\("login"\).*会员登录<\/button>/);
   assert.match(pageSource, /id="member-email"/);
   assert.match(pageSource, /id="member-password"/);
-  assert.match(pageSource, /await signInMember\(memberEmail, memberPassword\)/);
+  assert.match(pageSource, /await signInMember\(memberEmail, memberPassword, captchaToken \?\? undefined\)/);
+  assert.match(pageSource, /<TurnstileWidget siteKey=\{turnstileSiteKey\}/);
+  assert.match(pageSource, /Boolean\(turnstileSiteKey\) && !captchaToken/);
   assert.match(pageSource, /profile = await getMemberProfile\(\)/);
   assert.match(pageSource, /if \(!isProfileActive\(profile\)\)/);
   assert.match(pageSource, /getMemberSnapshot<DashboardMarket>\(nextView\)/);
