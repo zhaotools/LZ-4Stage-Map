@@ -139,7 +139,7 @@ const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧�
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { eyebrow: "GLOBAL INDEX STAGES", subtitle: "全球指数趋势看板", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
-  crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场阶段地图", regions: ["全球", "美股", "加密"], groups: ["美股", "加密"] },
+  crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场阶段地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
   usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股指数阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数阶段地图", regions: ["全球", "A股"], groups: ["A股"] },
   hkSelected: { eyebrow: "HONG KONG INDEX STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数阶段地图", regions: ["全球", "港股"], groups: ["港股"] },

@@ -46,8 +46,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /"2\.HK": \{ shortCode: "0002"/);
   assert.match(pageSource, /item\.collections\.includes\(view\)/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股/);
-  assert.match(cssSource, /\.view-crypto7 \.map-美股 \{ grid-area: 1 \/ 1 \/ 9 \/ 7; \}/);
-  assert.match(cssSource, /\.view-crypto7 \.map-加密 \{ grid-area: 1 \/ 7 \/ 9 \/ 13; \}/);
+  assert.match(pageSource, /crypto7: \{[^}]*groups: \["加密", "美股"\]/);
+  assert.match(cssSource, /\.view-crypto7 \.map-加密 \{ grid-area: 1 \/ 1 \/ 9 \/ 7; \}/);
+  assert.match(cssSource, /\.view-crypto7 \.map-美股 \{ grid-area: 1 \/ 7 \/ 9 \/ 13; \}/);
   assert.match(cssSource, /\.view-usSelected \.map-us-market \{ grid-area: 1 \/ 1 \/ 4 \/ 11; \}/);
   assert.match(cssSource, /\.view-usSelected \.map-us-sector \{ grid-area: 4 \/ 1 \/ 7 \/ 11; \}/);
   assert.match(cssSource, /\.view-usSelected \.map-us-leaders \{ grid-area: 7 \/ 1 \/ 10 \/ 11; \}/);
