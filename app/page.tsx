@@ -137,12 +137,12 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
 
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
-const viewMeta: Record<View, { mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
-  global: { mapTitle: "全球市场", regions, groups: marketRegions },
-  crypto7: { mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
-  usSelected: { mapTitle: "美股指数", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
-  chinaIndices: { mapTitle: "A股指数", regions: ["全球", "A股"], groups: ["A股"] },
-  hkSelected: { mapTitle: "港股指数", regions: ["全球", "港股"], groups: ["港股"] },
+const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
+  global: { mapKicker: "GLOBAL MARKET", mapTitle: "全球市场", regions, groups: marketRegions },
+  crypto7: { mapKicker: "CRYPTO MARKET", mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
+  usSelected: { mapKicker: "US INDEX", mapTitle: "美股指数", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  chinaIndices: { mapKicker: "CHINA INDEX", mapTitle: "A股指数", regions: ["全球", "A股"], groups: ["A股"] },
+  hkSelected: { mapKicker: "HONG KONG INDEX", mapTitle: "港股指数", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
@@ -443,7 +443,7 @@ export default function Home() {
 
           <section className="map-panel" id="stage-map">
             <div className="map-panel-head">
-              <div><span className="section-kicker">MARKET MAP</span><h2>{activeViewMeta.mapTitle}</h2><p>方块大小体现资产重要性，颜色代表当前所处阶段</p></div>
+              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>方块大小体现资产重要性，颜色代表当前所处阶段</p></div>
             </div>
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>

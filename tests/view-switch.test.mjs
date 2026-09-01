@@ -11,10 +11,12 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /switchView\("usSelected"\)/);
   assert.match(pageSource, /switchView\("chinaIndices"\)/);
   assert.match(pageSource, /switchView\("hkSelected"\)/);
-  assert.match(pageSource, /crypto7: \{ mapTitle: "加密市场"/);
-  assert.match(pageSource, /usSelected: \{ mapTitle: "美股指数"/);
-  assert.match(pageSource, /chinaIndices: \{ mapTitle: "A股指数"/);
-  assert.match(pageSource, /hkSelected: \{ mapTitle: "港股指数"/);
+  assert.match(pageSource, /global: \{ mapKicker: "GLOBAL MARKET", mapTitle: "全球市场"/);
+  assert.match(pageSource, /crypto7: \{ mapKicker: "CRYPTO MARKET", mapTitle: "加密市场"/);
+  assert.match(pageSource, /usSelected: \{ mapKicker: "US INDEX", mapTitle: "美股指数"/);
+  assert.match(pageSource, /chinaIndices: \{ mapKicker: "CHINA INDEX", mapTitle: "A股指数"/);
+  assert.match(pageSource, /hkSelected: \{ mapKicker: "HONG KONG INDEX", mapTitle: "港股指数"/);
+  assert.match(pageSource, /\{activeViewMeta\.mapKicker\}<\/span><h2>\{activeViewMeta\.mapTitle\}<\/h2>/);
   assert.match(pageSource, /"日股" \| "欧股"/);
   assert.match(pageSource, /GLOBAL TREND MAP/);
   assert.match(pageSource, /<h1>全球市场趋势地图<\/h1><p>Power by LZ-4Stage<\/p>/);
