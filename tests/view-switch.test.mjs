@@ -32,6 +32,11 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /id="member-username"/);
   assert.match(pageSource, /id="member-password"/);
   assert.match(pageSource, /usernameHash === ADMIN_USERNAME_HASH && passwordHash === ADMIN_PASSWORD_HASH/);
+  assert.match(pageSource, /className="member-auth-button"[^\n]+openMemberLogin[^\n]+登录<\/button>/);
+  assert.match(pageSource, /className="member-username"[^\n]+admin<\/span>/);
+  assert.match(pageSource, /window\.localStorage\.removeItem\(MEMBER_STORAGE_KEY\)/);
+  assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
+  assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
   assert.doesNotMatch(pageSource, /"028528"/);
   assert.doesNotMatch(pageSource, /ACCESS_STORAGE_KEY|ACCESS_PASSWORD_HASH|accessGranted/);
   assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
@@ -79,6 +84,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(cssSource, /\.side-nav \{ display: none; \}\.mobile-view-nav \{[^}]*display: flex;/);
   assert.match(cssSource, /\.mobile-view-nav button\.active \{ background: #2e68df; color: #fff;/);
   assert.match(cssSource, /\.nav-label \{ display: inline-flex;/);
+  assert.match(cssSource, /\.member-auth-button \{ height: 36px;/);
+  assert.match(cssSource, /\.member-account \{ min-height: 36px;/);
   assert.doesNotMatch(cssSource, /\.app-shell\.access-locked/);
   assert.match(pageSource, /crypto7: \{[^}]*groups: \["加密", "美股"\]/);
   assert.match(cssSource, /\.view-crypto7 \.map-加密 \{ grid-area: 1 \/ 1 \/ 9 \/ 7; \}/);

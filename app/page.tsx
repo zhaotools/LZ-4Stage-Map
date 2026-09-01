@@ -10,9 +10,11 @@ import {
   Grid2X2,
   Landmark,
   LockKeyhole,
+  LogOut,
   MousePointerClick,
   RefreshCw,
   TrendingUp,
+  UserRound,
   X,
 } from "lucide-react";
 
@@ -428,6 +430,20 @@ export default function Home() {
     setUsername("");
     setMemberPassword("");
   };
+  const openMemberLogin = () => {
+    setPendingView(null);
+    setLoginError(false);
+    setUsername("");
+    setMemberPassword("");
+    setMemberDialog("login");
+    closeMarketCard();
+  };
+  const handleMemberLogout = () => {
+    window.localStorage.removeItem(MEMBER_STORAGE_KEY);
+    setIsMember(false);
+    closeMemberDialog();
+    switchView("global");
+  };
   const activeViewMeta = viewMeta[view];
 
   return (
@@ -461,6 +477,14 @@ export default function Home() {
               <span className="confirmation-date"><CalendarDays size={16} />共同确认至 {commonConfirmationDate}</span>
               <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(dashboardData.generatedAt)}</strong></span></div>
               <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
+              {isMember ? (
+                <div className="member-account" aria-label="当前会员账号">
+                  <span className="member-username"><UserRound size={14} />admin</span>
+                  <button className="member-auth-button logout" type="button" onClick={handleMemberLogout}><LogOut size={14} />退出</button>
+                </div>
+              ) : (
+                <button className="member-auth-button" type="button" onClick={openMemberLogin}><UserRound size={14} />登录</button>
+              )}
             </div>
           </header>
 
