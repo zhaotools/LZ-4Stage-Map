@@ -30,9 +30,9 @@ test("renders the real-data trend map", async () => {
   assert.match(html, /全球指数趋势地图/);
   assert.match(html, /点击获取完整LZ-4Stage/);
   assert.match(html, /全球主要市场趋势看版(?:<!-- -->)? · Power by LZ-4Stage/);
-  assert.match(html, /全球市场阶段地图/);
+  assert.match(html, /全球市场趋势地图/);
   assert.match(html, /阶段分布/);
-  assert.match(html, /<span>全球指数<\/span>/);
+  assert.match(html, /<span>全球市场<\/span>/);
   assert.match(html, /<span>加密市场<\/span>/);
   assert.match(html, /<span>美股指数<\/span>/);
   assert.match(html, /<span>港股指数<\/span>/);

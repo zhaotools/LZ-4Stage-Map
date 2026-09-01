@@ -11,10 +11,10 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /switchView\("usSelected"\)/);
   assert.match(pageSource, /switchView\("chinaIndices"\)/);
   assert.match(pageSource, /switchView\("hkSelected"\)/);
-  assert.match(pageSource, /加密市场阶段地图/);
-  assert.match(pageSource, /美股指数阶段地图/);
-  assert.match(pageSource, /A股指数阶段地图/);
-  assert.match(pageSource, /港股指数阶段地图/);
+  assert.match(pageSource, /加密市场趋势地图/);
+  assert.match(pageSource, /美股指数趋势地图/);
+  assert.match(pageSource, /A股指数趋势地图/);
+  assert.match(pageSource, /港股指数趋势地图/);
   assert.match(pageSource, /CRYPTO MARKEET STAGES/);
   assert.match(pageSource, /US INDEX STAGES/);
   assert.match(pageSource, /HONG KONG INDEX STAGES/);

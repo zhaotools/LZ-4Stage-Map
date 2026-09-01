@@ -138,11 +138,11 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
-  global: { eyebrow: "GLOBAL INDEX STAGES MAP", subtitle: "全球主要市场趋势看版", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
-  crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场阶段地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
-  usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股指数阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
-  chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数阶段地图", regions: ["全球", "A股"], groups: ["A股"] },
-  hkSelected: { eyebrow: "HONG KONG INDEX STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数阶段地图", regions: ["全球", "港股"], groups: ["港股"] },
+  global: { eyebrow: "GLOBAL INDEX STAGES MAP", subtitle: "全球主要市场趋势看版", mapTitle: "全球市场趋势地图", regions, groups: marketRegions },
+  crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场趋势地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
+  usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股指数阶段看板", mapTitle: "美股指数趋势地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数趋势地图", regions: ["全球", "A股"], groups: ["A股"] },
+  hkSelected: { eyebrow: "HONG KONG INDEX STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数趋势地图", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
@@ -391,7 +391,7 @@ export default function Home() {
         <aside className="sidebar">
           <div className="brand"><div className="brand-mark">LZ</div><div><strong>LZ-4Stage</strong><small>MARKET TOOLKIT</small></div></div>
           <nav className="side-nav" aria-label="主要导航">
-            <button className={`nav-item ${view === "global" ? "active" : ""}`} onClick={() => switchView("global")} aria-pressed={view === "global"}><Grid2X2 size={18} /><span>全球指数</span></button>
+            <button className={`nav-item ${view === "global" ? "active" : ""}`} onClick={() => switchView("global")} aria-pressed={view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
             <button className={`nav-item ${view === "crypto7" ? "active" : ""}`} onClick={() => switchView("crypto7")} aria-pressed={view === "crypto7"}><BarChart3 size={18} /><span>加密市场</span></button>
             <button className={`nav-item ${view === "usSelected" ? "active" : ""}`} onClick={() => switchView("usSelected")} aria-pressed={view === "usSelected"}><TrendingUp size={18} /><span>美股指数</span></button>
             <button className={`nav-item ${view === "chinaIndices" ? "active" : ""}`} onClick={() => switchView("chinaIndices")} aria-pressed={view === "chinaIndices"}><Landmark size={18} /><span>A股指数</span></button>
