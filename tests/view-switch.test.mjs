@@ -12,9 +12,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /switchView\("usSelected"\)/);
   assert.match(pageSource, /switchView\("chinaIndices"\)/);
   assert.match(pageSource, /switchView\("hkSelected"\)/);
-  assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo\.png`\}/);
+  assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
   assert.match(indexSource, /<title>LZ 4Stage Map｜全球市场趋势地图<\/title>/);
-  assert.match(indexSource, /href="\.\/favicon\.png"/);
+  assert.match(indexSource, /href="\.\/favicon-v2\.png"/);
   assert.match(pageSource, /global: \{ mapKicker: "GLOBAL MARKET", mapTitle: "全球市场"/);
   assert.match(pageSource, /crypto7: \{ mapKicker: "CRYPTO MARKET", mapTitle: "加密市场"/);
   assert.match(pageSource, /usSelected: \{ mapKicker: "US INDEX", mapTitle: "美股指数"/);
