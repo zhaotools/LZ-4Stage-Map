@@ -393,7 +393,7 @@ export default function Home() {
     <>
       <div className={`app-shell ${accessGranted ? "" : "access-locked"}`} aria-hidden={!accessGranted}>
         <aside className="sidebar">
-          <div className="brand"><div className="brand-mark">LZ</div><div><strong>LZ-4Stage</strong><small>MARKET TOOLKIT</small></div></div>
+          <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo.png`} alt="LZ" width="38" height="38" /><div><strong>LZ-4Stage</strong><small>MARKET TOOLKIT</small></div></div>
           <nav className="side-nav" aria-label="主要导航">
             <button className={`nav-item ${view === "global" ? "active" : ""}`} onClick={() => switchView("global")} aria-pressed={view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
             <button className={`nav-item ${view === "crypto7" ? "active" : ""}`} onClick={() => switchView("crypto7")} aria-pressed={view === "crypto7"}><BarChart3 size={18} /><span>加密市场</span></button>
