@@ -23,6 +23,7 @@
     "pages-site/**/*.ts",
     "pages-site/**/*.tsx",
     "vite.pages.config.ts",
+    "vite-env.d.ts",
     "**/*.mts"
   ],
   "exclude": ["node_modules"]
