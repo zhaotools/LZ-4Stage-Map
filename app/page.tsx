@@ -44,8 +44,10 @@ type Market = {
   rows: number;
 };
 
-const ACCESS_STORAGE_KEY = "lz-4stage-map-access-v1";
-const ACCESS_PASSWORD_HASH = "59301bd9d2f98ebd8ec731e34903d3cd1f4557954257680102b2e1b81ab7bf5d";
+const MEMBER_STORAGE_KEY = "lz-4stage-map-member-v1";
+const ADMIN_USERNAME_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+const ADMIN_PASSWORD_HASH = "59301bd9d2f98ebd8ec731e34903d3cd1f4557954257680102b2e1b81ab7bf5d";
+const memberOnlyViews = new Set<View>(["crypto7", "usSelected", "chinaIndices", "hkSelected"]);
 
 async function hashText(value: string) {
   const bytes = new TextEncoder().encode(value);
@@ -286,10 +288,13 @@ function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMar
 }
 
 export default function Home() {
-  const [accessGranted, setAccessGranted] = useState(() => typeof window !== "undefined" && window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted");
-  const [password, setPassword] = useState("");
+  const [isMember, setIsMember] = useState(() => typeof window !== "undefined" && window.localStorage.getItem(MEMBER_STORAGE_KEY) === "granted");
+  const [memberDialog, setMemberDialog] = useState<"locked" | "login" | null>(null);
+  const [pendingView, setPendingView] = useState<View | null>(null);
+  const [username, setUsername] = useState("");
+  const [memberPassword, setMemberPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
-  const [checkingPassword, setCheckingPassword] = useState(false);
+  const [checkingCredentials, setCheckingCredentials] = useState(false);
   const [view, setView] = useState<View>("global");
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
@@ -308,25 +313,44 @@ export default function Home() {
   }, [showFullVersion]);
 
   useEffect(() => {
-    if (accessGranted) return;
+    if (!memberDialog) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = previousOverflow; };
-  }, [accessGranted]);
+  }, [memberDialog]);
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!memberDialog) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMemberDialog(null);
+        setPendingView(null);
+        setLoginError(false);
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [memberDialog]);
+
+  const handleMemberLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setCheckingPassword(true);
-    const valid = await hashText(password) === ACCESS_PASSWORD_HASH;
-    setCheckingPassword(false);
+    setCheckingCredentials(true);
+    const [usernameHash, passwordHash] = await Promise.all([hashText(username.trim()), hashText(memberPassword)]);
+    const valid = usernameHash === ADMIN_USERNAME_HASH && passwordHash === ADMIN_PASSWORD_HASH;
+    setCheckingCredentials(false);
     if (!valid) {
       setLoginError(true);
-      setPassword("");
+      setMemberPassword("");
       return;
     }
-    window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
+    window.localStorage.setItem(MEMBER_STORAGE_KEY, "granted");
     setLoginError(false);
-    setAccessGranted(true);
+    setIsMember(true);
+    setMemberDialog(null);
+    setUsername("");
+    setMemberPassword("");
+    if (pendingView) switchView(pendingView);
+    setPendingView(null);
   };
 
   const activeUniverse = useMemo(() => {
@@ -387,26 +411,43 @@ export default function Home() {
     setStageFilter("全部");
     closeMarketCard();
   };
+  const requestView = (nextView: View) => {
+    if (!isMember && memberOnlyViews.has(nextView)) {
+      setPendingView(nextView);
+      setMemberDialog("locked");
+      setLoginError(false);
+      closeMarketCard();
+      return;
+    }
+    switchView(nextView);
+  };
+  const closeMemberDialog = () => {
+    setMemberDialog(null);
+    setPendingView(null);
+    setLoginError(false);
+    setUsername("");
+    setMemberPassword("");
+  };
   const activeViewMeta = viewMeta[view];
 
   return (
     <>
-      <div className={`app-shell ${accessGranted ? "" : "access-locked"}`} aria-hidden={!accessGranted}>
+      <div className="app-shell">
         <aside className="sidebar">
           <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="38" height="38" /><div><strong>LZ-4Stage</strong><small>MARKET TOOLKIT</small></div></div>
           <nav className="side-nav" aria-label="主要导航">
-            <button className={`nav-item ${view === "global" ? "active" : ""}`} onClick={() => switchView("global")} aria-pressed={view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
-            <button className={`nav-item ${view === "crypto7" ? "active" : ""}`} onClick={() => switchView("crypto7")} aria-pressed={view === "crypto7"}><BarChart3 size={18} /><span>加密市场</span></button>
-            <button className={`nav-item ${view === "usSelected" ? "active" : ""}`} onClick={() => switchView("usSelected")} aria-pressed={view === "usSelected"}><TrendingUp size={18} /><span>美股指数</span></button>
-            <button className={`nav-item ${view === "chinaIndices" ? "active" : ""}`} onClick={() => switchView("chinaIndices")} aria-pressed={view === "chinaIndices"}><Landmark size={18} /><span>A股指数</span></button>
-            <button className={`nav-item ${view === "hkSelected" ? "active" : ""}`} onClick={() => switchView("hkSelected")} aria-pressed={view === "hkSelected"}><Building2 size={18} /><span>港股指数</span></button>
+            <button className={`nav-item ${view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
+            <button className={`nav-item ${view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
+            <button className={`nav-item ${view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
+            <button className={`nav-item ${view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
+            <button className={`nav-item ${view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
           </nav>
           <nav className="mobile-view-nav" aria-label="手机端页面导航">
-            <button type="button" className={view === "global" ? "active" : ""} onClick={() => switchView("global")}>全球</button>
-            <button type="button" className={view === "crypto7" ? "active" : ""} onClick={() => switchView("crypto7")}>加密</button>
-            <button type="button" className={view === "usSelected" ? "active" : ""} onClick={() => switchView("usSelected")}>美股</button>
-            <button type="button" className={view === "chinaIndices" ? "active" : ""} onClick={() => switchView("chinaIndices")}>A股</button>
-            <button type="button" className={view === "hkSelected" ? "active" : ""} onClick={() => switchView("hkSelected")}>港股</button>
+            <button type="button" className={view === "global" ? "active" : ""} onClick={() => requestView("global")}>全球</button>
+            <button type="button" className={view === "crypto7" ? "active" : ""} onClick={() => requestView("crypto7")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>加密</span></button>
+            <button type="button" className={view === "usSelected" ? "active" : ""} onClick={() => requestView("usSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>美股</span></button>
+            <button type="button" className={view === "chinaIndices" ? "active" : ""} onClick={() => requestView("chinaIndices")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>A股</span></button>
+            <button type="button" className={view === "hkSelected" ? "active" : ""} onClick={() => requestView("hkSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>港股</span></button>
           </nav>
           <div className="sidebar-bottom"><span>数据周期</span><strong>{week.year} · W{String(week.week).padStart(2, "0")}</strong><small>仅作为市场观察工具</small></div>
         </aside>
@@ -475,30 +516,51 @@ export default function Home() {
           </div>
         )}
       </div>
-      {!accessGranted && (
-        <div className="access-gate-backdrop">
+      {memberDialog && (
+        <div className="access-gate-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeMemberDialog(); }}>
           <section className="access-gate" role="dialog" aria-modal="true" aria-labelledby="access-gate-title">
+            <button className="modal-close" type="button" aria-label="关闭会员窗口" onClick={closeMemberDialog}><X size={19} /></button>
             <div className="access-gate-icon"><LockKeyhole size={23} /></div>
-            <span className="access-gate-kicker">PRIVATE ACCESS</span>
-            <h2 id="access-gate-title">需要登录</h2>
-            <p>LZ 4Stage Map 为受限访问的市场观察工具，请输入访问密码后继续。</p>
-            <form onSubmit={handleLogin}>
-              <label htmlFor="access-password">访问密码</label>
-              <input
-                id="access-password"
-                type="password"
-                value={password}
-                onChange={(event) => { setPassword(event.target.value); setLoginError(false); }}
-                placeholder="请输入密码"
-                autoComplete="current-password"
-                autoFocus
-                aria-invalid={loginError}
-                aria-describedby={loginError ? "access-error" : "access-note"}
-              />
-              {loginError && <span className="access-error" id="access-error" role="alert">密码不正确，请重新输入</span>}
-              <button type="submit" disabled={!password || checkingPassword}>{checkingPassword ? "正在验证…" : "进入市场地图"}</button>
-            </form>
-            <small id="access-note">验证成功后，此浏览器将保持登录状态。</small>
+            <span className="access-gate-kicker">LZ MEMBER</span>
+            {memberDialog === "locked" ? (
+              <>
+                <h2 id="access-gate-title">LZ会员专享</h2>
+                <p>登录会员账号后查看完整市场趋势地图</p>
+                <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
+              </>
+            ) : (
+              <>
+                <h2 id="access-gate-title">会员登录</h2>
+                <p>请输入LZ会员账号和密码</p>
+                <form onSubmit={handleMemberLogin}>
+                  <label htmlFor="member-username">登录名</label>
+                  <input
+                    id="member-username"
+                    type="text"
+                    value={username}
+                    onChange={(event) => { setUsername(event.target.value); setLoginError(false); }}
+                    placeholder="请输入登录名"
+                    autoComplete="username"
+                    autoFocus
+                    aria-invalid={loginError}
+                  />
+                  <label htmlFor="member-password">密码</label>
+                  <input
+                    id="member-password"
+                    type="password"
+                    value={memberPassword}
+                    onChange={(event) => { setMemberPassword(event.target.value); setLoginError(false); }}
+                    placeholder="请输入密码"
+                    autoComplete="current-password"
+                    aria-invalid={loginError}
+                    aria-describedby={loginError ? "access-error" : "access-note"}
+                  />
+                  {loginError && <span className="access-error" id="access-error" role="alert">用户名或密码不正确，请重新输入</span>}
+                  <button type="submit" disabled={!username.trim() || !memberPassword || checkingCredentials}>{checkingCredentials ? "正在登录…" : "登录并查看"}</button>
+                </form>
+                <small id="access-note">登录成功后，此浏览器将保持会员状态。</small>
+              </>
+            )}
           </section>
         </div>
       )}
