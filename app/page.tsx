@@ -137,12 +137,12 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
 
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
-const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
-  global: { eyebrow: "GLOBAL INDEX STAGES MAP", subtitle: "全球主要市场趋势看版", mapTitle: "全球市场趋势地图", regions, groups: marketRegions },
-  crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场趋势地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
-  usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股指数阶段看板", mapTitle: "美股指数趋势地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
-  chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数趋势地图", regions: ["全球", "A股"], groups: ["A股"] },
-  hkSelected: { eyebrow: "HONG KONG INDEX STAGES", subtitle: "港股精选阶段看板", mapTitle: "港股指数趋势地图", regions: ["全球", "港股"], groups: ["港股"] },
+const viewMeta: Record<View, { mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
+  global: { mapTitle: "全球市场趋势地图", regions, groups: marketRegions },
+  crypto7: { mapTitle: "加密市场趋势地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
+  usSelected: { mapTitle: "美股指数趋势地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  chinaIndices: { mapTitle: "A股指数趋势地图", regions: ["全球", "A股"], groups: ["A股"] },
+  hkSelected: { mapTitle: "港股指数趋势地图", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
@@ -188,6 +188,10 @@ function displayConfirmationDate(market: Market) {
 
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
+}
+
+function displayRegionName(region: Region | MarketRegion) {
+  return region === "大宗·宏观" ? "宏观" : region;
 }
 
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
@@ -276,7 +280,7 @@ function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMar
   }
   return (
     <div className={`market-map view-${view} ${region !== "全球" ? "single-map" : ""}`}>
-      {groups.map((group) => <MarketMapGroup key={group} group={group} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+      {groups.map((group) => <MarketMapGroup key={group} group={displayRegionName(group)} className={`map-${group.replace("·", "-")}`} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
     </div>
   );
 }
@@ -402,7 +406,7 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> {activeViewMeta.eyebrow}</div><h1>全球指数趋势地图</h1><p>{activeViewMeta.subtitle} · Power by LZ-4Stage</p></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL TREND MAP</div><h1>全球市场趋势地图</h1><p>Power by LZ-4Stage</p></div>
             <div className="top-actions">
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>
@@ -413,7 +417,7 @@ export default function Home() {
           </header>
 
           <div className="filterbar">
-            <div className="region-tabs" role="group" aria-label="市场筛选">{activeViewMeta.regions.map((item) => <button key={item} className={region === item ? "active" : ""} onClick={() => setRegion(item)}>{view !== "global" && item === "全球" ? "全部" : item}</button>)}</div>
+            <div className="region-tabs" role="group" aria-label="市场筛选">{activeViewMeta.regions.map((item) => <button key={item} className={region === item ? "active" : ""} onClick={() => setRegion(item)}>{view !== "global" && item === "全球" ? "全部" : displayRegionName(item)}</button>)}</div>
             <section className="stage-distribution" aria-label="阶段分布筛选">
               <div className="distribution-bar">
               {(["S1", "S2", "S3", "S4"] as Stage[]).map((stage) => {
