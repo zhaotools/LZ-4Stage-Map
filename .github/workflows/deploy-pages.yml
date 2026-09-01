@@ -17,6 +17,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://zcvazhbmkalmfgedfpaz.supabase.co
+      VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_jhykhNKqSydQN2iUDI9z_Q_p98Fafsv
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

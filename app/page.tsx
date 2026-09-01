@@ -19,8 +19,20 @@ import {
 } from "lucide-react";
 
 import dashboardData from "@/data/dashboard.json";
+import {
+  getMemberProfile,
+  getMemberSession,
+  getMemberSnapshot,
+  isProfileActive,
+  signInMember,
+  signOutMember,
+  type MemberProfile,
+  type MemberSnapshot,
+  type MemberView,
+} from "@/app/lib/member-api";
+import { isSupabaseConfigured } from "@/app/lib/supabase";
 type Stage = "S1" | "S2" | "S3" | "S4";
-type View = "global" | "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
+type View = "global" | MemberView;
 type Region = "全球" | "美股" | "A股" | "港股" | "日股" | "欧股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
 
@@ -46,15 +58,10 @@ type Market = {
   rows: number;
 };
 
-const MEMBER_STORAGE_KEY = "lz-4stage-map-member-v1";
-const ADMIN_USERNAME_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-const ADMIN_PASSWORD_HASH = "59301bd9d2f98ebd8ec731e34903d3cd1f4557954257680102b2e1b81ab7bf5d";
-const memberOnlyViews = new Set<View>(["crypto7", "usSelected", "chinaIndices", "hkSelected"]);
+const memberOnlyViews = new Set<MemberView>(["crypto7", "usSelected", "chinaIndices", "hkSelected"]);
 
-async function hashText(value: string) {
-  const bytes = new TextEncoder().encode(value);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+function isMemberView(view: View): view is MemberView {
+  return memberOnlyViews.has(view as MemberView);
 }
 
 const displayMeta: Record<string, { shortCode: string; cols: number; rows: number }> = {
@@ -118,19 +125,25 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   MSTR: { shortCode: "MSTR", cols: 3, rows: 2 },
 };
 
-const markets = dashboardData.markets.map((item) => {
-  const defaultShortCode = item.code.replace(/^SZ/, "").replace(/\.[A-Z]+$/, "");
-  const meta = displayMeta[item.code] ?? { shortCode: defaultShortCode, cols: 2, rows: 1 };
-  return {
-    ...item,
-    stage: item.stage as Stage,
-    region: item.region as MarketRegion,
-    signal: item.signal as Market["signal"],
-    dataStatus: item.dataStatus as Market["dataStatus"],
-    collections: item.collections as View[],
-    ...meta,
-  };
-}) satisfies Market[];
+type DashboardMarket = (typeof dashboardData.markets)[number];
+
+function hydrateMarkets(items: DashboardMarket[]): Market[] {
+  return items.map((item) => {
+    const defaultShortCode = item.code.replace(/^SZ/, "").replace(/\.[A-Z]+$/, "");
+    const meta = displayMeta[item.code] ?? { shortCode: defaultShortCode, cols: 2, rows: 1 };
+    return {
+      ...item,
+      stage: item.stage as Stage,
+      region: item.region as MarketRegion,
+      signal: item.signal as Market["signal"],
+      dataStatus: item.dataStatus as Market["dataStatus"],
+      collections: item.collections as View[],
+      ...meta,
+    };
+  });
+}
+
+const publicMarkets = hydrateMarkets(dashboardData.markets.filter((item) => item.collections.includes("global")));
 
 const stageMeta: Record<Stage, { title: string; season: string; color: string; dark: string }> = {
   S1: { title: "筑底阶段", season: "春", color: "#397ff6", dark: "#1c5bd0" },
@@ -290,13 +303,16 @@ function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMar
 }
 
 export default function Home() {
-  const [isMember, setIsMember] = useState(() => typeof window !== "undefined" && window.localStorage.getItem(MEMBER_STORAGE_KEY) === "granted");
-  const [memberDialog, setMemberDialog] = useState<"locked" | "login" | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
+  const [memberSnapshots, setMemberSnapshots] = useState<Partial<Record<MemberView, MemberSnapshot<DashboardMarket>>>>({});
+  const [memberDialog, setMemberDialog] = useState<"locked" | "login" | "dataError" | null>(null);
   const [pendingView, setPendingView] = useState<View | null>(null);
-  const [username, setUsername] = useState("");
+  const [memberEmail, setMemberEmail] = useState("");
   const [memberPassword, setMemberPassword] = useState("");
-  const [loginError, setLoginError] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [checkingCredentials, setCheckingCredentials] = useState(false);
+  const [loadingMemberView, setLoadingMemberView] = useState<MemberView | null>(null);
   const [view, setView] = useState<View>("global");
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
@@ -304,6 +320,34 @@ export default function Home() {
   const [hoverPoint, setHoverPoint] = useState({ x: 0, y: 0 });
   const [touchCardOpen, setTouchCardOpen] = useState(false);
   const [showFullVersion, setShowFullVersion] = useState(false);
+  const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
+  const memberDisplayName = memberProfile?.display_name || "会员";
+
+  useEffect(() => {
+    let cancelled = false;
+    const restoreMember = async () => {
+      if (!isSupabaseConfigured) {
+        setAuthReady(true);
+        return;
+      }
+      try {
+        const session = await getMemberSession();
+        if (!session) return;
+        const profile = await getMemberProfile();
+        if (!isProfileActive(profile)) {
+          await signOutMember();
+          return;
+        }
+        if (!cancelled) setMemberProfile(profile);
+      } catch {
+        if (!cancelled) setMemberProfile(null);
+      } finally {
+        if (!cancelled) setAuthReady(true);
+      }
+    };
+    void restoreMember();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!showFullVersion) return;
@@ -327,41 +371,83 @@ export default function Home() {
       if (event.key === "Escape") {
         setMemberDialog(null);
         setPendingView(null);
-        setLoginError(false);
+        setLoginError(null);
       }
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [memberDialog]);
 
+  const loadMemberView = async (nextView: MemberView) => {
+    if (memberSnapshots[nextView]) return memberSnapshots[nextView];
+    setLoadingMemberView(nextView);
+    try {
+      const snapshot = await getMemberSnapshot<DashboardMarket>(nextView);
+      setMemberSnapshots((current) => ({ ...current, [nextView]: snapshot }));
+      return snapshot;
+    } catch {
+      return null;
+    } finally {
+      setLoadingMemberView(null);
+    }
+  };
+
   const handleMemberLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setCheckingCredentials(true);
-    const [usernameHash, passwordHash] = await Promise.all([hashText(username.trim()), hashText(memberPassword)]);
-    const valid = usernameHash === ADMIN_USERNAME_HASH && passwordHash === ADMIN_PASSWORD_HASH;
-    setCheckingCredentials(false);
-    if (!valid) {
-      setLoginError(true);
-      setMemberPassword("");
+    setLoginError(null);
+    if (!isSupabaseConfigured) {
+      setLoginError("会员服务尚未完成配置，请稍后再试");
+      setCheckingCredentials(false);
       return;
     }
-    window.localStorage.setItem(MEMBER_STORAGE_KEY, "granted");
-    setLoginError(false);
-    setIsMember(true);
+
+    let profile: MemberProfile;
+    try {
+      await signInMember(memberEmail, memberPassword);
+      profile = await getMemberProfile();
+      if (!isProfileActive(profile)) {
+        await signOutMember();
+        setLoginError("会员账号尚未激活、已暂停或已到期，请联系管理员");
+        setMemberPassword("");
+        setCheckingCredentials(false);
+        return;
+      }
+    } catch {
+      await signOutMember().catch(() => undefined);
+      setLoginError("邮箱或密码错误，请重新输入");
+      setMemberPassword("");
+      setCheckingCredentials(false);
+      return;
+    }
+
+    setMemberProfile(profile);
+    setAuthReady(true);
+    if (pendingView && isMemberView(pendingView)) {
+      const snapshot = await loadMemberView(pendingView);
+      if (!snapshot) {
+        setMemberDialog("dataError");
+        setCheckingCredentials(false);
+        return;
+      }
+      switchView(pendingView);
+    }
     setMemberDialog(null);
-    setUsername("");
+    setMemberEmail("");
     setMemberPassword("");
-    if (pendingView) switchView(pendingView);
     setPendingView(null);
+    setCheckingCredentials(false);
   };
 
   const activeUniverse = useMemo(() => {
-    const selected = markets.filter((item) => item.collections.includes(view));
+    const selected = view === "global"
+      ? publicMarkets
+      : hydrateMarkets(memberSnapshots[view]?.markets ?? []);
     const order = collectionOrder[view];
     if (!order) return selected;
     const positions = new Map(order.map((code, index) => [code, index]));
     return [...selected].sort((a, b) => (positions.get(a.code) ?? Number.MAX_SAFE_INTEGER) - (positions.get(b.code) ?? Number.MAX_SAFE_INTEGER));
-  }, [view]);
+  }, [memberSnapshots, view]);
   const regionData = useMemo(() => activeUniverse.filter((item) => region === "全球" || item.region === region), [activeUniverse, region]);
   const counts = useMemo(() => {
     const result: Record<Stage, number> = { S1: 0, S2: 0, S3: 0, S4: 0 };
@@ -370,6 +456,7 @@ export default function Home() {
   }, [regionData]);
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? dashboardData.commonStageAsOf;
   const commonConfirmationDate = activeUniverse.map(displayConfirmationDate).sort()[0] ?? commonStageAsOf;
+  const activeGeneratedAt = view === "global" ? dashboardData.generatedAt : memberSnapshots[view]?.generatedAt ?? dashboardData.generatedAt;
   const week = isoWeek(commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定").slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
@@ -413,36 +500,54 @@ export default function Home() {
     setStageFilter("全部");
     closeMarketCard();
   };
-  const requestView = (nextView: View) => {
-    if (!isMember && memberOnlyViews.has(nextView)) {
+  const requestView = async (nextView: View) => {
+    if (!isMember && isMemberView(nextView)) {
       setPendingView(nextView);
       setMemberDialog("locked");
-      setLoginError(false);
+      setLoginError(null);
       closeMarketCard();
       return;
+    }
+    if (isMemberView(nextView)) {
+      const snapshot = await loadMemberView(nextView);
+      if (!snapshot) {
+        setPendingView(nextView);
+        setMemberDialog("dataError");
+        closeMarketCard();
+        return;
+      }
     }
     switchView(nextView);
   };
   const closeMemberDialog = () => {
     setMemberDialog(null);
     setPendingView(null);
-    setLoginError(false);
-    setUsername("");
+    setLoginError(null);
+    setMemberEmail("");
     setMemberPassword("");
   };
   const openMemberLogin = () => {
     setPendingView(null);
-    setLoginError(false);
-    setUsername("");
+    setLoginError(null);
+    setMemberEmail("");
     setMemberPassword("");
     setMemberDialog("login");
     closeMarketCard();
   };
-  const handleMemberLogout = () => {
-    window.localStorage.removeItem(MEMBER_STORAGE_KEY);
-    setIsMember(false);
+  const handleMemberLogout = async () => {
+    await signOutMember().catch(() => undefined);
+    setMemberProfile(null);
+    setMemberSnapshots({});
     closeMemberDialog();
     switchView("global");
+  };
+  const retryMemberData = async () => {
+    if (!pendingView || !isMemberView(pendingView)) return;
+    const snapshot = await loadMemberView(pendingView);
+    if (!snapshot) return;
+    const nextView = pendingView;
+    closeMemberDialog();
+    switchView(nextView);
   };
   const activeViewMeta = viewMeta[view];
 
@@ -475,15 +580,15 @@ export default function Home() {
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>
               <span className="confirmation-date"><CalendarDays size={16} />共同确认至 {commonConfirmationDate}</span>
-              <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(dashboardData.generatedAt)}</strong></span></div>
+              <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(activeGeneratedAt)}</strong></span></div>
               <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
               {isMember ? (
                 <div className="member-account" aria-label="当前会员账号">
-                  <span className="member-username"><UserRound size={14} />admin</span>
+                  <span className="member-username"><UserRound size={14} />{memberDisplayName}</span>
                   <button className="member-auth-button logout" type="button" onClick={handleMemberLogout}><LogOut size={14} />退出</button>
                 </div>
               ) : (
-                <button className="member-auth-button" type="button" onClick={openMemberLogin}><UserRound size={14} />登录</button>
+                <button className="member-auth-button" type="button" onClick={openMemberLogin} disabled={!authReady}><UserRound size={14} />{authReady ? "登录" : "检查登录…"}</button>
               )}
             </div>
           </header>
@@ -552,35 +657,41 @@ export default function Home() {
                 <p>登录会员账号后查看完整市场趋势地图</p>
                 <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
               </>
+            ) : memberDialog === "dataError" ? (
+              <>
+                <h2 id="access-gate-title">会员数据暂时不可用</h2>
+                <p>登录状态有效，但市场快照未能加载，请稍后重试。</p>
+                <button className="member-login-cta" type="button" onClick={retryMemberData} disabled={Boolean(loadingMemberView)}>{loadingMemberView ? "正在重试…" : "重新加载"}</button>
+              </>
             ) : (
               <>
                 <h2 id="access-gate-title">会员登录</h2>
-                <p>请输入LZ会员账号和密码</p>
+                <p>请输入LZ会员邮箱和密码</p>
                 <form onSubmit={handleMemberLogin}>
-                  <label htmlFor="member-username">登录名</label>
+                  <label htmlFor="member-email">会员邮箱</label>
                   <input
-                    id="member-username"
-                    type="text"
-                    value={username}
-                    onChange={(event) => { setUsername(event.target.value); setLoginError(false); }}
-                    placeholder="请输入登录名"
+                    id="member-email"
+                    type="email"
+                    value={memberEmail}
+                    onChange={(event) => { setMemberEmail(event.target.value); setLoginError(null); }}
+                    placeholder="请输入会员邮箱"
                     autoComplete="username"
                     autoFocus
-                    aria-invalid={loginError}
+                    aria-invalid={Boolean(loginError)}
                   />
                   <label htmlFor="member-password">密码</label>
                   <input
                     id="member-password"
                     type="password"
                     value={memberPassword}
-                    onChange={(event) => { setMemberPassword(event.target.value); setLoginError(false); }}
+                    onChange={(event) => { setMemberPassword(event.target.value); setLoginError(null); }}
                     placeholder="请输入密码"
                     autoComplete="current-password"
-                    aria-invalid={loginError}
+                    aria-invalid={Boolean(loginError)}
                     aria-describedby={loginError ? "access-error" : "access-note"}
                   />
-                  {loginError && <span className="access-error" id="access-error" role="alert">用户名或密码不正确，请重新输入</span>}
-                  <button type="submit" disabled={!username.trim() || !memberPassword || checkingCredentials}>{checkingCredentials ? "正在登录…" : "登录并查看"}</button>
+                  {loginError && <span className="access-error" id="access-error" role="alert">{loginError}</span>}
+                  <button type="submit" disabled={!memberEmail.trim() || !memberPassword || checkingCredentials}>{checkingCredentials ? (loadingMemberView ? "正在加载会员数据…" : "正在登录…") : "登录并查看"}</button>
                 </form>
                 <small id="access-note">登录成功后，此浏览器将保持会员状态。</small>
               </>
