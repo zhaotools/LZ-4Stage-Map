@@ -138,11 +138,11 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
-  global: { mapTitle: "全球市场趋势地图", regions, groups: marketRegions },
-  crypto7: { mapTitle: "加密市场趋势地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
-  usSelected: { mapTitle: "美股指数趋势地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
-  chinaIndices: { mapTitle: "A股指数趋势地图", regions: ["全球", "A股"], groups: ["A股"] },
-  hkSelected: { mapTitle: "港股指数趋势地图", regions: ["全球", "港股"], groups: ["港股"] },
+  global: { mapTitle: "全球市场", regions, groups: marketRegions },
+  crypto7: { mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
+  usSelected: { mapTitle: "美股指数", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  chinaIndices: { mapTitle: "A股指数", regions: ["全球", "A股"], groups: ["A股"] },
+  hkSelected: { mapTitle: "港股指数", regions: ["全球", "港股"], groups: ["港股"] },
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],

@@ -28,10 +28,10 @@ test("renders the real-data trend map", async () => {
   );
   const html = await response.text();
   assert.match(html, /GLOBAL TREND MAP/);
-  assert.match(html, /全球市场趋势地图/);
+  assert.match(html, /<h1>全球市场趋势地图<\/h1>/);
   assert.match(html, /点击获取完整LZ-4Stage/);
   assert.match(html, /<p>Power by LZ-4Stage<\/p>/);
-  assert.match(html, /全球市场趋势地图/);
+  assert.match(html, /<h2>全球市场<\/h2>/);
   assert.match(html, />宏观<\/button>/);
   assert.match(html, /阶段分布/);
   assert.match(html, /<span>全球市场<\/span>/);
