@@ -470,7 +470,7 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL TREND MAP</div><h1>全球市场趋势地图</h1><p>Power by LZ-4Stage</p></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL TREND MAP｜Power by LZ-4Stage</div><h1>全球市场趋势地图</h1></div>
             <div className="top-actions">
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>

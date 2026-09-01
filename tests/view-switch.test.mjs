@@ -37,6 +37,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /window\.localStorage\.removeItem\(MEMBER_STORAGE_KEY\)/);
   assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
+  assert.match(pageSource, /GLOBAL TREND MAP｜Power by LZ-4Stage/);
+  assert.doesNotMatch(pageSource, /<p>Power by LZ-4Stage<\/p>/);
   assert.doesNotMatch(pageSource, /"028528"/);
   assert.doesNotMatch(pageSource, /ACCESS_STORAGE_KEY|ACCESS_PASSWORD_HASH|accessGranted/);
   assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
@@ -50,7 +52,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /\{activeViewMeta\.mapKicker\}<\/span><h2>\{activeViewMeta\.mapTitle\}<\/h2>/);
   assert.match(pageSource, /"日股" \| "欧股"/);
   assert.match(pageSource, /GLOBAL TREND MAP/);
-  assert.match(pageSource, /<h1>全球市场趋势地图<\/h1><p>Power by LZ-4Stage<\/p>/);
+  assert.match(pageSource, /<h1>全球市场趋势地图<\/h1>/);
   assert.doesNotMatch(pageSource, /activeViewMeta\.(?:eyebrow|subtitle)/);
   assert.match(pageSource, /return region === "大宗·宏观" \? "宏观" : region/);
   assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
@@ -86,6 +88,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(cssSource, /\.nav-label \{ display: inline-flex;/);
   assert.match(cssSource, /\.member-auth-button \{ height: 36px;/);
   assert.match(cssSource, /\.member-account \{ min-height: 36px;/);
+  assert.match(cssSource, /\.topbar \{ display: flex; justify-content: space-between; align-items: flex-start;/);
   assert.doesNotMatch(cssSource, /\.app-shell\.access-locked/);
   assert.match(pageSource, /crypto7: \{[^}]*groups: \["加密", "美股"\]/);
   assert.match(cssSource, /\.view-crypto7 \.map-加密 \{ grid-area: 1 \/ 1 \/ 9 \/ 7; \}/);
