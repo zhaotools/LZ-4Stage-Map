@@ -401,6 +401,13 @@ export default function Home() {
             <button className={`nav-item ${view === "chinaIndices" ? "active" : ""}`} onClick={() => switchView("chinaIndices")} aria-pressed={view === "chinaIndices"}><Landmark size={18} /><span>A股指数</span></button>
             <button className={`nav-item ${view === "hkSelected" ? "active" : ""}`} onClick={() => switchView("hkSelected")} aria-pressed={view === "hkSelected"}><Building2 size={18} /><span>港股指数</span></button>
           </nav>
+          <select className="mobile-view-select" value={view} onChange={(event) => switchView(event.target.value as View)} aria-label="选择市场页面">
+            <option value="global">全球市场</option>
+            <option value="crypto7">加密市场</option>
+            <option value="usSelected">美股指数</option>
+            <option value="chinaIndices">A股指数</option>
+            <option value="hkSelected">港股指数</option>
+          </select>
           <div className="sidebar-bottom"><span>数据周期</span><strong>{week.year} · W{String(week.week).padStart(2, "0")}</strong><small>仅作为市场观察工具</small></div>
         </aside>
 

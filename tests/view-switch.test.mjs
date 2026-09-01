@@ -12,6 +12,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /switchView\("usSelected"\)/);
   assert.match(pageSource, /switchView\("chinaIndices"\)/);
   assert.match(pageSource, /switchView\("hkSelected"\)/);
+  assert.match(pageSource, /className="mobile-view-select" value=\{view\} onChange=\{\(event\) => switchView\(event\.target\.value as View\)\}/);
+  assert.match(pageSource, /<option value="global">全球市场<\/option>/);
+  assert.match(pageSource, /<option value="hkSelected">港股指数<\/option>/);
   assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
   assert.match(indexSource, /<title>LZ 4Stage Map｜全球市场趋势地图<\/title>/);
   assert.match(indexSource, /href="\.\/favicon-v2\.png"/);
@@ -53,6 +56,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /"2\.HK": \{ shortCode: "0002"/);
   assert.match(pageSource, /item\.collections\.includes\(view\)/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股/);
+  assert.match(cssSource, /@media \(max-width: 780px\)/);
+  assert.match(cssSource, /\.side-nav \{ display: none; \}\.mobile-view-select \{ display: block;/);
   assert.match(pageSource, /crypto7: \{[^}]*groups: \["加密", "美股"\]/);
   assert.match(cssSource, /\.view-crypto7 \.map-加密 \{ grid-area: 1 \/ 1 \/ 9 \/ 7; \}/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股 \{ grid-area: 1 \/ 7 \/ 9 \/ 13; \}/);
