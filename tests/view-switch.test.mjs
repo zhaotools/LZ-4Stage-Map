@@ -19,6 +19,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /US INDEX STAGES/);
   assert.match(pageSource, /HONG KONG INDEX STAGES/);
   assert.match(pageSource, /"日股" \| "欧股"/);
+  assert.match(pageSource, /GLOBAL INDEX STAGES MAP/);
+  assert.match(pageSource, /全球指数趋势地图/);
+  assert.match(pageSource, /全球主要市场趋势看版/);
   assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
   assert.match(pageSource, /crypto7: \["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"\]/);
   assert.match(pageSource, /"SOL-USD": \{ shortCode: "SOL", cols: 3, rows: 2 \}/);

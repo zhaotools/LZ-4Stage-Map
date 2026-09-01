@@ -138,7 +138,7 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { eyebrow: string; subtitle: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
-  global: { eyebrow: "GLOBAL INDEX STAGES", subtitle: "全球指数趋势看板", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
+  global: { eyebrow: "GLOBAL INDEX STAGES MAP", subtitle: "全球主要市场趋势看版", mapTitle: "全球市场阶段地图", regions, groups: marketRegions },
   crypto7: { eyebrow: "CRYPTO MARKEET STAGES", subtitle: "加密市场阶段看板", mapTitle: "加密市场阶段地图", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
   usSelected: { eyebrow: "US INDEX STAGES", subtitle: "美股指数阶段看板", mapTitle: "美股指数阶段地图", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { eyebrow: "CHINA INDEX STAGES", subtitle: "A股指数阶段看板", mapTitle: "A股指数阶段地图", regions: ["全球", "A股"], groups: ["A股"] },
@@ -402,7 +402,7 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> {activeViewMeta.eyebrow}</div><h1>LZ 4Stage Map</h1><p>{activeViewMeta.subtitle} · Power by LZ-4Stage</p></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> {activeViewMeta.eyebrow}</div><h1>全球指数趋势地图</h1><p>{activeViewMeta.subtitle} · Power by LZ-4Stage</p></div>
             <div className="top-actions">
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>
