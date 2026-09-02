@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart3,
   Building2,
@@ -216,12 +216,17 @@ function displayRegionName(region: Region | MarketRegion) {
   return region === "大宗·宏观" ? "宏观" : region;
 }
 
+function observationStageFor(market: Market) {
+  const label = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
+  return label.match(/^S[1-4]/)?.[0] as Stage | undefined;
+}
+
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
   const maDirection = momentumDirection(market.momentum);
   const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
   const observationLabel = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
-  const observationStage = observationLabel.match(/^S[1-4]/)?.[0] as Stage | undefined;
+  const observationStage = observationStageFor(market);
   const observationColor = observationStage ? stageMeta[observationStage].color : undefined;
   const stageConfirmedAt = new Date(`${market.stageAsOf}T00:00:00Z`);
   stageConfirmedAt.setUTCDate(stageConfirmedAt.getUTCDate() + 1 - (market.weeks - 1) * 7);
@@ -247,6 +252,8 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
       <div className="map-tiles">
         {items.map((item) => {
           const faded = stageFilter !== "全部" && item.stage !== stageFilter;
+          const observationStage = observationStageFor(item);
+          const observationChanged = Boolean(observationStage && observationStage !== item.stage);
           const multiCryptoLayout = group === "加密" && items.length > 1;
           const tileCols = dense ? 1 : multiCryptoLayout
             ? 3
@@ -255,8 +262,12 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
           return (
             <button
               key={item.code}
-              className={`map-tile tile-${item.stage.toLowerCase()} ${faded ? "tile-faded" : ""}`}
-              style={{ gridColumn: `span ${tileCols}`, gridRow: `span ${tileRows}` }}
+              className={`map-tile tile-${item.stage.toLowerCase()} ${observationChanged ? "tile-observation-change" : ""} ${faded ? "tile-faded" : ""}`}
+              style={{
+                gridColumn: `span ${tileCols}`,
+                gridRow: `span ${tileRows}`,
+                ...(observationChanged && observationStage ? { "--observation-border": stageMeta[observationStage].color } : {}),
+              } as CSSProperties}
               aria-label={`${item.shortCode}，${item.name}，${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onClick={(event) => onMarketTap(item, event.currentTarget)}
@@ -717,7 +728,7 @@ export default function Home() {
 
           <section className="map-panel" id="stage-map">
             <div className="map-panel-head">
-              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>方块大小体现资产重要性，颜色代表当前所处阶段</p></div>
+              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>颜色代表当前所处阶段，外框代表本周观察变化</p></div>
             </div>
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
