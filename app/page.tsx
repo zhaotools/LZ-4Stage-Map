@@ -164,9 +164,9 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
   S4: { title: "下降阶段", season: "冬", color: "#ed4859", dark: "#bd2638" },
 };
 const radarRuleMeta: Record<TrendRadarRuleId, { label: string; description: string; color: string }> = {
-  s4Recovery: { label: "S4修复观察", description: "S4B- · 本周观察转向S2", color: "#8b5cf6" },
-  s2aEntry: { label: "进入S2A", description: "当前进入S2A阶段", color: "#397ff6" },
-  s2Early: { label: "S2早期阶段", description: "S2持续时间不超过4周", color: "#18a567" },
+  s4Recovery: { label: "转向S2观察", description: "S4B- / S4- / S4B / S3 · 本周观察转向S2", color: "#18a567" },
+  s2aEntry: { label: "进入S2A", description: "当前进入S2A阶段", color: "#18a567" },
+  s2Early: { label: "S2早期阶段", description: "S2持续时间不超过4周", color: "#087849" },
 };
 
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
@@ -238,6 +238,12 @@ function observationConfirmationFor(market: Market) {
   return progress ? `${progress}周确认` : null;
 }
 
+function stageConfirmationDateFor(market: Market) {
+  const confirmedAt = new Date(`${market.stageAsOf}T00:00:00Z`);
+  confirmedAt.setUTCDate(confirmedAt.getUTCDate() + 1 - (market.weeks - 1) * 7);
+  return confirmedAt.toISOString().slice(0, 10);
+}
+
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
   const maDirection = momentumDirection(market.momentum);
@@ -246,9 +252,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
   const observationStage = observationStageFor(market);
   const observationConfirmation = observationConfirmationFor(market);
   const observationColor = observationStage ? stageMeta[observationStage].color : undefined;
-  const stageConfirmedAt = new Date(`${market.stageAsOf}T00:00:00Z`);
-  stageConfirmedAt.setUTCDate(stageConfirmedAt.getUTCDate() + 1 - (market.weeks - 1) * 7);
-  const confirmationDate = stageConfirmedAt.toISOString().slice(0, 10);
+  const confirmationDate = stageConfirmationDateFor(market);
   return (
     <div className={`market-hover-card ${touchMode ? "touch-card" : ""}`} role={touchMode ? "dialog" : "tooltip"} aria-label={touchMode ? `${market.shortCode} 资产信息` : undefined} style={{ left: point.x, top: point.y }}>
       <div className="hover-card-title"><span style={{ background: stageMeta[market.stage].color }} />{market.shortCode} · {market.name}{touchMode && <button className="hover-close" type="button" aria-label="关闭资产阶段信息" onClick={onClose}><X size={17} /></button>}</div>
@@ -343,7 +347,6 @@ function TrendRadarPage({
   region,
   onFilterChange,
   onRegionChange,
-  onMarketTap,
 }: {
   snapshot: TrendRadarSnapshot<DashboardMarket>;
   markets: RadarMarket[];
@@ -351,7 +354,6 @@ function TrendRadarPage({
   region: "全部" | MarketRegion;
   onFilterChange: (filter: RadarFilter) => void;
   onRegionChange: (region: "全部" | MarketRegion) => void;
-  onMarketTap: (item: Market, element: HTMLButtonElement) => void;
 }) {
   const ruleIds = ["s4Recovery", "s2aEntry", "s2Early"] as TrendRadarRuleId[];
   const availableRegions = marketRegions.filter((item) => markets.some((market) => market.region === item));
@@ -371,7 +373,7 @@ function TrendRadarPage({
         {ruleIds.map((ruleId) => {
           const meta = radarRuleMeta[ruleId];
           return (
-            <button key={ruleId} type="button" className={`radar-rule-card ${filter === ruleId ? "selected" : ""}`} style={{ "--radar-rule-color": meta.color } as CSSProperties} onClick={() => onFilterChange(filter === ruleId ? "all" : ruleId)} aria-pressed={filter === ruleId}>
+            <button key={ruleId} type="button" className={`radar-rule-card radar-rule-${ruleId} ${filter === ruleId ? "selected" : ""}`} style={{ "--radar-rule-color": meta.color } as CSSProperties} onClick={() => onFilterChange(filter === ruleId ? "all" : ruleId)} aria-pressed={filter === ruleId}>
               <span>{meta.label}</span><strong>{snapshot.counts[ruleId]}</strong><small>{meta.description}</small>
             </button>
           );
@@ -400,10 +402,9 @@ function TrendRadarPage({
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>阶段时长</dt><dd>{market.weeks}周</dd></div>
+                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationDateFor(market)} 4AM UTC+8</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
-                <button className="radar-detail-button" type="button" onClick={(event) => onMarketTap(market, event.currentTarget)}>查看阶段详情</button>
               </article>
             );
           })}
@@ -863,7 +864,7 @@ export default function Home() {
           <nav className="mobile-tool-nav" aria-label="手机端会员工具"><button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>趋势雷达</span></button></nav>
 
           {radarActive && radarSnapshot ? (
-            <TrendRadarPage snapshot={radarSnapshot} markets={radarMarkets} filter={radarFilter} region={radarRegion} onFilterChange={setRadarFilter} onRegionChange={setRadarRegion} onMarketTap={handleMarketTap} />
+            <TrendRadarPage snapshot={radarSnapshot} markets={radarMarkets} filter={radarFilter} region={radarRegion} onFilterChange={setRadarFilter} onRegionChange={setRadarRegion} />
           ) : <>
           <div className="filterbar">
             <div className="region-tabs" role="group" aria-label="市场筛选">{activeViewMeta.regions.map((item) => <button key={item} className={region === item ? "active" : ""} onClick={() => setRegion(item)}>{view !== "global" && item === "全球" ? "全部" : displayRegionName(item)}</button>)}</div>

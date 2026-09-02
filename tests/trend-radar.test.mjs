@@ -14,10 +14,13 @@ test("trend radar is a protected snapshot page with three scan conditions", () =
   assert.match(pageSource, /aria-label="会员工具"/);
   assert.match(pageSource, /手机端会员工具/);
   assert.match(pageSource, /趋势雷达/);
-  assert.match(pageSource, /S4B- · 本周观察转向S2/);
+  assert.match(pageSource, /转向S2观察/);
+  assert.match(pageSource, /S4B- \/ S4- \/ S4B \/ S3 · 本周观察转向S2/);
   assert.match(pageSource, /当前进入S2A阶段/);
   assert.match(pageSource, /S2持续时间不超过4周/);
   assert.match(pageSource, /market\.matchRules\.map/);
+  assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationDateFor\(market\)\} 4AM UTC\+8<\/dd>/);
+  assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
   assert.match(pageSource, /扫描 \{snapshot\.universeSize\} 个全球精选资产/);
   assert.match(cssSource, /\.radar-summary \{ display: grid;/);
   assert.match(cssSource, /\.radar-results \{ display: grid;/);
