@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-02T18:31:15.223Z",
+  "generatedAt": "2026-09-02T23:25:18.919Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-02T18:31:15.223Z",
-    "crypto": "2026-09-02T18:31:15.223Z"
+    "traditional": "2026-09-02T23:25:18.919Z",
+    "crypto": "2026-09-02T23:25:18.919Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-24",
@@ -32,7 +32,7 @@
       "momentum": 1.79,
       "distance": 6.81,
       "confidence": 95,
-      "close": 7670.77001953125,
+      "close": 7666.60009765625,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -60,7 +60,7 @@
       "momentum": 7.22,
       "distance": 8.07,
       "confidence": 95,
-      "close": 500.760009765625,
+      "close": 501.44000244140625,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -88,7 +88,7 @@
       "momentum": -0.64,
       "distance": -24.79,
       "confidence": 95,
-      "close": 15.229999542236328,
+      "close": 15.199999809265137,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -198,8 +198,8 @@
       "momentum": 1.48,
       "distance": 6.74,
       "confidence": 95,
-      "close": 6362.14990234375,
-      "marketAsOf": "2026-09-02",
+      "close": 6368.97998046875,
+      "marketAsOf": "2026-09-01",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -226,7 +226,7 @@
       "momentum": 0.2,
       "distance": 0.32,
       "confidence": 84,
-      "close": 99.56600189208984,
+      "close": 99.5770034790039,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -281,7 +281,7 @@
       "momentum": 4.62,
       "distance": -2.62,
       "confidence": 68,
-      "close": 91.13999938964844,
+      "close": 90.69000244140625,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -308,7 +308,7 @@
       "momentum": -0.88,
       "distance": -1.6,
       "confidence": 84,
-      "close": 4426,
+      "close": 4429.60009765625,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -336,7 +336,7 @@
       "momentum": -4.28,
       "distance": 11.89,
       "confidence": 35,
-      "close": 77447.3,
+      "close": 77152.29,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -364,7 +364,7 @@
       "momentum": -6.31,
       "distance": 19.57,
       "confidence": 35,
-      "close": 2395.66,
+      "close": 2383.26,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -392,7 +392,7 @@
       "momentum": 2.37,
       "distance": 6.95,
       "confidence": 95,
-      "close": 29120.283203125,
+      "close": 29143.330078125,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
