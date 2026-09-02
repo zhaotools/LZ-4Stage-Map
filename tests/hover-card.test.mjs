@@ -40,7 +40,8 @@ test("market tiles outline observation-stage changes", async () => {
   assert.match(source, /observationStage !== item\.stage/);
   assert.match(source, /tile-observation-change/);
   assert.match(source, /--observation-border.*stageMeta\[observationStage\]\.color/s);
-  assert.match(css, /\.map-tile\.tile-observation-change.*var\(--observation-border\)/s);
+  assert.match(css, /\.map-tile\.tile-observation-change \{ box-shadow: inset 0 0 0 2px var\(--observation-border\); \}/);
+  assert.doesNotMatch(css, /tile-observation-change \{[^}]*#ffffff/s);
   assert.match(source, /颜色代表当前所处阶段，外框代表本周观察变化/);
   assert.doesNotMatch(source, /方块大小体现资产重要性，颜色代表当前所处阶段/);
 });
