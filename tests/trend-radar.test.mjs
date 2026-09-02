@@ -22,7 +22,11 @@ test("trend radar is a protected snapshot page with three scan conditions", () =
   assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationDateFor\(market\)\} 4AM UTC\+8<\/dd>/);
   assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
   assert.match(pageSource, /扫描 \{snapshot\.universeSize\} 个全球精选资产/);
+  assert.doesNotMatch(pageSource, /完整周线 · \{snapshot\.analysisPeriod\}/);
   assert.match(cssSource, /\.radar-summary \{ display: grid;/);
+  assert.doesNotMatch(cssSource, /\.radar-rule-card::before/);
+  assert.match(cssSource, /\.radar-rule-s4Recovery \{ background: linear-gradient\(110deg, #fff0d7 0%, #ffe1e5 50%, #def5e8 100%\); \}/);
+  assert.match(cssSource, /\.radar-rule-s2Early \{ background: #c2e8d3; \}/);
   assert.match(cssSource, /\.radar-results \{ display: grid;/);
   assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.radar-summary, \.radar-results \{ grid-template-columns: 1fr;/);
 });

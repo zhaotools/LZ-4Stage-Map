@@ -363,7 +363,6 @@ function TrendRadarPage({
     <section className="radar-panel" aria-labelledby="trend-radar-title">
       <div className="radar-head">
         <div><span className="section-kicker">TREND RADAR</span><h2 id="trend-radar-title">趋势雷达</h2><p>扫描 {snapshot.universeSize} 个全球精选资产，寻找重要周线阶段变化</p></div>
-        <span className="radar-period">完整周线 · {snapshot.analysisPeriod}</span>
       </div>
 
       <div className="radar-summary" role="group" aria-label="趋势雷达条件筛选">
