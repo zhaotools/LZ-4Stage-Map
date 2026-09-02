@@ -1,10 +1,11 @@
 "use client";
 
-import { type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart3,
   Building2,
   CalendarDays,
+  ChevronDown,
   Clock3,
   Globe2,
   Grid2X2,
@@ -323,6 +324,7 @@ export default function Home() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [loadingMemberView, setLoadingMemberView] = useState<MemberView | null>(null);
   const [view, setView] = useState<View>("global");
   const [region, setRegion] = useState<Region>("全球");
@@ -331,6 +333,7 @@ export default function Home() {
   const [hoverPoint, setHoverPoint] = useState({ x: 0, y: 0 });
   const [touchCardOpen, setTouchCardOpen] = useState(false);
   const [showFullVersion, setShowFullVersion] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
   const memberDisplayName = memberProfile?.display_name || "会员";
   const handleCaptchaToken = useCallback((token: string | null) => setCaptchaToken(token), []);
@@ -376,6 +379,22 @@ export default function Home() {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = previousOverflow; };
   }, [memberDialog]);
+
+  useEffect(() => {
+    if (!accountMenuOpen) return;
+    const closeOnOutside = (event: MouseEvent) => {
+      if (!accountMenuRef.current?.contains(event.target as Node)) setAccountMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setAccountMenuOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutside);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOnOutside);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [accountMenuOpen]);
 
   useEffect(() => {
     if (!memberDialog) return;
@@ -559,6 +578,7 @@ export default function Home() {
     closeMarketCard();
   };
   const handleMemberLogout = async () => {
+    setAccountMenuOpen(false);
     await signOutMember().catch(() => undefined);
     setMemberProfile(null);
     setMemberSnapshots({});
@@ -566,6 +586,7 @@ export default function Home() {
     switchView("global");
   };
   const openPasswordChange = () => {
+    setAccountMenuOpen(false);
     setPendingView(null);
     setCurrentPassword("");
     setNewPassword("");
@@ -650,10 +671,18 @@ export default function Home() {
               <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(activeGeneratedAt)}</strong></span></div>
               <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
               {isMember ? (
-                <div className="member-account" aria-label="当前会员账号">
-                  <span className="member-username"><UserRound size={14} />{memberDisplayName}</span>
-                  <button className="member-auth-button change-password" type="button" onClick={openPasswordChange}><KeyRound size={14} />修改密码</button>
-                  <button className="member-auth-button logout" type="button" onClick={handleMemberLogout}><LogOut size={14} />退出</button>
+                <div className="member-account-menu" ref={accountMenuRef}>
+                  <div className="member-account" aria-label="当前会员账号">
+                    <button className="member-username" type="button" onClick={() => setAccountMenuOpen((current) => !current)} aria-haspopup="menu" aria-expanded={accountMenuOpen}>
+                      <UserRound size={14} />{memberDisplayName}<ChevronDown className={accountMenuOpen ? "open" : ""} size={13} aria-hidden="true" />
+                    </button>
+                    <button className="member-auth-button logout" type="button" onClick={handleMemberLogout}><LogOut size={14} />退出</button>
+                  </div>
+                  {accountMenuOpen && (
+                    <div className="member-submenu" role="menu" aria-label="会员账号菜单">
+                      <button type="button" role="menuitem" onClick={openPasswordChange}><KeyRound size={14} />修改密码</button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <button className="member-auth-button" type="button" onClick={openMemberLogin} disabled={!authReady}><UserRound size={14} />{authReady ? "登录" : "检查登录…"}</button>

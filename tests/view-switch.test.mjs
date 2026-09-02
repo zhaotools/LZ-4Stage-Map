@@ -37,8 +37,10 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /if \(!isProfileActive\(profile\)\)/);
   assert.match(pageSource, /getMemberSnapshot<DashboardMarket>\(nextView\)/);
   assert.match(pageSource, /className="member-auth-button"[^\n]+openMemberLogin[^\n]+authReady \? "登录" : "检查登录…"/);
-  assert.match(pageSource, /className="member-username"[^\n]+\{memberDisplayName\}<\/span>/);
-  assert.match(pageSource, /className="member-auth-button change-password"[^\n]+openPasswordChange[^\n]+修改密码<\/button>/);
+  assert.match(pageSource, /className="member-username"[^\n]+aria-haspopup="menu" aria-expanded=\{accountMenuOpen\}/);
+  assert.match(pageSource, /\{memberDisplayName\}<ChevronDown className=\{accountMenuOpen \? "open" : ""\}/);
+  assert.match(pageSource, /className="member-submenu" role="menu" aria-label="会员账号菜单"/);
+  assert.match(pageSource, /role="menuitem" onClick=\{openPasswordChange\}[^\n]+修改密码<\/button>/);
   assert.match(pageSource, /id="current-member-password"/);
   assert.match(pageSource, /id="new-member-password"/);
   assert.match(pageSource, /id="confirm-member-password"/);
