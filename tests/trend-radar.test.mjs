@@ -6,7 +6,7 @@ const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "
 const apiSource = await readFile(new URL("../app/lib/member-api.ts", import.meta.url), "utf8");
 const cssSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-test("trend radar is a protected snapshot page with three scan conditions", () => {
+test("trend radar switches between three S2 and three S4 scan conditions", () => {
   assert.match(apiSource, /viewKey: "trendRadar"/);
   assert.match(apiSource, /\.eq\("view_key", "trendRadar"\)/);
   assert.match(pageSource, /type ProtectedPage = MemberView \| "trendRadar"/);
@@ -18,7 +18,13 @@ test("trend radar is a protected snapshot page with three scan conditions", () =
   assert.match(pageSource, /S4B- \/ S4- \/ S4B \/ S3 · 本周观察转向S2/);
   assert.match(pageSource, /当前进入S2A阶段/);
   assert.match(pageSource, /S2持续时间不超过4周/);
-  assert.match(pageSource, /market\.matchRules\.map/);
+  assert.match(pageSource, /转向S4观察/);
+  assert.match(pageSource, /S2B- \/ S2- \/ S2B \/ S3 · 本周观察转向S4/);
+  assert.match(pageSource, /当前进入S4A阶段/);
+  assert.match(pageSource, /S4持续时间不超过4周/);
+  assert.match(pageSource, /扫描\{mode\.toUpperCase\(\)\}/);
+  assert.match(pageSource, /const \[radarScanMode, setRadarScanMode\] = useState<RadarScanMode>\("s2"\)/);
+  assert.match(pageSource, /market\.matchRules\.filter[\s\S]*\.map/);
   assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationDateFor\(market\)\} 4AM UTC\+8<\/dd>/);
   assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
   assert.match(pageSource, /扫描 \{snapshot\.universeSize\} 个全球精选资产/);
@@ -27,6 +33,10 @@ test("trend radar is a protected snapshot page with three scan conditions", () =
   assert.doesNotMatch(cssSource, /\.radar-rule-card::before/);
   assert.match(cssSource, /\.radar-rule-s4Recovery \{ background: linear-gradient\(110deg, #fff0d7 0%, #ffe1e5 50%, #def5e8 100%\); \}/);
   assert.match(cssSource, /\.radar-rule-s2Early \{ background: #c2e8d3; \}/);
+  assert.match(cssSource, /\.radar-rule-s2Breakdown \{ background: linear-gradient\(110deg, #def5e8 0%, #fff0d7 50%, #ffe1e5 100%\); \}/);
+  assert.match(cssSource, /\.radar-rule-s4aEntry \{ background: #fde9ec; \}/);
+  assert.match(cssSource, /\.radar-rule-s4Early \{ background: #f5c4cb; \}/);
+  assert.match(cssSource, /\.radar-scan-switch button\.active/);
   assert.match(cssSource, /\.radar-results \{ display: grid;/);
   assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.radar-summary, \.radar-results \{ grid-template-columns: 1fr;/);
 });

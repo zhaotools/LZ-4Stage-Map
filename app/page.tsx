@@ -43,6 +43,7 @@ type Stage = "S1" | "S2" | "S3" | "S4";
 type View = "global" | MemberView;
 type ProtectedPage = MemberView | "trendRadar";
 type RadarFilter = "all" | TrendRadarRuleId;
+type RadarScanMode = "s2" | "s4";
 type Region = "全球" | "美股" | "A股" | "港股" | "日股" | "欧股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
 
@@ -167,6 +168,13 @@ const radarRuleMeta: Record<TrendRadarRuleId, { label: string; description: stri
   s4Recovery: { label: "转向S2观察", description: "S4B- / S4- / S4B / S3 · 本周观察转向S2", color: "#18a567" },
   s2aEntry: { label: "进入S2A", description: "当前进入S2A阶段", color: "#18a567" },
   s2Early: { label: "S2早期阶段", description: "S2持续时间不超过4周", color: "#087849" },
+  s2Breakdown: { label: "转向S4观察", description: "S2B- / S2- / S2B / S3 · 本周观察转向S4", color: "#ed4859" },
+  s4aEntry: { label: "进入S4A", description: "当前进入S4A阶段", color: "#ed4859" },
+  s4Early: { label: "S4早期阶段", description: "S4持续时间不超过4周", color: "#bd2638" },
+};
+const radarRuleIds: Record<RadarScanMode, TrendRadarRuleId[]> = {
+  s2: ["s4Recovery", "s2aEntry", "s2Early"],
+  s4: ["s2Breakdown", "s4aEntry", "s4Early"],
 };
 
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
@@ -345,35 +353,43 @@ function TrendRadarPage({
   markets,
   filter,
   region,
+  scanMode,
   onFilterChange,
   onRegionChange,
+  onScanModeChange,
 }: {
   snapshot: TrendRadarSnapshot<DashboardMarket>;
   markets: RadarMarket[];
   filter: RadarFilter;
   region: "全部" | MarketRegion;
+  scanMode: RadarScanMode;
   onFilterChange: (filter: RadarFilter) => void;
   onRegionChange: (region: "全部" | MarketRegion) => void;
+  onScanModeChange: (mode: RadarScanMode) => void;
 }) {
-  const ruleIds = ["s4Recovery", "s2aEntry", "s2Early"] as TrendRadarRuleId[];
-  const availableRegions = marketRegions.filter((item) => markets.some((market) => market.region === item));
-  const filtered = markets.filter((market) => (filter === "all" || market.matchRules.includes(filter)) && (region === "全部" || market.region === region));
+  const ruleIds = radarRuleIds[scanMode];
+  const familyMarkets = markets.filter((market) => market.matchRules.some((ruleId) => ruleIds.includes(ruleId)));
+  const availableRegions = marketRegions.filter((item) => familyMarkets.some((market) => market.region === item));
+  const filtered = familyMarkets.filter((market) => (filter === "all" || market.matchRules.includes(filter)) && (region === "全部" || market.region === region));
 
   return (
     <section className="radar-panel" aria-labelledby="trend-radar-title">
       <div className="radar-head">
         <div><span className="section-kicker">TREND RADAR</span><h2 id="trend-radar-title">趋势雷达</h2><p>扫描 {snapshot.universeSize} 个全球精选资产，寻找重要周线阶段变化</p></div>
+        <div className="radar-scan-switch" role="group" aria-label="趋势方向扫描切换">
+          {(["s2", "s4"] as RadarScanMode[]).map((mode) => <button key={mode} type="button" className={scanMode === mode ? "active" : ""} onClick={() => onScanModeChange(mode)} aria-pressed={scanMode === mode}>扫描{mode.toUpperCase()}</button>)}
+        </div>
       </div>
 
       <div className="radar-summary" role="group" aria-label="趋势雷达条件筛选">
         <button type="button" className={`radar-rule-card radar-rule-all ${filter === "all" ? "selected" : ""}`} onClick={() => onFilterChange("all")} aria-pressed={filter === "all"}>
-          <span>本周发现</span><strong>{snapshot.counts.unique}</strong><small>个不重复资产</small>
+          <span>本周发现</span><strong>{familyMarkets.length}</strong><small>个不重复资产</small>
         </button>
         {ruleIds.map((ruleId) => {
           const meta = radarRuleMeta[ruleId];
           return (
             <button key={ruleId} type="button" className={`radar-rule-card radar-rule-${ruleId} ${filter === ruleId ? "selected" : ""}`} style={{ "--radar-rule-color": meta.color } as CSSProperties} onClick={() => onFilterChange(filter === ruleId ? "all" : ruleId)} aria-pressed={filter === ruleId}>
-              <span>{meta.label}</span><strong>{snapshot.counts[ruleId]}</strong><small>{meta.description}</small>
+              <span>{meta.label}</span><strong>{familyMarkets.filter((market) => market.matchRules.includes(ruleId)).length}</strong><small>{meta.description}</small>
             </button>
           );
         })}
@@ -383,7 +399,7 @@ function TrendRadarPage({
         <div className="radar-region-tabs" role="group" aria-label="趋势雷达市场筛选">
           {(["全部", ...availableRegions] as Array<"全部" | MarketRegion>).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item === "全部" ? item : displayRegionName(item)}</button>)}
         </div>
-        <span>显示 {filtered.length} / {snapshot.counts.unique} 个资产</span>
+        <span>显示 {filtered.length} / {familyMarkets.length} 个资产</span>
       </div>
 
       {filtered.length ? (
@@ -397,7 +413,7 @@ function TrendRadarPage({
             return (
               <article key={market.code} className="radar-result-card" style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}>
                 <div className="radar-result-title"><div><strong>{market.shortCode}</strong><span>{market.name}</span></div><em>{displayRegionName(market.region)}</em></div>
-                <div className="radar-match-tags">{market.matchRules.map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
+                <div className="radar-match-tags">{market.matchRules.filter((ruleId) => ruleIds.includes(ruleId)).map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
@@ -439,6 +455,7 @@ export default function Home() {
   const [radarActive, setRadarActive] = useState(false);
   const [radarFilter, setRadarFilter] = useState<RadarFilter>("all");
   const [radarRegion, setRadarRegion] = useState<"全部" | MarketRegion>("全部");
+  const [radarScanMode, setRadarScanMode] = useState<RadarScanMode>("s2");
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
   const [hoveredMarket, setHoveredMarket] = useState<Market | null>(null);
@@ -863,7 +880,7 @@ export default function Home() {
           <nav className="mobile-tool-nav" aria-label="手机端会员工具"><button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>趋势雷达</span></button></nav>
 
           {radarActive && radarSnapshot ? (
-            <TrendRadarPage snapshot={radarSnapshot} markets={radarMarkets} filter={radarFilter} region={radarRegion} onFilterChange={setRadarFilter} onRegionChange={setRadarRegion} />
+            <TrendRadarPage snapshot={radarSnapshot} markets={radarMarkets} filter={radarFilter} region={radarRegion} scanMode={radarScanMode} onFilterChange={setRadarFilter} onRegionChange={setRadarRegion} onScanModeChange={(mode) => { setRadarScanMode(mode); setRadarFilter("all"); setRadarRegion("全部"); }} />
           ) : <>
           <div className="filterbar">
             <div className="region-tabs" role="group" aria-label="市场筛选">{activeViewMeta.regions.map((item) => <button key={item} className={region === item ? "active" : ""} onClick={() => setRegion(item)}>{view !== "global" && item === "全球" ? "全部" : displayRegionName(item)}</button>)}</div>

@@ -3,7 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 
 export type MemberView = "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
-export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
+export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early" | "s2Breakdown" | "s4aEntry" | "s4Early";
 
 export type MemberProfile = {
   user_id: string;
@@ -25,7 +25,7 @@ export type MemberSnapshot<TMarket = unknown> = {
 };
 
 export type TrendRadarSnapshot<TMarket = unknown> = {
-  schemaVersion: "lz-trend-radar-v1";
+  schemaVersion: "lz-trend-radar-v1" | "lz-trend-radar-v2";
   generatedAt: string;
   updateScope: "all" | "traditional" | "crypto";
   lastUpdatedAt: { traditional: string; crypto: string };
