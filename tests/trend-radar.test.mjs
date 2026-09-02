@@ -31,12 +31,14 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.doesNotMatch(pageSource, /完整周线 · \{snapshot\.analysisPeriod\}/);
   assert.match(cssSource, /\.radar-summary \{ display: grid;/);
   assert.doesNotMatch(cssSource, /\.radar-rule-card::before/);
-  assert.match(cssSource, /\.radar-rule-s4Recovery \{ background: linear-gradient\(110deg, #fff0d7 0%, #ffe1e5 50%, #def5e8 100%\); \}/);
+  assert.match(cssSource, /\.radar-rule-s4Recovery \{ background: linear-gradient\(110deg, #ffe1e5 0%, #e5efff 50%, #def5e8 100%\); \}/);
   assert.match(cssSource, /\.radar-rule-s2Early \{ background: #c2e8d3; \}/);
   assert.match(cssSource, /\.radar-rule-s2Breakdown \{ background: linear-gradient\(110deg, #def5e8 0%, #fff0d7 50%, #ffe1e5 100%\); \}/);
   assert.match(cssSource, /\.radar-rule-s4aEntry \{ background: #fde9ec; \}/);
   assert.match(cssSource, /\.radar-rule-s4Early \{ background: #f5c4cb; \}/);
   assert.match(cssSource, /\.radar-scan-switch button\.active/);
+  assert.match(cssSource, /\.radar-scan-switch \.scan-s2\.active \{ background: var\(--green\); \}/);
+  assert.match(cssSource, /\.radar-scan-switch \.scan-s4\.active \{ background: var\(--red\); \}/);
   assert.match(cssSource, /\.radar-results \{ display: grid;/);
   assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.radar-summary, \.radar-results \{ grid-template-columns: 1fr;/);
 });

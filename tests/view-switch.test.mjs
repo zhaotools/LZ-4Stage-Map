@@ -7,6 +7,9 @@ const cssSource = await readFile(new URL("../app/globals.css", import.meta.url),
 const indexSource = await readFile(new URL("../pages-site/index.html", import.meta.url), "utf8");
 
 test("sidebar switches between the five stage-map collections", () => {
+  assert.match(pageSource, /id="market-map-navigation-title">市场地图<\/h2>/);
+  assert.match(pageSource, /id="member-tools-navigation-title">会员工具<\/h2>/);
+  assert.ok(pageSource.indexOf("market-map-navigation-title") < pageSource.indexOf("member-tools-navigation-title"));
   assert.match(pageSource, /requestView\("global"\)/);
   assert.match(pageSource, /requestView\("crypto7"\)/);
   assert.match(pageSource, /requestView\("usSelected"\)/);
@@ -98,7 +101,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /hydrateMarkets\(memberSnapshots\[view\]\?\.markets \?\? \[\]\)/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股/);
   assert.match(cssSource, /@media \(max-width: 780px\)/);
-  assert.match(cssSource, /\.side-nav \{ display: none; \}\.mobile-view-nav \{[^}]*display: flex;/);
+  assert.match(cssSource, /\.sidebar-navigation \{ display: none; \}\.mobile-view-nav \{[^}]*display: flex;/);
   assert.match(cssSource, /\.mobile-view-nav button\.active \{ background: #2e68df; color: #fff;/);
   assert.match(cssSource, /\.nav-label \{ display: inline-flex;/);
   assert.match(cssSource, /\.member-auth-button \{ height: 36px;/);

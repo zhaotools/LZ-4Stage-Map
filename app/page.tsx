@@ -377,7 +377,7 @@ function TrendRadarPage({
       <div className="radar-head">
         <div><span className="section-kicker">TREND RADAR</span><h2 id="trend-radar-title">趋势雷达</h2><p>扫描 {snapshot.universeSize} 个全球精选资产，寻找重要周线阶段变化</p></div>
         <div className="radar-scan-switch" role="group" aria-label="趋势方向扫描切换">
-          {(["s2", "s4"] as RadarScanMode[]).map((mode) => <button key={mode} type="button" className={scanMode === mode ? "active" : ""} onClick={() => onScanModeChange(mode)} aria-pressed={scanMode === mode}>扫描{mode.toUpperCase()}</button>)}
+          {(["s2", "s4"] as RadarScanMode[]).map((mode) => <button key={mode} type="button" className={`scan-${mode} ${scanMode === mode ? "active" : ""}`} onClick={() => onScanModeChange(mode)} aria-pressed={scanMode === mode}>扫描{mode.toUpperCase()}</button>)}
         </div>
       </div>
 
@@ -828,22 +828,30 @@ export default function Home() {
       <div className="app-shell">
         <aside className="sidebar">
           <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="38" height="38" /><div><strong>LZ-4Stage</strong><small>MARKET TOOLKIT</small></div></div>
-          <nav className="side-nav" aria-label="主要导航">
-            <button className={`nav-item ${!radarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!radarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
-            <button className={`nav-item ${!radarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!radarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
-            <button className={`nav-item ${!radarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!radarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
-            <button className={`nav-item ${!radarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!radarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
-            <button className={`nav-item ${!radarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!radarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
-          </nav>
+          <div className="sidebar-navigation">
+            <section className="side-nav-section" aria-labelledby="market-map-navigation-title">
+              <h2 id="market-map-navigation-title">市场地图</h2>
+              <nav className="side-nav" aria-label="市场地图">
+                <button className={`nav-item ${!radarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!radarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
+                <button className={`nav-item ${!radarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!radarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
+                <button className={`nav-item ${!radarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!radarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
+                <button className={`nav-item ${!radarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!radarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
+                <button className={`nav-item ${!radarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!radarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
+              </nav>
+            </section>
+            <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
+              <h2 id="member-tools-navigation-title">会员工具</h2>
+              <nav className="side-tools" aria-label="会员工具">
+                <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}趋势雷达</span></button>
+              </nav>
+            </section>
+          </div>
           <nav className="mobile-view-nav" aria-label="手机端页面导航">
             <button type="button" className={!radarActive && view === "global" ? "active" : ""} onClick={() => requestView("global")}>全球</button>
             <button type="button" className={!radarActive && view === "crypto7" ? "active" : ""} onClick={() => requestView("crypto7")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>加密</span></button>
             <button type="button" className={!radarActive && view === "usSelected" ? "active" : ""} onClick={() => requestView("usSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>美股</span></button>
             <button type="button" className={!radarActive && view === "chinaIndices" ? "active" : ""} onClick={() => requestView("chinaIndices")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>A股</span></button>
             <button type="button" className={!radarActive && view === "hkSelected" ? "active" : ""} onClick={() => requestView("hkSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>港股</span></button>
-          </nav>
-          <nav className="side-tools" aria-label="会员工具">
-            <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}趋势雷达</span></button>
           </nav>
           <div className="sidebar-bottom"><span>数据周期</span><strong>{week.year} · W{String(week.week).padStart(2, "0")}</strong><small>仅作为市场观察工具</small></div>
         </aside>
