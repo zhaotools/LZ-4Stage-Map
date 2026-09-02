@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-02T09:50:18.157Z",
+  "generatedAt": "2026-09-02T11:24:09.412Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-02T09:50:18.157Z",
-    "crypto": "2026-09-02T09:50:18.157Z"
+    "traditional": "2026-09-02T11:24:09.412Z",
+    "crypto": "2026-09-02T11:24:09.412Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-24",
@@ -30,11 +30,11 @@
       "observation": "趋势减速",
       "signal": "减速",
       "momentum": 1.79,
-      "distance": 7.07,
+      "distance": 6.81,
       "confidence": 95,
       "close": 7631.47021484375,
       "marketAsOf": "2026-09-01",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
@@ -85,12 +85,12 @@
       "observationStage": "S4",
       "observation": "正常下降",
       "signal": "稳定",
-      "momentum": -0.62,
-      "distance": -24.38,
+      "momentum": -0.64,
+      "distance": -24.79,
       "confidence": 95,
-      "close": 16.770000457763672,
+      "close": 16.739999771118164,
       "marketAsOf": "2026-09-02",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
@@ -168,12 +168,12 @@
       "observationStage": "S2B-",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 3.77,
-      "distance": 6.91,
+      "momentum": 3.79,
+      "distance": 7.34,
       "confidence": 95,
       "close": 64325.640625,
       "marketAsOf": "2026-09-02",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
@@ -195,12 +195,12 @@
       "observationStage": "S2",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 1.44,
-      "distance": 5.78,
+      "momentum": 1.48,
+      "distance": 6.74,
       "confidence": 95,
-      "close": 6339.33984375,
+      "close": 6339.14013671875,
       "marketAsOf": "2026-09-02",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
@@ -223,12 +223,12 @@
       "observationStage": "S1",
       "observation": "S1",
       "signal": "稳定",
-      "momentum": 0.18,
-      "distance": -0.21,
-      "confidence": 95,
-      "close": 99.7979965209961,
+      "momentum": 0.2,
+      "distance": 0.32,
+      "confidence": 84,
+      "close": 99.81500244140625,
       "marketAsOf": "2026-09-02",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
@@ -251,12 +251,12 @@
       "observationStage": "S2",
       "observation": "正常推进",
       "signal": "稳定",
-      "momentum": 1.87,
-      "distance": 5.6,
+      "momentum": 1.91,
+      "distance": 6.65,
       "confidence": 95,
       "close": 4.796000003814697,
       "marketAsOf": "2026-09-01",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
@@ -281,7 +281,7 @@
       "momentum": 4.62,
       "distance": -2.62,
       "confidence": 68,
-      "close": 90.31999969482422,
+      "close": 89.93000030517578,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -308,7 +308,7 @@
       "momentum": -0.88,
       "distance": -1.6,
       "confidence": 84,
-      "close": 4356.39990234375,
+      "close": 4364.89990234375,
       "marketAsOf": "2026-09-02",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
@@ -336,7 +336,7 @@
       "momentum": -4.28,
       "distance": 11.89,
       "confidence": 35,
-      "close": 76679.97,
+      "close": 76435.94,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -364,7 +364,7 @@
       "momentum": -6.31,
       "distance": 19.57,
       "confidence": 35,
-      "close": 2373.32,
+      "close": 2370.77,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -389,12 +389,12 @@
       "observationStage": "S2",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 2.4,
-      "distance": 7.68,
+      "momentum": 2.37,
+      "distance": 6.95,
       "confidence": 95,
       "close": 29077.220703125,
       "marketAsOf": "2026-09-01",
-      "stageAsOf": "2026-08-27",
+      "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
     {
