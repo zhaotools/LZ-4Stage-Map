@@ -10,7 +10,7 @@
     "build": "vite build --config vite.pages.config.ts",
     "build:pages": "vite build --config vite.pages.config.ts",
     "test": "npm run test:ui && npm run build:pages",
-    "test:ui": "node --test tests/dashboard-data.test.mjs tests/hover-card.test.mjs tests/member-password.test.mjs tests/trend-radar.test.mjs tests/view-switch.test.mjs",
+    "test:ui": "node --test tests/dashboard-data.test.mjs tests/hover-card.test.mjs tests/member-password.test.mjs tests/trend-radar.test.mjs tests/stock-radar.test.mjs tests/view-switch.test.mjs",
     "data:verify": "node --test tests/dashboard-data.test.mjs"
   },
   "dependencies": {

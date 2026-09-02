@@ -27,6 +27,7 @@ import {
   getMemberProfile,
   getMemberSession,
   getMemberSnapshot,
+  getStockRadarSnapshot,
   getTrendRadarSnapshot,
   isProfileActive,
   signInMember,
@@ -35,14 +36,17 @@ import {
   type MemberProfile,
   type MemberSnapshot,
   type MemberView,
+  type StockRadarRuleId,
+  type StockRadarSnapshot,
   type TrendRadarRuleId,
   type TrendRadarSnapshot,
 } from "@/app/lib/member-api";
 import { isSupabaseConfigured } from "@/app/lib/supabase";
 type Stage = "S1" | "S2" | "S3" | "S4";
 type View = "global" | MemberView;
-type ProtectedPage = MemberView | "trendRadar";
+type ProtectedPage = MemberView | "trendRadar" | "stockRadar";
 type RadarFilter = "all" | TrendRadarRuleId;
+type StockRadarFilter = "all" | StockRadarRuleId;
 type RadarScanMode = "s2" | "s4";
 type Region = "全球" | "美股" | "A股" | "港股" | "日股" | "欧股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
@@ -69,6 +73,12 @@ type Market = {
   rows: number;
 };
 type RadarMarket = Market & { matchRules: TrendRadarRuleId[] };
+type StockRadarMarket = Market & {
+  industry: string;
+  liquidityRank: number;
+  averageTurnover20d: number;
+  matchRules: StockRadarRuleId[];
+};
 
 const memberOnlyViews = new Set<MemberView>(["crypto7", "usSelected", "chinaIndices", "hkSelected"]);
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? "";
@@ -431,11 +441,100 @@ function TrendRadarPage({
   );
 }
 
+function formatTurnover(value: number, region: StockRadarMarket["region"]) {
+  const unit = region === "美股" ? "亿美元" : "亿元";
+  return `${(value / 100_000_000).toLocaleString("zh-CN", { maximumFractionDigits: 1 })}${unit}`;
+}
+
+function StockRadarPage({
+  snapshot,
+  markets,
+  filter,
+  region,
+  onFilterChange,
+  onRegionChange,
+}: {
+  snapshot: StockRadarSnapshot<StockRadarMarket>;
+  markets: StockRadarMarket[];
+  filter: StockRadarFilter;
+  region: "全部" | "美股" | "A股" | "港股";
+  onFilterChange: (filter: StockRadarFilter) => void;
+  onRegionChange: (region: "全部" | "美股" | "A股" | "港股") => void;
+}) {
+  const filtered = markets.filter((market) => (filter === "all" || market.matchRules.includes(filter)) && (region === "全部" || market.region === region));
+  const ruleIds: StockRadarRuleId[] = ["s4Recovery", "s2aEntry", "s2Early"];
+
+  return (
+    <section className="radar-panel stock-radar-panel" aria-labelledby="stock-radar-title">
+      <div className="radar-head stock-radar-head">
+        <div><span className="section-kicker">STOCK RADAR</span><h2 id="stock-radar-title">个股雷达</h2><p>扫描美股、A股、港股各100只高流动性股票，寻找牛市初期周线机会</p></div>
+        <div className="stock-radar-status" aria-label="个股雷达数据质量">
+          <strong>{snapshot.quality.completionRate}% 完整</strong>
+          <span>{snapshot.quality.live} 实时 · {snapshot.quality.cache} 缓存</span>
+        </div>
+      </div>
+
+      <div className="radar-summary" role="group" aria-label="个股雷达条件筛选">
+        <button type="button" className={`radar-rule-card radar-rule-all ${filter === "all" ? "selected" : ""}`} onClick={() => onFilterChange("all")} aria-pressed={filter === "all"}>
+          <span>本周发现</span><strong>{markets.length}</strong><small>个不重复股票</small>
+        </button>
+        {ruleIds.map((ruleId) => {
+          const meta = radarRuleMeta[ruleId];
+          return (
+            <button key={ruleId} type="button" className={`radar-rule-card radar-rule-${ruleId} ${filter === ruleId ? "selected" : ""}`} style={{ "--radar-rule-color": meta.color } as CSSProperties} onClick={() => onFilterChange(filter === ruleId ? "all" : ruleId)} aria-pressed={filter === ruleId}>
+              <span>{meta.label}</span><strong>{snapshot.counts[ruleId]}</strong><small>{meta.description}</small>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="stock-market-health" aria-label="三个市场扫描状态">
+        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 个机会</em></div>)}
+      </div>
+
+      <div className="radar-toolbar">
+        <div className="radar-region-tabs" role="group" aria-label="个股雷达市场筛选">
+          {(["全部", "美股", "A股", "港股"] as const).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item}</button>)}
+        </div>
+        <span>显示 {filtered.length} / {markets.length} 个机会</span>
+      </div>
+
+      {filtered.length ? (
+        <div className="radar-results stock-radar-results">
+          {filtered.map((market) => {
+            const observationStage = observationStageFor(market);
+            const observationLabel = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
+            const observationConfirmation = observationConfirmationFor(market);
+            const maDirection = momentumDirection(market.momentum);
+            const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
+            return (
+              <article key={market.code} className="radar-result-card stock-radar-result" style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}>
+                <div className="radar-result-title"><div><strong>{market.shortCode}</strong><span>{market.name}</span></div><em>{market.region} · #{market.liquidityRank}</em></div>
+                <div className="stock-result-meta"><span>{market.industry || "其他"}</span><span>20日均额 {formatTurnover(market.averageTurnover20d, market.region)}</span></div>
+                <div className="radar-match-tags">{market.matchRules.map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
+                <dl>
+                  <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
+                  <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
+                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationDateFor(market)} 4AM UTC+8</dd></div>
+                  <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
+                </dl>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="radar-empty"><Radar size={30} /><strong>当前筛选下暂无符合条件的股票</strong><span>可切换扫描条件或市场范围查看</span></div>
+      )}
+    </section>
+  );
+}
+
 export default function Home() {
   const [authReady, setAuthReady] = useState(false);
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [memberSnapshots, setMemberSnapshots] = useState<Partial<Record<MemberView, MemberSnapshot<DashboardMarket>>>>({});
   const [radarSnapshot, setRadarSnapshot] = useState<TrendRadarSnapshot<DashboardMarket> | null>(null);
+  const [stockRadarSnapshot, setStockRadarSnapshot] = useState<StockRadarSnapshot<StockRadarMarket> | null>(null);
   const [memberDialog, setMemberDialog] = useState<"locked" | "login" | "dataError" | "password" | "passwordChanged" | null>(null);
   const [pendingView, setPendingView] = useState<ProtectedPage | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
@@ -453,9 +552,12 @@ export default function Home() {
   const [loadingMemberView, setLoadingMemberView] = useState<ProtectedPage | null>(null);
   const [view, setView] = useState<View>("global");
   const [radarActive, setRadarActive] = useState(false);
+  const [stockRadarActive, setStockRadarActive] = useState(false);
   const [radarFilter, setRadarFilter] = useState<RadarFilter>("all");
   const [radarRegion, setRadarRegion] = useState<"全部" | MarketRegion>("全部");
   const [radarScanMode, setRadarScanMode] = useState<RadarScanMode>("s2");
+  const [stockRadarFilter, setStockRadarFilter] = useState<StockRadarFilter>("all");
+  const [stockRadarRegion, setStockRadarRegion] = useState<"全部" | "美股" | "A股" | "港股">("全部");
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
   const [hoveredMarket, setHoveredMarket] = useState<Market | null>(null);
@@ -566,6 +668,20 @@ export default function Home() {
     }
   };
 
+  const loadStockRadar = async () => {
+    if (stockRadarSnapshot) return stockRadarSnapshot;
+    setLoadingMemberView("stockRadar");
+    try {
+      const snapshot = await getStockRadarSnapshot<StockRadarMarket>();
+      setStockRadarSnapshot(snapshot);
+      return snapshot;
+    } catch {
+      return null;
+    } finally {
+      setLoadingMemberView(null);
+    }
+  };
+
   const handleMemberLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setCheckingCredentials(true);
@@ -602,7 +718,11 @@ export default function Home() {
     setMemberProfile(profile);
     setAuthReady(true);
     if (pendingView) {
-      const snapshot = pendingView === "trendRadar" ? await loadTrendRadar() : await loadMemberView(pendingView);
+      const snapshot = pendingView === "trendRadar"
+        ? await loadTrendRadar()
+        : pendingView === "stockRadar"
+          ? await loadStockRadar()
+          : await loadMemberView(pendingView);
       if (!snapshot) {
         setMemberDialog("dataError");
         setCheckingCredentials(false);
@@ -610,8 +730,15 @@ export default function Home() {
       }
       if (pendingView === "trendRadar") {
         setRadarActive(true);
+        setStockRadarActive(false);
         setRadarFilter("all");
         setRadarRegion("全部");
+        closeMarketCard();
+      } else if (pendingView === "stockRadar") {
+        setStockRadarActive(true);
+        setRadarActive(false);
+        setStockRadarFilter("all");
+        setStockRadarRegion("全部");
         closeMarketCard();
       } else {
         switchView(pendingView);
@@ -646,7 +773,11 @@ export default function Home() {
   }, [regionData]);
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? dashboardData.commonStageAsOf;
   const commonConfirmationDate = activeUniverse.map(displayConfirmationDate).sort()[0] ?? commonStageAsOf;
-  const activeGeneratedAt = radarActive && radarSnapshot ? radarSnapshot.generatedAt : view === "global" ? dashboardData.generatedAt : memberSnapshots[view]?.generatedAt ?? dashboardData.generatedAt;
+  const activeGeneratedAt = stockRadarActive && stockRadarSnapshot
+    ? stockRadarSnapshot.generatedAt
+    : radarActive && radarSnapshot
+      ? radarSnapshot.generatedAt
+      : view === "global" ? dashboardData.generatedAt : memberSnapshots[view]?.generatedAt ?? dashboardData.generatedAt;
   const week = isoWeek(commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定").slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
@@ -686,6 +817,7 @@ export default function Home() {
   };
   const switchView = (nextView: View) => {
     setRadarActive(false);
+    setStockRadarActive(false);
     setView(nextView);
     setRegion("全球");
     setStageFilter("全部");
@@ -707,8 +839,30 @@ export default function Home() {
       return;
     }
     setRadarActive(true);
+    setStockRadarActive(false);
     setRadarFilter("all");
     setRadarRegion("全部");
+    closeMarketCard();
+  };
+  const requestStockRadar = async () => {
+    if (!isMember) {
+      setPendingView("stockRadar");
+      setMemberDialog("locked");
+      setLoginError(null);
+      closeMarketCard();
+      return;
+    }
+    const snapshot = await loadStockRadar();
+    if (!snapshot) {
+      setPendingView("stockRadar");
+      setMemberDialog("dataError");
+      closeMarketCard();
+      return;
+    }
+    setStockRadarActive(true);
+    setRadarActive(false);
+    setStockRadarFilter("all");
+    setStockRadarRegion("全部");
     closeMarketCard();
   };
   const requestView = async (nextView: View) => {
@@ -758,6 +912,7 @@ export default function Home() {
     setMemberProfile(null);
     setMemberSnapshots({});
     setRadarSnapshot(null);
+    setStockRadarSnapshot(null);
     closeMemberDialog();
     switchView("global");
   };
@@ -799,6 +954,7 @@ export default function Home() {
     setMemberProfile(null);
     setMemberSnapshots({});
     setRadarSnapshot(null);
+    setStockRadarSnapshot(null);
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
@@ -808,14 +964,25 @@ export default function Home() {
   };
   const retryMemberData = async () => {
     if (!pendingView) return;
-    const snapshot = pendingView === "trendRadar" ? await loadTrendRadar() : await loadMemberView(pendingView);
+    const snapshot = pendingView === "trendRadar"
+      ? await loadTrendRadar()
+      : pendingView === "stockRadar"
+        ? await loadStockRadar()
+        : await loadMemberView(pendingView);
     if (!snapshot) return;
     const nextView = pendingView;
     closeMemberDialog();
     if (nextView === "trendRadar") {
       setRadarActive(true);
+      setStockRadarActive(false);
       setRadarFilter("all");
       setRadarRegion("全部");
+      closeMarketCard();
+    } else if (nextView === "stockRadar") {
+      setStockRadarActive(true);
+      setRadarActive(false);
+      setStockRadarFilter("all");
+      setStockRadarRegion("全部");
       closeMarketCard();
     } else {
       switchView(nextView);
@@ -832,26 +999,27 @@ export default function Home() {
             <section className="side-nav-section" aria-labelledby="market-map-navigation-title">
               <h2 id="market-map-navigation-title">市场地图</h2>
               <nav className="side-nav" aria-label="市场地图">
-                <button className={`nav-item ${!radarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!radarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
-                <button className={`nav-item ${!radarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!radarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
-                <button className={`nav-item ${!radarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!radarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
-                <button className={`nav-item ${!radarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!radarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
-                <button className={`nav-item ${!radarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!radarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
+                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!radarActive && !stockRadarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
+                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!radarActive && !stockRadarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
+                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!radarActive && !stockRadarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
+                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!radarActive && !stockRadarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
+                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!radarActive && !stockRadarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
               </nav>
             </section>
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
               <h2 id="member-tools-navigation-title">会员工具</h2>
               <nav className="side-tools" aria-label="会员工具">
                 <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}趋势雷达</span></button>
+                <button className={`nav-item ${stockRadarActive ? "active" : ""}`} type="button" onClick={requestStockRadar} aria-pressed={stockRadarActive}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}个股雷达</span></button>
               </nav>
             </section>
           </div>
           <nav className="mobile-view-nav" aria-label="手机端页面导航">
-            <button type="button" className={!radarActive && view === "global" ? "active" : ""} onClick={() => requestView("global")}>全球</button>
-            <button type="button" className={!radarActive && view === "crypto7" ? "active" : ""} onClick={() => requestView("crypto7")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>加密</span></button>
-            <button type="button" className={!radarActive && view === "usSelected" ? "active" : ""} onClick={() => requestView("usSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>美股</span></button>
-            <button type="button" className={!radarActive && view === "chinaIndices" ? "active" : ""} onClick={() => requestView("chinaIndices")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>A股</span></button>
-            <button type="button" className={!radarActive && view === "hkSelected" ? "active" : ""} onClick={() => requestView("hkSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>港股</span></button>
+            <button type="button" className={!radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => requestView("global")}>全球</button>
+            <button type="button" className={!radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => requestView("crypto7")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>加密</span></button>
+            <button type="button" className={!radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => requestView("usSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>美股</span></button>
+            <button type="button" className={!radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => requestView("chinaIndices")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>A股</span></button>
+            <button type="button" className={!radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => requestView("hkSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>港股</span></button>
           </nav>
           <div className="sidebar-bottom"><span>数据周期</span><strong>{week.year} · W{String(week.week).padStart(2, "0")}</strong><small>仅作为市场观察工具</small></div>
         </aside>
@@ -885,9 +1053,14 @@ export default function Home() {
             </div>
           </header>
 
-          <nav className="mobile-tool-nav" aria-label="手机端会员工具"><button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>趋势雷达</span></button></nav>
+          <nav className="mobile-tool-nav" aria-label="手机端会员工具">
+            <button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>趋势雷达</span></button>
+            <button type="button" className={stockRadarActive ? "active" : ""} onClick={requestStockRadar}><TrendingUp size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>个股雷达</span></button>
+          </nav>
 
-          {radarActive && radarSnapshot ? (
+          {stockRadarActive && stockRadarSnapshot ? (
+            <StockRadarPage snapshot={stockRadarSnapshot} markets={stockRadarSnapshot.matches} filter={stockRadarFilter} region={stockRadarRegion} onFilterChange={setStockRadarFilter} onRegionChange={setStockRadarRegion} />
+          ) : radarActive && radarSnapshot ? (
             <TrendRadarPage snapshot={radarSnapshot} markets={radarMarkets} filter={radarFilter} region={radarRegion} scanMode={radarScanMode} onFilterChange={setRadarFilter} onRegionChange={setRadarRegion} onScanModeChange={(mode) => { setRadarScanMode(mode); setRadarFilter("all"); setRadarRegion("全部"); }} />
           ) : <>
           <div className="filterbar">
@@ -924,7 +1097,7 @@ export default function Home() {
           </section>
           </>}
 
-          <footer><span>{radarActive && radarSnapshot ? `LZ-4stage 全球精选扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
+          <footer><span>{stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4stage 全球精选扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
         </main>
         <HoverMarketCard market={hoveredMarket} point={hoverPoint} touchMode={touchCardOpen} onClose={closeMarketCard} />
         {showFullVersion && (
@@ -952,13 +1125,13 @@ export default function Home() {
             {memberDialog === "locked" ? (
               <>
                 <h2 id="access-gate-title">LZ会员专享</h2>
-                <p>{pendingView === "trendRadar" ? "登录会员账号后查看趋势雷达扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
+                <p>{pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看趋势雷达扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
                 <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
               </>
             ) : memberDialog === "dataError" ? (
               <>
                 <h2 id="access-gate-title">会员数据暂时不可用</h2>
-                <p>登录状态有效，但{pendingView === "trendRadar" ? "趋势雷达结果" : "市场快照"}未能加载，请稍后重试。</p>
+                <p>登录状态有效，但{pendingView === "stockRadar" ? "个股雷达结果" : pendingView === "trendRadar" ? "趋势雷达结果" : "市场快照"}未能加载，请稍后重试。</p>
                 <button className="member-login-cta" type="button" onClick={retryMemberData} disabled={Boolean(loadingMemberView)}>{loadingMemberView ? "正在重试…" : "重新加载"}</button>
               </>
             ) : memberDialog === "passwordChanged" ? (

@@ -9,7 +9,7 @@ const cssSource = await readFile(new URL("../app/globals.css", import.meta.url),
 test("trend radar switches between three S2 and three S4 scan conditions", () => {
   assert.match(apiSource, /viewKey: "trendRadar"/);
   assert.match(apiSource, /\.eq\("view_key", "trendRadar"\)/);
-  assert.match(pageSource, /type ProtectedPage = MemberView \| "trendRadar"/);
+  assert.match(pageSource, /type ProtectedPage = MemberView \| "trendRadar" \| "stockRadar"/);
   assert.match(pageSource, /if \(!isMember\) \{[\s\S]*setPendingView\("trendRadar"\)/);
   assert.match(pageSource, /aria-label="会员工具"/);
   assert.match(pageSource, /手机端会员工具/);

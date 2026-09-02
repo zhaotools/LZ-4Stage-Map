@@ -4,6 +4,7 @@ import { supabase } from "./supabase";
 
 export type MemberView = "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
 export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early" | "s2Breakdown" | "s4aEntry" | "s4Early";
+export type StockRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
 
 export type MemberProfile = {
   user_id: string;
@@ -36,6 +37,24 @@ export type TrendRadarSnapshot<TMarket = unknown> = {
   rules: Array<{ id: TrendRadarRuleId; label: string; description: string }>;
   counts: Record<TrendRadarRuleId, number> & { unique: number };
   matches: Array<TMarket & { matchRules: TrendRadarRuleId[] }>;
+};
+
+export type StockRadarSnapshot<TMarket = unknown> = {
+  schemaVersion: "lz-stock-radar-v1";
+  generatedAt: string;
+  analysisPeriod: string;
+  scanDirection: "S2";
+  runMode: "full" | string;
+  viewKey: "stockRadar";
+  universeSelectedAt: string;
+  universeSize: number;
+  configuredUniverseSize: number;
+  commonStageAsOf: string | null;
+  marketStats: Array<{ region: "美股" | "A股" | "港股"; universe: number; analyzed: number; live: number; cache: number; matches: number; latestMarketAsOf: string | null }>;
+  quality: { expected: number; analyzed: number; completionRate: number; live: number; cache: number; failures: Array<{ code: string; region: string; error: string }>; durationSeconds: number };
+  rules: Array<{ id: StockRadarRuleId; label: string; description: string }>;
+  counts: Record<StockRadarRuleId, number> & { unique: number };
+  matches: Array<TMarket & { matchRules: StockRadarRuleId[] }>;
 };
 
 function requireClient() {
@@ -107,6 +126,16 @@ export async function getTrendRadarSnapshot<TMarket>(): Promise<TrendRadarSnapsh
     .single();
   if (error) throw error;
   return data.payload as TrendRadarSnapshot<TMarket>;
+}
+
+export async function getStockRadarSnapshot<TMarket>(): Promise<StockRadarSnapshot<TMarket>> {
+  const { data, error } = await requireClient()
+    .from("market_snapshots")
+    .select("payload")
+    .eq("view_key", "stockRadar")
+    .single();
+  if (error) throw error;
+  return data.payload as StockRadarSnapshot<TMarket>;
 }
 
 export function onMemberAuthChange(callback: (session: Session | null) => void) {
