@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 
 export type MemberView = "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
+export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
 
 export type MemberProfile = {
   user_id: string;
@@ -21,6 +22,20 @@ export type MemberSnapshot<TMarket = unknown> = {
   commonStageAsOf: string;
   viewKey: MemberView;
   markets: TMarket[];
+};
+
+export type TrendRadarSnapshot<TMarket = unknown> = {
+  schemaVersion: "lz-trend-radar-v1";
+  generatedAt: string;
+  updateScope: "all" | "traditional" | "crypto";
+  lastUpdatedAt: { traditional: string; crypto: string };
+  analysisPeriod: string;
+  commonStageAsOf: string;
+  viewKey: "trendRadar";
+  universeSize: number;
+  rules: Array<{ id: TrendRadarRuleId; label: string; description: string }>;
+  counts: Record<TrendRadarRuleId, number> & { unique: number };
+  matches: Array<TMarket & { matchRules: TrendRadarRuleId[] }>;
 };
 
 function requireClient() {
@@ -82,6 +97,16 @@ export async function getMemberSnapshot<TMarket>(viewKey: MemberView): Promise<M
     .single();
   if (error) throw error;
   return data.payload as MemberSnapshot<TMarket>;
+}
+
+export async function getTrendRadarSnapshot<TMarket>(): Promise<TrendRadarSnapshot<TMarket>> {
+  const { data, error } = await requireClient()
+    .from("market_snapshots")
+    .select("payload")
+    .eq("view_key", "trendRadar")
+    .single();
+  if (error) throw error;
+  return data.payload as TrendRadarSnapshot<TMarket>;
 }
 
 export function onMemberAuthChange(callback: (session: Session | null) => void) {
