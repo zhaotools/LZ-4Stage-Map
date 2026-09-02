@@ -44,6 +44,15 @@ export async function signOutMember() {
   if (error) throw error;
 }
 
+export async function updateMemberPassword(currentPassword: string, newPassword: string) {
+  const { data, error } = await requireClient().auth.updateUser({
+    password: newPassword,
+    current_password: currentPassword,
+  });
+  if (error) throw error;
+  return data.user;
+}
+
 export async function getMemberSession(): Promise<Session | null> {
   const { data, error } = await requireClient().auth.getSession();
   if (error) throw error;

@@ -31,7 +31,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run data:verify
+      - run: npm run test:ui
       - run: npm run build:pages
       - uses: actions/configure-pages@v5
         with:

@@ -38,6 +38,14 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /getMemberSnapshot<DashboardMarket>\(nextView\)/);
   assert.match(pageSource, /className="member-auth-button"[^\n]+openMemberLogin[^\n]+authReady \? "登录" : "检查登录…"/);
   assert.match(pageSource, /className="member-username"[^\n]+\{memberDisplayName\}<\/span>/);
+  assert.match(pageSource, /className="member-auth-button change-password"[^\n]+openPasswordChange[^\n]+修改密码<\/button>/);
+  assert.match(pageSource, /id="current-member-password"/);
+  assert.match(pageSource, /id="new-member-password"/);
+  assert.match(pageSource, /id="confirm-member-password"/);
+  assert.match(pageSource, /await updateMemberPassword\(currentPassword, newPassword\)/);
+  assert.match(pageSource, /新密码至少8位，并同时包含字母和数字/);
+  assert.match(pageSource, /密码修改成功/);
+  assert.match(pageSource, /当前账号已安全退出，请使用新密码重新登录/);
   assert.match(pageSource, /await signOutMember\(\)/);
   assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);

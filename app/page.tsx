@@ -8,6 +8,7 @@ import {
   Clock3,
   Globe2,
   Grid2X2,
+  KeyRound,
   Landmark,
   LockKeyhole,
   LogOut,
@@ -27,6 +28,7 @@ import {
   isProfileActive,
   signInMember,
   signOutMember,
+  updateMemberPassword,
   type MemberProfile,
   type MemberSnapshot,
   type MemberView,
@@ -308,7 +310,7 @@ export default function Home() {
   const [authReady, setAuthReady] = useState(false);
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [memberSnapshots, setMemberSnapshots] = useState<Partial<Record<MemberView, MemberSnapshot<DashboardMarket>>>>({});
-  const [memberDialog, setMemberDialog] = useState<"locked" | "login" | "dataError" | null>(null);
+  const [memberDialog, setMemberDialog] = useState<"locked" | "login" | "dataError" | "password" | "passwordChanged" | null>(null);
   const [pendingView, setPendingView] = useState<View | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
   const [memberPassword, setMemberPassword] = useState("");
@@ -316,6 +318,11 @@ export default function Home() {
   const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [checkingCredentials, setCheckingCredentials] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [changingPassword, setChangingPassword] = useState(false);
   const [loadingMemberView, setLoadingMemberView] = useState<MemberView | null>(null);
   const [view, setView] = useState<View>("global");
   const [region, setRegion] = useState<Region>("全球");
@@ -536,6 +543,10 @@ export default function Home() {
     setMemberEmail("");
     setMemberPassword("");
     setCaptchaToken(null);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordError(null);
   };
   const openMemberLogin = () => {
     setPendingView(null);
@@ -553,6 +564,49 @@ export default function Home() {
     setMemberSnapshots({});
     closeMemberDialog();
     switchView("global");
+  };
+  const openPasswordChange = () => {
+    setPendingView(null);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordError(null);
+    setMemberDialog("password");
+    closeMarketCard();
+  };
+  const handlePasswordChange = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPasswordError(null);
+    if (newPassword.length < 8 || !/[A-Za-z]/.test(newPassword) || !/\d/.test(newPassword)) {
+      setPasswordError("新密码至少8位，并同时包含字母和数字");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("两次输入的新密码不一致");
+      return;
+    }
+    if (newPassword === currentPassword) {
+      setPasswordError("新密码不能与当前密码相同");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await updateMemberPassword(currentPassword, newPassword);
+    } catch {
+      setPasswordError("当前密码不正确，或新密码不符合安全要求");
+      setChangingPassword(false);
+      return;
+    }
+    await signOutMember().catch(() => undefined);
+    setMemberProfile(null);
+    setMemberSnapshots({});
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    switchView("global");
+    setMemberDialog("passwordChanged");
+    setChangingPassword(false);
   };
   const retryMemberData = async () => {
     if (!pendingView || !isMemberView(pendingView)) return;
@@ -598,6 +652,7 @@ export default function Home() {
               {isMember ? (
                 <div className="member-account" aria-label="当前会员账号">
                   <span className="member-username"><UserRound size={14} />{memberDisplayName}</span>
+                  <button className="member-auth-button change-password" type="button" onClick={openPasswordChange}><KeyRound size={14} />修改密码</button>
                   <button className="member-auth-button logout" type="button" onClick={handleMemberLogout}><LogOut size={14} />退出</button>
                 </div>
               ) : (
@@ -675,6 +730,54 @@ export default function Home() {
                 <h2 id="access-gate-title">会员数据暂时不可用</h2>
                 <p>登录状态有效，但市场快照未能加载，请稍后重试。</p>
                 <button className="member-login-cta" type="button" onClick={retryMemberData} disabled={Boolean(loadingMemberView)}>{loadingMemberView ? "正在重试…" : "重新加载"}</button>
+              </>
+            ) : memberDialog === "passwordChanged" ? (
+              <>
+                <h2 id="access-gate-title">密码修改成功</h2>
+                <p>当前账号已安全退出，请使用新密码重新登录。</p>
+                <button className="member-login-cta" type="button" onClick={openMemberLogin}>重新登录</button>
+              </>
+            ) : memberDialog === "password" ? (
+              <>
+                <h2 id="access-gate-title">修改登录密码</h2>
+                <p>请输入当前密码，并设置新的会员登录密码。</p>
+                <form onSubmit={handlePasswordChange}>
+                  <label htmlFor="current-member-password">当前密码</label>
+                  <input
+                    id="current-member-password"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(event) => { setCurrentPassword(event.target.value); setPasswordError(null); }}
+                    placeholder="请输入当前密码"
+                    autoComplete="current-password"
+                    autoFocus
+                    aria-invalid={Boolean(passwordError)}
+                  />
+                  <label htmlFor="new-member-password">新密码</label>
+                  <input
+                    id="new-member-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(event) => { setNewPassword(event.target.value); setPasswordError(null); }}
+                    placeholder="至少8位，包含字母和数字"
+                    autoComplete="new-password"
+                    aria-invalid={Boolean(passwordError)}
+                  />
+                  <label htmlFor="confirm-member-password">确认新密码</label>
+                  <input
+                    id="confirm-member-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(event) => { setConfirmPassword(event.target.value); setPasswordError(null); }}
+                    placeholder="请再次输入新密码"
+                    autoComplete="new-password"
+                    aria-invalid={Boolean(passwordError)}
+                    aria-describedby={passwordError ? "password-change-error" : "password-change-note"}
+                  />
+                  {passwordError && <span className="access-error" id="password-change-error" role="alert">{passwordError}</span>}
+                  <button type="submit" disabled={!currentPassword || !newPassword || !confirmPassword || changingPassword}>{changingPassword ? "正在修改…" : "确认修改密码"}</button>
+                </form>
+                <small id="password-change-note">修改成功后将退出当前账号，请使用新密码重新登录。</small>
               </>
             ) : (
               <>
