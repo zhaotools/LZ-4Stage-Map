@@ -23,10 +23,13 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /market\.stageDetail/);
   assert.match(source, /market\.observationStage/);
   assert.match(source, /function observationStageFor\(market: Market\)/);
+  assert.match(source, /function observationConfirmationFor\(market: Market\)/);
+  assert.match(source, /market\.observation\.match\(\/\\b\\d\+\\\/\\d\+\\b\/\)/);
+  assert.match(source, /`\$\{progress\}周确认`/);
   assert.match(source, /label\.match\(\/\^S\[1-4\]\//);
   assert.match(source, /stageMeta\[observationStage\]\.color/);
   assert.match(source, /maDirection === "上升" \? stageMeta\.S2\.color : maDirection === "下降" \? stageMeta\.S4\.color : undefined/);
-  assert.match(source, /<dd style=\{\{ color: observationColor \}\}>\{observationLabel\}<\/dd>/);
+  assert.match(source, /\{observationLabel\}\{observationConfirmation && <> · \{observationConfirmation\}<\/>\}/);
   assert.match(source, /<dd style=\{\{ color: maColor \}\}>\{maDirection\}/);
   assert.match(source, /momentum > 0 \? "上升" : momentum < 0 \? "下降" : "持平"/);
   assert.match(source, /5周.*toFixed\(2\).*%/s);

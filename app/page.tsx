@@ -221,12 +221,18 @@ function observationStageFor(market: Market) {
   return label.match(/^S[1-4]/)?.[0] as Stage | undefined;
 }
 
+function observationConfirmationFor(market: Market) {
+  const progress = market.observation.match(/\b\d+\/\d+\b/)?.[0];
+  return progress ? `${progress}周确认` : null;
+}
+
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
   const maDirection = momentumDirection(market.momentum);
   const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
   const observationLabel = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
   const observationStage = observationStageFor(market);
+  const observationConfirmation = observationConfirmationFor(market);
   const observationColor = observationStage ? stageMeta[observationStage].color : undefined;
   const stageConfirmedAt = new Date(`${market.stageAsOf}T00:00:00Z`);
   stageConfirmedAt.setUTCDate(stageConfirmedAt.getUTCDate() + 1 - (market.weeks - 1) * 7);
@@ -237,7 +243,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
         <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationDate} 4AM UTC+8</dd></div>
-        <div><dt>本周观察</dt><dd style={{ color: observationColor }}>{observationLabel}</dd></div>
+        <div><dt>本周观察</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
       </dl>
     </div>
