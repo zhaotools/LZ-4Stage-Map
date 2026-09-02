@@ -15,11 +15,11 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /手机端会员工具/);
   assert.match(pageSource, /趋势雷达/);
   assert.match(pageSource, /转向S2观察/);
-  assert.match(pageSource, /S4B- \/ S4- \/ S4B \/ S3 · 本周观察转向S2/);
+  assert.match(pageSource, /当前主阶段 S4 \/ S3 · 本周观察转向 S2/);
   assert.match(pageSource, /当前进入S2A阶段/);
   assert.match(pageSource, /S2持续时间不超过4周/);
   assert.match(pageSource, /转向S4观察/);
-  assert.match(pageSource, /S2B- \/ S2- \/ S2B \/ S3 · 本周观察转向S4/);
+  assert.match(pageSource, /当前主阶段 S2 \/ S3 · 本周观察转向 S4/);
   assert.match(pageSource, /当前进入S4A阶段/);
   assert.match(pageSource, /S4持续时间不超过4周/);
   assert.match(pageSource, /扫描\{mode\.toUpperCase\(\)\}/);
@@ -37,8 +37,8 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(cssSource, /\.radar-rule-s4aEntry \{ background: #fde9ec; \}/);
   assert.match(cssSource, /\.radar-rule-s4Early \{ background: #f5c4cb; \}/);
   assert.match(cssSource, /\.radar-scan-switch button\.active/);
-  assert.match(cssSource, /\.radar-scan-switch \.scan-s2\.active \{ background: var\(--green\); \}/);
-  assert.match(cssSource, /\.radar-scan-switch \.scan-s4\.active \{ background: var\(--red\); \}/);
+  assert.match(cssSource, /\.radar-scan-switch \.scan-s2\.active \{ color: #087849; background: #c2e8d3; \}/);
+  assert.match(cssSource, /\.radar-scan-switch \.scan-s4\.active \{ color: #bd2638; background: #f5c4cb; \}/);
   assert.match(cssSource, /\.radar-results \{ display: grid;/);
   assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.radar-summary, \.radar-results \{ grid-template-columns: 1fr;/);
 });
