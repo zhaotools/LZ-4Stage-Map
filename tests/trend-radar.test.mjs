@@ -13,7 +13,7 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /if \(!isMember\) \{[\s\S]*setPendingView\("trendRadar"\)/);
   assert.match(pageSource, /aria-label="会员工具"/);
   assert.match(pageSource, /手机端会员工具/);
-  assert.match(pageSource, /趋势雷达/);
+  assert.match(pageSource, /全球阶段扫描/);
   assert.match(pageSource, /转向S2观察/);
   assert.match(pageSource, /当前主阶段 S4 \/ S3 · 本周观察转向 S2/);
   assert.match(pageSource, /当前进入S2A阶段/);
@@ -27,7 +27,7 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /market\.matchRules\.filter[\s\S]*\.map/);
   assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationDateFor\(market\)\} 4AM UTC\+8<\/dd>/);
   assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
-  assert.match(pageSource, /扫描 \{snapshot\.universeSize\} 个全球精选资产/);
+  assert.match(pageSource, /\{snapshot\.universeSize\}个全球核心资产四阶段状态/);
   assert.doesNotMatch(pageSource, /完整周线 · \{snapshot\.analysisPeriod\}/);
   assert.match(cssSource, /\.radar-summary \{ display: grid;/);
   assert.doesNotMatch(cssSource, /\.radar-rule-card::before/);

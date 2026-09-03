@@ -385,13 +385,13 @@ function TrendRadarPage({
   return (
     <section className="radar-panel" aria-labelledby="trend-radar-title">
       <div className="radar-head">
-        <div><span className="section-kicker">TREND RADAR</span><h2 id="trend-radar-title">趋势雷达</h2><p>扫描 {snapshot.universeSize} 个全球精选资产，寻找重要周线阶段变化</p></div>
+        <div><span className="section-kicker">TREND RADAR</span><h2 id="trend-radar-title">全球阶段扫描</h2><p>{snapshot.universeSize}个全球核心资产四阶段状态</p></div>
         <div className="radar-scan-switch" role="group" aria-label="趋势方向扫描切换">
           {(["s2", "s4"] as RadarScanMode[]).map((mode) => <button key={mode} type="button" className={`scan-${mode} ${scanMode === mode ? "active" : ""}`} onClick={() => onScanModeChange(mode)} aria-pressed={scanMode === mode}>扫描{mode.toUpperCase()}</button>)}
         </div>
       </div>
 
-      <div className="radar-summary" role="group" aria-label="趋势雷达条件筛选">
+      <div className="radar-summary" role="group" aria-label="全球阶段扫描条件筛选">
         <button type="button" className={`radar-rule-card radar-rule-all ${filter === "all" ? "selected" : ""}`} onClick={() => onFilterChange("all")} aria-pressed={filter === "all"}>
           <span>本周发现</span><strong>{familyMarkets.length}</strong><small>个不重复资产</small>
         </button>
@@ -406,7 +406,7 @@ function TrendRadarPage({
       </div>
 
       <div className="radar-toolbar">
-        <div className="radar-region-tabs" role="group" aria-label="趋势雷达市场筛选">
+        <div className="radar-region-tabs" role="group" aria-label="全球阶段扫描市场筛选">
           {(["全部", ...availableRegions] as Array<"全部" | MarketRegion>).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item === "全部" ? item : displayRegionName(item)}</button>)}
         </div>
         <span>显示 {filtered.length} / {familyMarkets.length} 个资产</span>
@@ -467,14 +467,14 @@ function StockRadarPage({
   return (
     <section className="radar-panel stock-radar-panel" aria-labelledby="stock-radar-title">
       <div className="radar-head stock-radar-head">
-        <div><span className="section-kicker">STOCK RADAR</span><h2 id="stock-radar-title">个股雷达</h2><p>扫描美股、A股、港股各100只高流动性股票，寻找牛市初期周线机会</p></div>
-        <div className="stock-radar-status" aria-label="个股雷达数据质量">
+        <div><span className="section-kicker">STOCK RADAR</span><h2 id="stock-radar-title">个股阶段扫描</h2><p>A股·港股·美股高流动性股票四阶段状态</p></div>
+        <div className="stock-radar-status" aria-label="个股阶段扫描数据质量">
           <strong>{snapshot.quality.completionRate}% 完整</strong>
           <span>{snapshot.quality.live} 实时 · {snapshot.quality.cache} 缓存</span>
         </div>
       </div>
 
-      <div className="radar-summary" role="group" aria-label="个股雷达条件筛选">
+      <div className="radar-summary" role="group" aria-label="个股阶段扫描条件筛选">
         <button type="button" className={`radar-rule-card radar-rule-all ${filter === "all" ? "selected" : ""}`} onClick={() => onFilterChange("all")} aria-pressed={filter === "all"}>
           <span>本周发现</span><strong>{markets.length}</strong><small>个不重复股票</small>
         </button>
@@ -493,7 +493,7 @@ function StockRadarPage({
       </div>
 
       <div className="radar-toolbar">
-        <div className="radar-region-tabs" role="group" aria-label="个股雷达市场筛选">
+        <div className="radar-region-tabs" role="group" aria-label="个股阶段扫描市场筛选">
           {(["全部", "美股", "A股", "港股"] as const).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item}</button>)}
         </div>
         <span>显示 {filtered.length} / {markets.length} 个机会</span>
@@ -1009,8 +1009,8 @@ export default function Home() {
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
               <h2 id="member-tools-navigation-title">会员工具</h2>
               <nav className="side-tools" aria-label="会员工具">
-                <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}趋势雷达</span></button>
-                <button className={`nav-item ${stockRadarActive ? "active" : ""}`} type="button" onClick={requestStockRadar} aria-pressed={stockRadarActive}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}个股雷达</span></button>
+                <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}全球阶段扫描</span></button>
+                <button className={`nav-item ${stockRadarActive ? "active" : ""}`} type="button" onClick={requestStockRadar} aria-pressed={stockRadarActive}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}个股阶段扫描</span></button>
               </nav>
             </section>
           </div>
@@ -1026,7 +1026,7 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL TREND MAP｜Power by LZ-4Stage</div><h1>全球市场趋势地图</h1></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL TREND MAP｜Power by LZ-4Stage</div><h1>全球市场趋势地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
             <div className="top-actions">
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>
@@ -1054,8 +1054,8 @@ export default function Home() {
           </header>
 
           <nav className="mobile-tool-nav" aria-label="手机端会员工具">
-            <button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>趋势雷达</span></button>
-            <button type="button" className={stockRadarActive ? "active" : ""} onClick={requestStockRadar}><TrendingUp size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>个股雷达</span></button>
+            <button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>全球阶段扫描</span></button>
+            <button type="button" className={stockRadarActive ? "active" : ""} onClick={requestStockRadar}><TrendingUp size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>个股阶段扫描</span></button>
           </nav>
 
           {stockRadarActive && stockRadarSnapshot ? (
@@ -1097,7 +1097,7 @@ export default function Home() {
           </section>
           </>}
 
-          <footer><span>{stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4stage 全球精选扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
+          <footer><span>{stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
         </main>
         <HoverMarketCard market={hoveredMarket} point={hoverPoint} touchMode={touchCardOpen} onClose={closeMarketCard} />
         {showFullVersion && (
@@ -1125,13 +1125,13 @@ export default function Home() {
             {memberDialog === "locked" ? (
               <>
                 <h2 id="access-gate-title">LZ会员专享</h2>
-                <p>{pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看趋势雷达扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
+                <p>{pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
                 <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
               </>
             ) : memberDialog === "dataError" ? (
               <>
                 <h2 id="access-gate-title">会员数据暂时不可用</h2>
-                <p>登录状态有效，但{pendingView === "stockRadar" ? "个股雷达结果" : pendingView === "trendRadar" ? "趋势雷达结果" : "市场快照"}未能加载，请稍后重试。</p>
+                <p>登录状态有效，但{pendingView === "stockRadar" ? "个股阶段扫描结果" : pendingView === "trendRadar" ? "全球阶段扫描结果" : "市场快照"}未能加载，请稍后重试。</p>
                 <button className="member-login-cta" type="button" onClick={retryMemberData} disabled={Boolean(loadingMemberView)}>{loadingMemberView ? "正在重试…" : "重新加载"}</button>
               </>
             ) : memberDialog === "passwordChanged" ? (

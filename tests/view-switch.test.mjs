@@ -71,6 +71,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /"日股" \| "欧股"/);
   assert.match(pageSource, /GLOBAL TREND MAP/);
   assert.match(pageSource, /<h1>全球市场趋势地图<\/h1>/);
+  assert.match(pageSource, /<p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察<\/p>/);
   assert.doesNotMatch(pageSource, /activeViewMeta\.(?:eyebrow|subtitle)/);
   assert.match(pageSource, /return region === "大宗·宏观" \? "宏观" : region/);
   assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
