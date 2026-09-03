@@ -7,7 +7,6 @@ import {
   Building2,
   CalendarDays,
   ChevronDown,
-  Clock3,
   Globe2,
   Grid2X2,
   KeyRound,
@@ -16,7 +15,6 @@ import {
   LogOut,
   MousePointerClick,
   Radar,
-  RefreshCw,
   TrendingUp,
   UserPlus,
   UserRound,
@@ -1098,9 +1096,7 @@ export default function Home() {
             <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
             <div className="top-actions">
               <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
-              <span className="confirmation-date"><CalendarDays size={16} /><span className="confirmation-label-long">共同确认至</span><span className="confirmation-label-short">确认至</span> {commonConfirmationDate}</span>
-              <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(activeGeneratedAt)}</strong></span></div>
-              <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
+              <span className="confirmation-date"><CalendarDays size={16} />确认至 {commonConfirmationDate}</span>
               <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>
               {isMember ? (
                 <div className="member-account-menu" ref={accountMenuRef}>
@@ -1177,7 +1173,7 @@ export default function Home() {
           </section>
           </>}
 
-          <footer><span>{introductionActive ? "LZ-4Stage 四阶段趋势框架" : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
+          <footer><span>{introductionActive ? "LZ-4Stage 四阶段趋势框架" : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>数据生成于 {formatDateTime(activeGeneratedAt)}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
         </main>
         <HoverMarketCard market={hoveredMarket} point={hoverPoint} touchMode={touchCardOpen} onClose={closeMarketCard} />
         {showFullVersion && (
