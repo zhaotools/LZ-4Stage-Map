@@ -18,6 +18,7 @@ import {
   Radar,
   RefreshCw,
   TrendingUp,
+  UserPlus,
   UserRound,
   X,
 } from "lucide-react";
@@ -1097,10 +1098,10 @@ export default function Home() {
             <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
             <div className="top-actions">
               <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
-              <button className="period-badge full-version-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={15} />点击获取完整版</button>
               <span className="confirmation-date"><CalendarDays size={16} />共同确认至 {commonConfirmationDate}</span>
               <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(activeGeneratedAt)}</strong></span></div>
               <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
+              <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>
               {isMember ? (
                 <div className="member-account-menu" ref={accountMenuRef}>
                   <div className="member-account" aria-label="当前会员账号">
@@ -1116,7 +1117,7 @@ export default function Home() {
                   )}
                 </div>
               ) : (
-                <button className="member-auth-button" type="button" onClick={openMemberLogin} disabled={!authReady}><UserRound size={14} />{authReady ? "登录" : "检查登录…"}</button>
+                <button className="member-auth-button login-button" type="button" onClick={openMemberLogin} disabled={!authReady}><UserRound size={14} />{authReady ? "登录" : "检查登录…"}</button>
               )}
             </div>
           </header>
@@ -1184,9 +1185,9 @@ export default function Home() {
             <section className="full-version-modal" role="dialog" aria-modal="true" aria-labelledby="full-version-title">
               <button className="modal-close" type="button" aria-label="关闭完整版介绍" onClick={() => setShowFullVersion(false)}><X size={19} /></button>
               <div className="modal-icon"><MousePointerClick size={21} /></div>
-              <h2 id="full-version-title">了解LZ-4Stage完整版</h2>
-              <p>当前公开地图提供全球主要资产阶段观察。</p>
-              <p>完整版可用于查询自选的股票、ETF、指数、加密等资产。</p>
+              <h2 id="full-version-title">注册成为LZ会员</h2>
+              <p>LZ-4Stage全球市场阶段地图，可公开访问。</p>
+              <p>其他市场查询，以及市场扫描工具，需注册会员。</p>
               <div className="wechat-contact"><strong>请添加以下微信</strong><span>咨询更多信息</span></div>
               {/* Keep the original QR pixels intact instead of routing through image optimization. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}

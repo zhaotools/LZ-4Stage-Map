@@ -42,7 +42,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /profile = await getMemberProfile\(\)/);
   assert.match(pageSource, /if \(!isProfileActive\(profile\)\)/);
   assert.match(pageSource, /getMemberSnapshot<DashboardMarket>\(nextView\)/);
-  assert.match(pageSource, /className="member-auth-button"[^\n]+openMemberLogin[^\n]+authReady \? "登录" : "检查登录…"/);
+  assert.match(pageSource, /className="member-auth-button login-button"[^\n]+openMemberLogin[^\n]+authReady \? "登录" : "检查登录…"/);
   assert.match(pageSource, /className="member-username"[^\n]+aria-haspopup="menu" aria-expanded=\{accountMenuOpen\}/);
   assert.match(pageSource, /\{memberDisplayName\}<ChevronDown className=\{accountMenuOpen \? "open" : ""\}/);
   assert.match(pageSource, /className="member-submenu" role="menu" aria-label="会员账号菜单"/);
@@ -59,10 +59,14 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
   assert.match(pageSource, /GLOBAL STAGE MAP｜Power by LZ-4Stage/);
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+LZ-4Stage介绍<\/button>/);
-  assert.match(pageSource, /className="period-badge full-version-button"[^\n]+点击获取完整版<\/button>/);
-  assert.ok(pageSource.indexOf("LZ-4Stage介绍</button>") < pageSource.indexOf("点击获取完整版</button>"));
+  assert.match(pageSource, /className="member-auth-button register-member-button"[^\n]+注册会员<\/button>/);
+  assert.ok(pageSource.indexOf("注册会员</button>") < pageSource.indexOf('className="member-auth-button login-button"'));
   assert.doesNotMatch(pageSource, />完整周线<\/span>/);
   assert.doesNotMatch(pageSource, /点击获取完整LZ-4Stage/);
+  assert.doesNotMatch(pageSource, /点击获取完整版/);
+  assert.match(pageSource, /注册成为LZ会员/);
+  assert.match(pageSource, /LZ-4Stage全球市场阶段地图，可公开访问。/);
+  assert.match(pageSource, /其他市场查询，以及市场扫描工具，需注册会员。/);
   assert.match(pageSource, /const \[introductionActive, setIntroductionActive\] = useState\(false\)/);
   assert.match(pageSource, /const openStageIntroduction = \(\) => \{[\s\S]+setIntroductionActive\(true\)/);
   assert.match(pageSource, /className="stage-introduction" aria-labelledby="stage-introduction-title"/);
@@ -78,6 +82,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。/);
   assert.match(cssSource, /\.stage-intro-link \{[^}]*text-decoration: underline;/);
   assert.match(cssSource, /\.stage-introduction-image \{[^}]*margin: 0 auto 28px;/);
+  assert.match(cssSource, /\.stage-introduction-copy \{[^}]*font-size: 15px;/);
+  assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 16px;/);
   assert.doesNotMatch(pageSource, /<p>Power by LZ-4Stage<\/p>/);
   assert.doesNotMatch(pageSource, /"028528"/);
   assert.doesNotMatch(pageSource, /ADMIN_USERNAME_HASH|ADMIN_PASSWORD_HASH|MEMBER_STORAGE_KEY|hashText/);
