@@ -3,6 +3,7 @@
 import { type CSSProperties, type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart3,
+  BookOpenText,
   Building2,
   CalendarDays,
   ChevronDown,
@@ -554,6 +555,7 @@ export default function Home() {
   const [view, setView] = useState<View>("global");
   const [radarActive, setRadarActive] = useState(false);
   const [stockRadarActive, setStockRadarActive] = useState(false);
+  const [introductionActive, setIntroductionActive] = useState(false);
   const [radarFilter, setRadarFilter] = useState<RadarFilter>("all");
   const [radarRegion, setRadarRegion] = useState<"全部" | MarketRegion>("全部");
   const [radarScanMode, setRadarScanMode] = useState<RadarScanMode>("s2");
@@ -836,6 +838,7 @@ export default function Home() {
   const switchView = (nextView: View) => {
     setRadarActive(false);
     setStockRadarActive(false);
+    setIntroductionActive(false);
     setView(nextView);
     setRegion("全球");
     setStageFilter("全部");
@@ -858,6 +861,7 @@ export default function Home() {
     }
     setRadarActive(true);
     setStockRadarActive(false);
+    setIntroductionActive(false);
     setRadarFilter("all");
     setRadarRegion("全部");
     closeMarketCard();
@@ -879,6 +883,7 @@ export default function Home() {
     }
     setStockRadarActive(true);
     setRadarActive(false);
+    setIntroductionActive(false);
     setStockRadarFilter("all");
     setStockRadarRegion("全部");
     closeMarketCard();
@@ -922,6 +927,13 @@ export default function Home() {
     setCaptchaToken(null);
     setCaptchaResetKey((current) => current + 1);
     setMemberDialog("login");
+    closeMarketCard();
+  };
+  const openStageIntroduction = () => {
+    setIntroductionActive(true);
+    setRadarActive(false);
+    setStockRadarActive(false);
+    setMobileMenuOpen(null);
     closeMarketCard();
   };
   const handleMemberLogout = async () => {
@@ -993,12 +1005,14 @@ export default function Home() {
     if (nextView === "trendRadar") {
       setRadarActive(true);
       setStockRadarActive(false);
+      setIntroductionActive(false);
       setRadarFilter("all");
       setRadarRegion("全部");
       closeMarketCard();
     } else if (nextView === "stockRadar") {
       setStockRadarActive(true);
       setRadarActive(false);
+      setIntroductionActive(false);
       setStockRadarFilter("all");
       setStockRadarRegion("全部");
       closeMarketCard();
@@ -1017,11 +1031,11 @@ export default function Home() {
             <section className="side-nav-section" aria-labelledby="market-map-navigation-title">
               <h2 id="market-map-navigation-title">市场地图</h2>
               <nav className="side-nav" aria-label="市场地图">
-                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!radarActive && !stockRadarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
-                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!radarActive && !stockRadarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
-                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!radarActive && !stockRadarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
-                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!radarActive && !stockRadarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
-                <button className={`nav-item ${!radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!radarActive && !stockRadarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
               </nav>
             </section>
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
@@ -1036,7 +1050,7 @@ export default function Home() {
             <div className="mobile-nav-menu">
               <button
                 type="button"
-                className={`mobile-menu-trigger ${!radarActive && !stockRadarActive ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
+                className={`mobile-menu-trigger ${!introductionActive && !radarActive && !stockRadarActive ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
                 onClick={() => setMobileMenuOpen((current) => current === "market" ? null : "market")}
                 aria-label="手机端市场地图"
                 aria-haspopup="menu"
@@ -1047,11 +1061,11 @@ export default function Home() {
               </button>
               {mobileMenuOpen === "market" && (
                 <div className="mobile-dropdown-panel" id="mobile-market-menu" role="menu" aria-label="市场地图">
-                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("global"); }}><Grid2X2 size={15} /><span>全球</span></button>
-                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("usSelected"); }}><TrendingUp size={15} /><span>美股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("chinaIndices"); }}><Landmark size={15} /><span>A股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("global"); }}><Grid2X2 size={15} /><span>全球</span></button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("usSelected"); }}><TrendingUp size={15} /><span>美股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("chinaIndices"); }}><Landmark size={15} /><span>A股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                 </div>
               )}
             </div>
@@ -1082,8 +1096,8 @@ export default function Home() {
           <header className="topbar">
             <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
             <div className="top-actions">
-              <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
-              <span className="period-badge">完整周线</span>
+              <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
+              <button className="period-badge full-version-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={15} />点击获取完整版</button>
               <span className="confirmation-date"><CalendarDays size={16} />共同确认至 {commonConfirmationDate}</span>
               <div className="update-time"><Clock3 size={15} /><span>生成于 <strong>{formatDateTime(activeGeneratedAt)}</strong></span></div>
               <button className="icon-button" aria-label="刷新页面" onClick={() => window.location.reload()}><RefreshCw size={18} /></button>
@@ -1107,7 +1121,23 @@ export default function Home() {
             </div>
           </header>
 
-          {stockRadarActive && stockRadarSnapshot ? (
+          {introductionActive ? (
+            <article className="stage-introduction" aria-labelledby="stage-introduction-title">
+              <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.png`} alt="LZ-4Stage 春夏秋冬四阶段趋势框架图" width="1536" height="1024" />
+              <div className="stage-introduction-copy">
+                <h2 id="stage-introduction-title">LZ-4Stage 四阶段趋势框架</h2>
+                <p>LZ-4Stage 将一个完整的市场趋势周期划分为 <strong>4 个阶段</strong>，用“春、夏、秋、冬”帮助理解资产当前所处的位置。</p>
+                <section className="stage-introduction-item stage-introduction-s1"><h3>Stage 1｜春季：底部整理期</h3><p>下跌趋势逐渐结束，价格开始横盘筑底，30周均线趋于走平。市场处于新一轮趋势形成前的准备阶段。</p></section>
+                <section className="stage-introduction-item stage-introduction-s2"><h3>Stage 2｜夏季：上升趋势期</h3><p>价格突破底部区域并运行在30周均线上方，均线转为向上。通常是趋势最明确、持续时间最长的阶段。</p><p>LZ-4Stage 进一步划分为 <strong>S2A → S2 → S2- → S2B → S2B-</strong>，用于观察趋势从早期启动到后期衰减的过程。</p></section>
+                <section className="stage-introduction-item stage-introduction-s3"><h3>Stage 3｜秋季：顶部整理期</h3><p>上涨动能减弱，价格高位反复震荡，30周均线逐渐走平。市场由上涨趋势向下一阶段过渡。</p></section>
+                <section className="stage-introduction-item stage-introduction-s4"><h3>Stage 4｜冬季：下降趋势期</h3><p>价格跌破关键趋势区域，30周均线转为向下，进入持续下降阶段。</p><p>LZ-4Stage 将其进一步划分为 <strong>S4A → S4 → S4- → S4B → S4B-</strong>，用于观察下跌趋势从早期到尾声的变化。</p></section>
+                <p className="stage-introduction-ma"><strong>30周移动平均线</strong> 是整个四阶段框架的重要参考线，用来判断中长期趋势方向：<br /><strong>向上代表趋势偏强，走平代表趋势转换，向下代表趋势偏弱。</strong></p>
+                <p>LZ-4Stage 的核心不是预测涨跌，而是回答一个更简单的问题：<strong>当前资产处在趋势周期的什么位置？</strong></p>
+                <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
+                <p className="stage-introduction-closing">用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。</p>
+              </div>
+            </article>
+          ) : stockRadarActive && stockRadarSnapshot ? (
             <StockRadarPage snapshot={stockRadarSnapshot} markets={stockRadarSnapshot.matches} filter={stockRadarFilter} region={stockRadarRegion} onFilterChange={setStockRadarFilter} onRegionChange={setStockRadarRegion} />
           ) : radarActive && radarSnapshot ? (
             <TrendRadarPage snapshot={radarSnapshot} markets={radarMarkets} filter={radarFilter} region={radarRegion} scanMode={radarScanMode} onFilterChange={setRadarFilter} onRegionChange={setRadarRegion} onScanModeChange={(mode) => { setRadarScanMode(mode); setRadarFilter("all"); setRadarRegion("全部"); }} />
@@ -1146,7 +1176,7 @@ export default function Home() {
           </section>
           </>}
 
-          <footer><span>{stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
+          <footer><span>{introductionActive ? "LZ-4Stage 四阶段趋势框架" : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></footer>
         </main>
         <HoverMarketCard market={hoveredMarket} point={hoverPoint} touchMode={touchCardOpen} onClose={closeMarketCard} />
         {showFullVersion && (

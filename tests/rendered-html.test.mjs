@@ -29,7 +29,8 @@ test("renders the real-data trend map", async () => {
   const html = await response.text();
   assert.match(html, /GLOBAL STAGE MAP/);
   assert.match(html, /<h1>全球市场阶段地图<\/h1>/);
-  assert.match(html, /点击获取完整LZ-4Stage/);
+  assert.match(html, /LZ-4Stage介绍/);
+  assert.match(html, /点击获取完整版/);
   assert.match(html, /<p>Power by LZ-4Stage<\/p>/);
   assert.match(html, /<h2>全球市场<\/h2>/);
   assert.match(html, />GLOBAL MARKET<\/span>/);
