@@ -59,7 +59,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
   assert.match(pageSource, /GLOBAL STAGE MAP｜Power by LZ-4Stage/);
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+LZ-4Stage介绍<\/button>/);
-  assert.match(pageSource, /className="member-auth-button register-member-button"[^\n]+注册会员<\/button>/);
+  assert.match(pageSource, /\{!isMember && <button className="member-auth-button register-member-button"[^\n]+注册会员<\/button>\}/);
   assert.ok(pageSource.indexOf("注册会员</button>") < pageSource.indexOf('className="member-auth-button login-button"'));
   assert.match(pageSource, /className="confirmation-date"><CalendarDays size=\{16\} \/>确认至 \{commonConfirmationDate\}<\/span>/);
   assert.match(pageSource, /数据生成于 \{formatDateTime\(activeGeneratedAt\)\}/);

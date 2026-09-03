@@ -1097,7 +1097,7 @@ export default function Home() {
             <div className="top-actions">
               <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
               <span className="confirmation-date"><CalendarDays size={16} />确认至 {commonConfirmationDate}</span>
-              <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>
+              {!isMember && <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>}
               {isMember ? (
                 <div className="member-account-menu" ref={accountMenuRef}>
                   <div className="member-account" aria-label="当前会员账号">
