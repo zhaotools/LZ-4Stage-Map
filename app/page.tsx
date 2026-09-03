@@ -549,6 +549,7 @@ export default function Home() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [changingPassword, setChangingPassword] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<"market" | "tools" | null>(null);
   const [loadingMemberView, setLoadingMemberView] = useState<ProtectedPage | null>(null);
   const [view, setView] = useState<View>("global");
   const [radarActive, setRadarActive] = useState(false);
@@ -565,6 +566,7 @@ export default function Home() {
   const [touchCardOpen, setTouchCardOpen] = useState(false);
   const [showFullVersion, setShowFullVersion] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
+  const mobileNavigationRef = useRef<HTMLElement | null>(null);
   const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
   const memberDisplayName = memberProfile?.display_name || "会员";
   const handleCaptchaToken = useCallback((token: string | null) => setCaptchaToken(token), []);
@@ -626,6 +628,22 @@ export default function Home() {
       window.removeEventListener("keydown", closeOnEscape);
     };
   }, [accountMenuOpen]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const closeOnOutside = (event: globalThis.PointerEvent) => {
+      if (!mobileNavigationRef.current?.contains(event.target as Node)) setMobileMenuOpen(null);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(null);
+    };
+    document.addEventListener("pointerdown", closeOnOutside);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutside);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     if (!memberDialog) return;
@@ -1014,12 +1032,48 @@ export default function Home() {
               </nav>
             </section>
           </div>
-          <nav className="mobile-view-nav" aria-label="手机端页面导航">
-            <button type="button" className={!radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => requestView("global")}>全球</button>
-            <button type="button" className={!radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => requestView("crypto7")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>加密</span></button>
-            <button type="button" className={!radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => requestView("usSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>美股</span></button>
-            <button type="button" className={!radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => requestView("chinaIndices")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>A股</span></button>
-            <button type="button" className={!radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => requestView("hkSelected")}>{!isMember && <LockKeyhole size={9} aria-hidden="true" />}<span>港股</span></button>
+          <nav className="mobile-navigation-menus" aria-label="手机端导航" ref={mobileNavigationRef}>
+            <div className="mobile-nav-menu">
+              <button
+                type="button"
+                className={`mobile-menu-trigger ${!radarActive && !stockRadarActive ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
+                onClick={() => setMobileMenuOpen((current) => current === "market" ? null : "market")}
+                aria-label="手机端市场地图"
+                aria-haspopup="menu"
+                aria-expanded={mobileMenuOpen === "market"}
+                aria-controls="mobile-market-menu"
+              >
+                <Grid2X2 size={15} /><span>市场地图</span><ChevronDown size={13} aria-hidden="true" />
+              </button>
+              {mobileMenuOpen === "market" && (
+                <div className="mobile-dropdown-panel" id="mobile-market-menu" role="menu" aria-label="市场地图">
+                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("global"); }}><Grid2X2 size={15} /><span>全球</span></button>
+                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("usSelected"); }}><TrendingUp size={15} /><span>美股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("chinaIndices"); }}><Landmark size={15} /><span>A股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                </div>
+              )}
+            </div>
+            <div className="mobile-nav-menu mobile-tools-menu">
+              <button
+                type="button"
+                className={`mobile-menu-trigger ${radarActive || stockRadarActive ? "active" : ""} ${mobileMenuOpen === "tools" ? "open" : ""}`}
+                onClick={() => setMobileMenuOpen((current) => current === "tools" ? null : "tools")}
+                aria-label="手机端会员工具"
+                aria-haspopup="menu"
+                aria-expanded={mobileMenuOpen === "tools"}
+                aria-controls="mobile-tools-menu"
+              >
+                <Radar size={15} /><span>会员工具</span><ChevronDown size={13} aria-hidden="true" />
+              </button>
+              {mobileMenuOpen === "tools" && (
+                <div className="mobile-dropdown-panel" id="mobile-tools-menu" role="menu" aria-label="会员工具">
+                  <button type="button" role="menuitem" className={radarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestTrendRadar(); }}><Radar size={15} /><span>全球阶段扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={stockRadarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestStockRadar(); }}><TrendingUp size={15} /><span>个股阶段扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                </div>
+              )}
+            </div>
           </nav>
           <div className="sidebar-bottom"><span>数据周期</span><strong>{week.year} · W{String(week.week).padStart(2, "0")}</strong><small>仅作为市场观察工具</small></div>
         </aside>
@@ -1052,11 +1106,6 @@ export default function Home() {
               )}
             </div>
           </header>
-
-          <nav className="mobile-tool-nav" aria-label="手机端会员工具">
-            <button type="button" className={radarActive ? "active" : ""} onClick={requestTrendRadar}><Radar size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>全球阶段扫描</span></button>
-            <button type="button" className={stockRadarActive ? "active" : ""} onClick={requestStockRadar}><TrendingUp size={15} />{!isMember && <LockKeyhole size={10} aria-hidden="true" />}<span>个股阶段扫描</span></button>
-          </nav>
 
           {stockRadarActive && stockRadarSnapshot ? (
             <StockRadarPage snapshot={stockRadarSnapshot} markets={stockRadarSnapshot.matches} filter={stockRadarFilter} region={stockRadarRegion} onFilterChange={setStockRadarFilter} onRegionChange={setStockRadarRegion} />
