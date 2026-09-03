@@ -61,6 +61,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+LZ-4Stage介绍<\/button>/);
   assert.match(pageSource, /className="member-auth-button register-member-button"[^\n]+注册会员<\/button>/);
   assert.ok(pageSource.indexOf("注册会员</button>") < pageSource.indexOf('className="member-auth-button login-button"'));
+  assert.match(pageSource, /confirmation-label-long">共同确认至<\/span><span className="confirmation-label-short">确认至<\/span>/);
   assert.doesNotMatch(pageSource, />完整周线<\/span>/);
   assert.doesNotMatch(pageSource, /点击获取完整LZ-4Stage/);
   assert.doesNotMatch(pageSource, /点击获取完整版/);
@@ -84,6 +85,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(cssSource, /\.stage-introduction-image \{[^}]*margin: 0 auto 28px;/);
   assert.match(cssSource, /\.stage-introduction-copy \{[^}]*font-size: 15px;/);
   assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 16px;/);
+  assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.top-actions \{[^}]*flex-wrap: nowrap;[^}]*gap: 5px;/);
+  assert.match(cssSource, /\.confirmation-label-long \{ display: none; \}\.confirmation-label-short \{ display: inline; \}/);
   assert.doesNotMatch(pageSource, /<p>Power by LZ-4Stage<\/p>/);
   assert.doesNotMatch(pageSource, /"028528"/);
   assert.doesNotMatch(pageSource, /ADMIN_USERNAME_HASH|ADMIN_PASSWORD_HASH|MEMBER_STORAGE_KEY|hashText/);
