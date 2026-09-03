@@ -13,8 +13,9 @@ test("member-only stock radar loads the protected 300-stock S2 snapshot", () => 
   assert.match(pageSource, /onClick=\{requestStockRadar\}/);
   assert.match(pageSource, />个股阶段扫描<\/span>/);
   assert.match(pageSource, /A股·港股·美股高流动性股票四阶段状态/);
-  assert.match(pageSource, /\{stat\.matches\} 个观察标的/);
-  assert.match(pageSource, /\{markets\.length\} 个观察标的/);
+  assert.match(pageSource, /\{stat\.matches\} 个观察/);
+  assert.match(pageSource, /\{markets\.length\} 个观察/);
+  assert.doesNotMatch(pageSource, /观察标的/);
   assert.doesNotMatch(pageSource, /个机会/);
   assert.match(pageSource, /20日均额/);
   assert.match(pageSource, /stockRadarSnapshot\.matches/);

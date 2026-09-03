@@ -489,14 +489,14 @@ function StockRadarPage({
       </div>
 
       <div className="stock-market-health" aria-label="三个市场扫描状态">
-        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 个观察标的</em></div>)}
+        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 个观察</em></div>)}
       </div>
 
       <div className="radar-toolbar">
         <div className="radar-region-tabs" role="group" aria-label="个股阶段扫描市场筛选">
           {(["全部", "美股", "A股", "港股"] as const).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item}</button>)}
         </div>
-        <span>显示 {filtered.length} / {markets.length} 个观察标的</span>
+        <span>显示 {filtered.length} / {markets.length} 个观察</span>
       </div>
 
       {filtered.length ? (
