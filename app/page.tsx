@@ -385,7 +385,7 @@ function TrendRadarPage({
   return (
     <section className="radar-panel" aria-labelledby="trend-radar-title">
       <div className="radar-head">
-        <div><span className="section-kicker">TREND RADAR</span><h2 id="trend-radar-title">全球阶段扫描</h2><p>{snapshot.universeSize}个全球核心资产四阶段状态</p></div>
+        <div><span className="section-kicker">STAGE SCAN</span><h2 id="trend-radar-title">全球阶段扫描</h2><p>{snapshot.universeSize}个全球核心资产四阶段状态</p></div>
         <div className="radar-scan-switch" role="group" aria-label="趋势方向扫描切换">
           {(["s2", "s4"] as RadarScanMode[]).map((mode) => <button key={mode} type="button" className={`scan-${mode} ${scanMode === mode ? "active" : ""}`} onClick={() => onScanModeChange(mode)} aria-pressed={scanMode === mode}>扫描{mode.toUpperCase()}</button>)}
         </div>
@@ -467,7 +467,7 @@ function StockRadarPage({
   return (
     <section className="radar-panel stock-radar-panel" aria-labelledby="stock-radar-title">
       <div className="radar-head stock-radar-head">
-        <div><span className="section-kicker">STOCK RADAR</span><h2 id="stock-radar-title">个股阶段扫描</h2><p>A股·港股·美股高流动性股票四阶段状态</p></div>
+        <div><span className="section-kicker">STAGE SCAN</span><h2 id="stock-radar-title">个股阶段扫描</h2><p>A股·港股·美股高流动性股票四阶段状态</p></div>
         <div className="stock-radar-status" aria-label="个股阶段扫描数据质量">
           <strong>{snapshot.quality.completionRate}% 完整</strong>
           <span>{snapshot.quality.live} 实时 · {snapshot.quality.cache} 缓存</span>
@@ -489,14 +489,14 @@ function StockRadarPage({
       </div>
 
       <div className="stock-market-health" aria-label="三个市场扫描状态">
-        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 个机会</em></div>)}
+        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 个观察标的</em></div>)}
       </div>
 
       <div className="radar-toolbar">
         <div className="radar-region-tabs" role="group" aria-label="个股阶段扫描市场筛选">
           {(["全部", "美股", "A股", "港股"] as const).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item}</button>)}
         </div>
-        <span>显示 {filtered.length} / {markets.length} 个机会</span>
+        <span>显示 {filtered.length} / {markets.length} 个观察标的</span>
       </div>
 
       {filtered.length ? (
@@ -1026,7 +1026,7 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL TREND MAP｜Power by LZ-4Stage</div><h1>全球市场趋势地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
             <div className="top-actions">
               <button className="full-version-link" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><MousePointerClick size={16} />点击获取完整LZ-4Stage</button>
               <span className="period-badge">完整周线</span>

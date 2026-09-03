@@ -14,6 +14,7 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /aria-label="会员工具"/);
   assert.match(pageSource, /手机端会员工具/);
   assert.match(pageSource, /全球阶段扫描/);
+  assert.match(pageSource, /<span className="section-kicker">STAGE SCAN<\/span>/);
   assert.match(pageSource, /转向S2观察/);
   assert.match(pageSource, /当前主阶段 S4 \/ S3 · 本周观察转向 S2/);
   assert.match(pageSource, /当前进入S2A阶段/);

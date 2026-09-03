@@ -54,7 +54,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /await signOutMember\(\)/);
   assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
-  assert.match(pageSource, /GLOBAL TREND MAP｜Power by LZ-4Stage/);
+  assert.match(pageSource, /GLOBAL STAGE MAP｜Power by LZ-4Stage/);
   assert.doesNotMatch(pageSource, /<p>Power by LZ-4Stage<\/p>/);
   assert.doesNotMatch(pageSource, /"028528"/);
   assert.doesNotMatch(pageSource, /ADMIN_USERNAME_HASH|ADMIN_PASSWORD_HASH|MEMBER_STORAGE_KEY|hashText/);
@@ -69,8 +69,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /hkSelected: \{ mapKicker: "HONG KONG INDEX", mapTitle: "港股指数"/);
   assert.match(pageSource, /\{activeViewMeta\.mapKicker\}<\/span><h2>\{activeViewMeta\.mapTitle\}<\/h2>/);
   assert.match(pageSource, /"日股" \| "欧股"/);
-  assert.match(pageSource, /GLOBAL TREND MAP/);
-  assert.match(pageSource, /<h1>全球市场趋势地图<\/h1>/);
+  assert.match(pageSource, /GLOBAL STAGE MAP/);
+  assert.match(pageSource, /<h1>全球市场阶段地图<\/h1>/);
   assert.match(pageSource, /<p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察<\/p>/);
   assert.doesNotMatch(pageSource, /activeViewMeta\.(?:eyebrow|subtitle)/);
   assert.match(pageSource, /return region === "大宗·宏观" \? "宏观" : region/);
