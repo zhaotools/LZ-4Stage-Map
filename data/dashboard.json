@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-02T23:25:18.919Z",
+  "generatedAt": "2026-09-04T08:02:37.208Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-02T23:25:18.919Z",
-    "crypto": "2026-09-02T23:25:18.919Z"
+    "traditional": "2026-09-04T08:02:37.208Z",
+    "crypto": "2026-09-04T08:02:37.208Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-24",
@@ -32,8 +32,8 @@
       "momentum": 1.79,
       "distance": 6.81,
       "confidence": 95,
-      "close": 7666.60009765625,
-      "marketAsOf": "2026-09-02",
+      "close": 7747.7099609375,
+      "marketAsOf": "2026-09-03",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -60,8 +60,8 @@
       "momentum": 7.22,
       "distance": 8.07,
       "confidence": 95,
-      "close": 501.44000244140625,
-      "marketAsOf": "2026-09-02",
+      "close": 502.20001220703125,
+      "marketAsOf": "2026-09-03",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -88,8 +88,8 @@
       "momentum": -0.64,
       "distance": -24.79,
       "confidence": 95,
-      "close": 15.199999809265137,
-      "marketAsOf": "2026-09-02",
+      "close": 14.170000076293945,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -103,7 +103,7 @@
         "global",
         "chinaIndices"
       ],
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S2",
@@ -116,8 +116,8 @@
       "momentum": 0.95,
       "distance": -5.05,
       "confidence": 50,
-      "close": 3312.24,
-      "marketAsOf": "2026-09-02",
+      "close": 3286.55,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -144,8 +144,8 @@
       "momentum": -3.32,
       "distance": -5.03,
       "confidence": 95,
-      "close": 4517.16,
-      "marketAsOf": "2026-09-02",
+      "close": 4565.95,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -171,8 +171,8 @@
       "momentum": 3.79,
       "distance": 7.34,
       "confidence": 95,
-      "close": 66215.34375,
-      "marketAsOf": "2026-09-01",
+      "close": 65020.94140625,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -198,8 +198,8 @@
       "momentum": 1.48,
       "distance": 6.74,
       "confidence": 95,
-      "close": 6368.97998046875,
-      "marketAsOf": "2026-09-01",
+      "close": 6385.08984375,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -226,8 +226,8 @@
       "momentum": 0.2,
       "distance": 0.32,
       "confidence": 84,
-      "close": 99.5770034790039,
-      "marketAsOf": "2026-09-02",
+      "close": 99.04000091552734,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -254,8 +254,8 @@
       "momentum": 1.91,
       "distance": 6.65,
       "confidence": 95,
-      "close": 4.796000003814697,
-      "marketAsOf": "2026-09-02",
+      "close": 4.76200008392334,
+      "marketAsOf": "2026-09-03",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -281,8 +281,8 @@
       "momentum": 4.62,
       "distance": -2.62,
       "confidence": 68,
-      "close": 90.69000244140625,
-      "marketAsOf": "2026-09-02",
+      "close": 90.66999816894531,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -308,8 +308,8 @@
       "momentum": -0.88,
       "distance": -1.6,
       "confidence": 84,
-      "close": 4429.60009765625,
-      "marketAsOf": "2026-09-02",
+      "close": 4531.7001953125,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -336,7 +336,7 @@
       "momentum": -4.28,
       "distance": 11.89,
       "confidence": 35,
-      "close": 77152.29,
+      "close": 80633.88,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -364,7 +364,7 @@
       "momentum": -6.31,
       "distance": 19.57,
       "confidence": 35,
-      "close": 2383.26,
+      "close": 2503.97,
       "marketAsOf": "2026-08-31",
       "stageAsOf": "2026-08-24",
       "hasProvisionalBar": true
@@ -392,8 +392,8 @@
       "momentum": 2.37,
       "distance": 6.95,
       "confidence": 95,
-      "close": 29143.330078125,
-      "marketAsOf": "2026-09-02",
+      "close": 29482.3203125,
+      "marketAsOf": "2026-09-03",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -420,8 +420,8 @@
       "momentum": -0.69,
       "distance": 0.82,
       "confidence": 50,
-      "close": 25311.21,
-      "marketAsOf": "2026-09-02",
+      "close": 25665.35,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     },
@@ -435,7 +435,7 @@
         "global",
         "chinaIndices"
       ],
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S3",
@@ -448,8 +448,8 @@
       "momentum": -0.21,
       "distance": -2.18,
       "confidence": 84,
-      "close": 4547.96,
-      "marketAsOf": "2026-09-02",
+      "close": 4548.05,
+      "marketAsOf": "2026-09-04",
       "stageAsOf": "2026-08-28",
       "hasProvisionalBar": true
     }
