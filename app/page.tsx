@@ -23,6 +23,7 @@ import {
 
 import dashboardData from "@/data/dashboard.json";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
+import { latestConfirmationDate, stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -230,14 +231,6 @@ function isoWeek(dateText: string) {
   return { year: date.getUTCFullYear(), week: Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7) };
 }
 
-function displayConfirmationDate(market: Market) {
-  if (market.region !== "加密") return market.stageAsOf;
-  const date = new Date(`${market.stageAsOf}T00:00:00Z`);
-  const day = date.getUTCDay();
-  date.setUTCDate(date.getUTCDate() + (day === 1 ? 7 : (8 - day) % 7));
-  return date.toISOString().slice(0, 10);
-}
-
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
 }
@@ -256,12 +249,6 @@ function observationConfirmationFor(market: Market) {
   return progress ? `${progress}周确认` : null;
 }
 
-function stageConfirmationDateFor(market: Market) {
-  const confirmedAt = new Date(`${market.stageAsOf}T00:00:00Z`);
-  confirmedAt.setUTCDate(confirmedAt.getUTCDate() + 1 - (market.weeks - 1) * 7);
-  return confirmedAt.toISOString().slice(0, 10);
-}
-
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
   const maDirection = momentumDirection(market.momentum);
@@ -270,13 +257,13 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
   const observationStage = observationStageFor(market);
   const observationConfirmation = observationConfirmationFor(market);
   const observationColor = observationStage ? stageMeta[observationStage].color : undefined;
-  const confirmationDate = stageConfirmationDateFor(market);
+  const confirmationTime = stageConfirmationTimeFor(market);
   return (
     <div className={`market-hover-card ${touchMode ? "touch-card" : ""}`} role={touchMode ? "dialog" : "tooltip"} aria-label={touchMode ? `${market.shortCode} 资产信息` : undefined} style={{ left: point.x, top: point.y }}>
       <div className="hover-card-title"><span style={{ background: stageMeta[market.stage].color }} />{market.shortCode} · {market.name}{touchMode && <button className="hover-close" type="button" aria-label="关闭资产阶段信息" onClick={onClose}><X size={17} /></button>}</div>
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-        <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationDate} 4AM UTC+8</dd></div>
+        <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationTime}</dd></div>
         <div><dt>本周观察</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
       </dl>
@@ -427,7 +414,7 @@ function TrendRadarPage({
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationDateFor(market)} 4AM UTC+8</dd></div>
+                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </article>
@@ -515,7 +502,7 @@ function StockRadarPage({
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationDateFor(market)} 4AM UTC+8</dd></div>
+                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </article>
@@ -791,7 +778,7 @@ export default function Home() {
     return result;
   }, [regionData]);
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? dashboardData.commonStageAsOf;
-  const commonConfirmationDate = activeUniverse.map(displayConfirmationDate).sort()[0] ?? commonStageAsOf;
+  const commonConfirmationDate = latestConfirmationDate(activeUniverse, { excludeCrypto: view === "global" }) ?? commonStageAsOf;
   const activeGeneratedAt = stockRadarActive && stockRadarSnapshot
     ? stockRadarSnapshot.generatedAt
     : radarActive && radarSnapshot

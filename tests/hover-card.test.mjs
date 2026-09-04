@@ -18,8 +18,8 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.doesNotMatch(source, /<dt>代码名称<\/dt>/);
   assert.match(source, /market\.shortCode} · \{market\.name/);
   assert.doesNotMatch(source, /<dt>持续时间<\/dt>/);
-  assert.match(source, /market\.weeks}周· \{confirmationDate} 4AM UTC\+8/);
-  assert.match(source, /getUTCDate\(\) \+ 1 - \(market\.weeks - 1\) \* 7/);
+  assert.match(source, /market\.weeks}周· \{confirmationTime}/);
+  assert.match(source, /stageConfirmationTimeFor\(market\)/);
   assert.match(source, /market\.stageDetail/);
   assert.match(source, /market\.observationStage/);
   assert.match(source, /function observationStageFor\(market: Market\)/);

@@ -26,7 +26,7 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /扫描\{mode\.toUpperCase\(\)\}/);
   assert.match(pageSource, /const \[radarScanMode, setRadarScanMode\] = useState<RadarScanMode>\("s2"\)/);
   assert.match(pageSource, /market\.matchRules\.filter[\s\S]*\.map/);
-  assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationDateFor\(market\)\} 4AM UTC\+8<\/dd>/);
+  assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationTimeFor\(market\)\}<\/dd>/);
   assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
   assert.match(pageSource, /\{snapshot\.universeSize\}个全球核心资产四阶段状态/);
   assert.doesNotMatch(pageSource, /完整周线 · \{snapshot\.analysisPeriod\}/);
