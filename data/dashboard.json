@@ -1,9 +1,9 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-05T04:19:05.693Z",
+  "generatedAt": "2026-09-05T04:53:28.963Z",
   "updateScope": "traditional",
   "lastUpdatedAt": {
-    "traditional": "2026-09-05T04:19:05.693Z",
+    "traditional": "2026-09-05T04:53:28.963Z",
     "crypto": "2026-09-05T01:04:34.209Z"
   },
   "analysisPeriod": "weekly-completed-bars",
@@ -103,7 +103,7 @@
         "global",
         "chinaIndices"
       ],
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -435,7 +435,7 @@
         "global",
         "chinaIndices"
       ],
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S3",
