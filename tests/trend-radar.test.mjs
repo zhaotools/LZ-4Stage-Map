@@ -27,6 +27,7 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /const \[radarScanMode, setRadarScanMode\] = useState<RadarScanMode>\("s2"\)/);
   assert.match(pageSource, /market\.matchRules\.filter[\s\S]*\.map/);
   assert.match(pageSource, /<dt>确认时间<\/dt><dd>\{market\.weeks\}周 · \{stageConfirmationTimeFor\(market\)\}<\/dd>/);
+  assert.match(pageSource, /className="radar-result-card"[\s\S]*href=\{tradingViewChartUrlFor\(market\)\}[\s\S]*target="_blank"/);
   assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
   assert.match(pageSource, /\{snapshot\.universeSize\}个全球核心资产四阶段状态/);
   assert.doesNotMatch(pageSource, /完整周线 · \{snapshot\.analysisPeriod\}/);
@@ -41,5 +42,6 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(cssSource, /\.radar-scan-switch \.scan-s2\.active \{ color: #087849; background: #c2e8d3; \}/);
   assert.match(cssSource, /\.radar-scan-switch \.scan-s4\.active \{ color: #bd2638; background: #f5c4cb; \}/);
   assert.match(cssSource, /\.radar-results \{ display: grid;/);
+  assert.match(cssSource, /\.radar-result-card:hover, \.radar-result-card:focus-visible/);
   assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.radar-summary, \.radar-results \{ grid-template-columns: 1fr;/);
 });

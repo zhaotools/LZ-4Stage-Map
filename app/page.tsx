@@ -412,7 +412,16 @@ function TrendRadarPage({
             const maDirection = momentumDirection(market.momentum);
             const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
             return (
-              <article key={market.code} className="radar-result-card" style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}>
+              <a
+                key={market.code}
+                className="radar-result-card"
+                href={tradingViewChartUrlFor(market)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`在 TradingView 查看 ${market.shortCode} 日线`}
+                aria-label={`${market.shortCode} ${market.name}，在 TradingView 新标签页打开日线`}
+                style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}
+              >
                 <div className="radar-result-title"><div><strong>{market.shortCode}</strong><span>{market.name}</span></div><em>{displayRegionName(market.region)}</em></div>
                 <div className="radar-match-tags">{market.matchRules.filter((ruleId) => ruleIds.includes(ruleId)).map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
@@ -421,7 +430,7 @@ function TrendRadarPage({
                   <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
-              </article>
+              </a>
             );
           })}
         </div>
@@ -499,7 +508,16 @@ function StockRadarPage({
             const maDirection = momentumDirection(market.momentum);
             const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
             return (
-              <article key={market.code} className="radar-result-card stock-radar-result" style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}>
+              <a
+                key={market.code}
+                className="radar-result-card stock-radar-result"
+                href={tradingViewChartUrlFor(market)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`在 TradingView 查看 ${market.shortCode} 日线`}
+                aria-label={`${market.shortCode} ${market.name}，在 TradingView 新标签页打开日线`}
+                style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}
+              >
                 <div className="radar-result-title"><div><strong>{market.shortCode}</strong><span>{market.name}</span></div><em>{market.region} · #{market.liquidityRank}</em></div>
                 <div className="stock-result-meta"><span>{market.industry || "其他"}</span><span>20日均额 {formatTurnover(market.averageTurnover20d, market.region)}</span></div>
                 <div className="radar-match-tags">{market.matchRules.map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
@@ -509,7 +527,7 @@ function StockRadarPage({
                   <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
-              </article>
+              </a>
             );
           })}
         </div>

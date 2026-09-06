@@ -18,9 +18,11 @@ test("member-only stock radar loads the protected 300-stock S2 snapshot", () => 
   assert.doesNotMatch(pageSource, /观察标的/);
   assert.doesNotMatch(pageSource, /个机会/);
   assert.match(pageSource, /20日均额/);
+  assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*href=\{tradingViewChartUrlFor\(market\)\}[\s\S]*target="_blank"/);
   assert.match(pageSource, /stockRadarSnapshot\.matches/);
   assert.match(pageSource, /pendingView === "stockRadar"/);
   assert.match(pageSource, /登录会员账号后查看300只高流动性股票扫描结果/);
   assert.match(cssSource, /\.stock-market-health/);
   assert.match(cssSource, /\.stock-radar-status/);
+  assert.match(cssSource, /\.radar-result-card:hover, \.radar-result-card:focus-visible/);
 });
