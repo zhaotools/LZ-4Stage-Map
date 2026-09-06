@@ -47,5 +47,5 @@ export function tradingViewSymbolFor(market) {
 }
 
 export function tradingViewChartUrlFor(market) {
-  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tradingViewSymbolFor(market))}`;
+  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tradingViewSymbolFor(market))}&interval=D`;
 }

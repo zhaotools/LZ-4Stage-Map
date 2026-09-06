@@ -26,7 +26,7 @@ test("maps every market family to its TradingView symbol", () => {
 test("builds an encoded TradingView chart URL", () => {
   assert.equal(
     tradingViewChartUrlFor(market("000300.SH", "A股", "CSI")),
-    "https://www.tradingview.com/chart/?symbol=SSE%3A000300",
+    "https://www.tradingview.com/chart/?symbol=SSE%3A000300&interval=D",
   );
 });
 
