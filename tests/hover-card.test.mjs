@@ -6,7 +6,7 @@ const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8
 
 test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /onPointerMove/);
-  assert.match(source, /onClick=\{\(event\) => onMarketTap/);
+  assert.match(source, /onClick=\{\(\) => onMarketTap\(item\)\}/);
   assert.match(source, /pointerType !== "touch"/);
   assert.match(source, /touch-card/);
   assert.match(source, /关闭资产阶段信息/);

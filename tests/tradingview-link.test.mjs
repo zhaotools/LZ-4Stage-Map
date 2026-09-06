@@ -1,0 +1,38 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+import { tradingViewChartUrlFor, tradingViewSymbolFor } from "../app/lib/tradingview-link.mjs";
+
+const market = (code, region, exchange) => ({ code, region, exchange });
+
+test("maps every market family to its TradingView symbol", () => {
+  assert.equal(tradingViewSymbolFor(market("GSPC.INDEX", "美股", "NYSE")), "SP:SPX");
+  assert.equal(tradingViewSymbolFor(market("SOXX", "美股", "NASDAQ")), "NASDAQ:SOXX");
+  assert.equal(tradingViewSymbolFor(market("IWM", "美股", "NYSEARCA")), "AMEX:IWM");
+  assert.equal(tradingViewSymbolFor(market("BRK.B", "美股", "NYSE")), "NYSE:BRK.B");
+  assert.equal(tradingViewSymbolFor(market("000300.SH", "A股", "CSI")), "SSE:000300");
+  assert.equal(tradingViewSymbolFor(market("SZ399006", "A股", "SZSE")), "SZSE:399006");
+  assert.equal(tradingViewSymbolFor(market("931865.CSI", "A股", "CSI")), "SSE:931865");
+  assert.equal(tradingViewSymbolFor(market("700.HK", "港股", "HKEX")), "HKEX:700");
+  assert.equal(tradingViewSymbolFor(market("HSTECH", "港股", "HKEX")), "HSI:HSTECH");
+  assert.equal(tradingViewSymbolFor(market("N225", "日股", "OSE")), "TVC:NI225");
+  assert.equal(tradingViewSymbolFor(market("US10Y", "大宗·宏观", "CBOE")), "TVC:US10Y");
+  assert.equal(tradingViewSymbolFor(market("CL", "大宗·宏观", "NYMEX")), "NYMEX:CL1!");
+  assert.equal(tradingViewSymbolFor(market("BTC-USD", "加密", "CRYPTO")), "BINANCE:BTCUSDT");
+  assert.equal(tradingViewSymbolFor(market("HYPE-USD", "加密", "CRYPTO")), "OKX:HYPEUSDT");
+});
+
+test("builds an encoded TradingView chart URL", () => {
+  assert.equal(
+    tradingViewChartUrlFor(market("000300.SH", "A股", "CSI")),
+    "https://www.tradingview.com/chart/?symbol=SSE%3A000300",
+  );
+});
+
+test("map tile clicks open TradingView in a separate tab", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /onClick=\{\(\) => onMarketTap\(item\)\}/);
+  assert.match(source, /window\.open\(tradingViewChartUrlFor\(item\), "_blank", "noopener,noreferrer"\)/);
+  assert.match(source, /点击在TradingView新标签页打开K线/);
+});

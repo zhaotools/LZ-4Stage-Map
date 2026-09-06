@@ -24,6 +24,7 @@ import {
 import dashboardData from "@/data/dashboard.json";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { latestConfirmationDate, stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
+import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -54,9 +55,11 @@ type MarketRegion = Exclude<Region, "全球">;
 
 type Market = {
   code: string;
+  providerSymbol: string;
   shortCode: string;
   name: string;
   region: MarketRegion;
+  exchange: string;
   stage: Stage;
   subStage: string;
   stageDetail: string;
@@ -271,7 +274,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
   );
 }
 
-function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, element: HTMLButtonElement) => void }) {
+function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market) => void }) {
   if (!items.length) return null;
   return (
     <section className={`map-group ${className ?? `map-${group.replace("·", "-")}`} ${compact ? "map-group-full" : ""}`}>
@@ -295,9 +298,10 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
                 gridRow: `span ${tileRows}`,
                 ...(observationChanged && observationStage ? { "--observation-border": stageMeta[observationStage].color } : {}),
               } as CSSProperties}
-              aria-label={`${item.shortCode}，${item.name}，${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%`}
+              aria-label={`${item.shortCode}，${item.name}，${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
+              title={`在 TradingView 查看 ${item.shortCode} K线`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
-              onClick={(event) => onMarketTap(item, event.currentTarget)}
+              onClick={() => onMarketTap(item)}
               onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
               onFocus={(event) => onMarketFocus(item, event.currentTarget)}
               onBlur={onMarketLeave}
@@ -313,7 +317,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
   );
 }
 
-function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, element: HTMLButtonElement) => void }) {
+function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market) => void }) {
   const groups = region === "全球" ? viewMeta[view].groups : [region as MarketRegion];
   const dense = view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
   if (view === "usSelected" && region === "全球") {
@@ -806,16 +810,9 @@ export default function Home() {
     setHoveredMarket(item);
     placeHoverCard(rect.right, rect.top + rect.height / 2);
   };
-  const handleMarketTap = (item: Market, element: HTMLButtonElement) => {
-    if (touchCardOpen && hoveredMarket?.code === item.code) {
-      setHoveredMarket(null);
-      setTouchCardOpen(false);
-      return;
-    }
-    const rect = element.getBoundingClientRect();
-    setHoveredMarket(item);
-    setTouchCardOpen(true);
-    placeHoverCard(rect.right, rect.top + rect.height / 2);
+  const handleMarketTap = (item: Market) => {
+    closeMarketCard();
+    window.open(tradingViewChartUrlFor(item), "_blank", "noopener,noreferrer");
   };
   const closeMarketCard = () => {
     setHoveredMarket(null);
