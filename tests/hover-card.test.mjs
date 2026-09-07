@@ -4,6 +4,14 @@ import test from "node:test";
 
 const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
+test("click dismisses hover details and suppresses focus restoration until the pointer leaves", () => {
+  assert.match(source, /onPointerDown=.*hoverDismissed = "true"; onMarketLeave\(\)/);
+  assert.match(source, /onPointerMove=.*!event\.currentTarget\.dataset\.hoverDismissed/);
+  assert.match(source, /onFocus=.*!event\.currentTarget\.dataset\.hoverDismissed/);
+  assert.match(source, /onPointerLeave=.*delete event\.currentTarget\.dataset\.hoverDismissed/);
+  assert.match(source, /const handleMarketTap = .*\n\s*closeMarketCard\(\);\n\s*window\.open/);
+});
+
 test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /onPointerMove/);
   assert.match(source, /onClick=\{\(\) => onMarketTap\(item\)\}/);

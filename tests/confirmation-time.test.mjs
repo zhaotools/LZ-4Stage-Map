@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   confirmationDateFor,
+  globalConfirmationDates,
   confirmationTimeForTradingDate,
   latestConfirmationDate,
   stageConfirmationTimeFor,
@@ -30,4 +31,15 @@ test("uses Beijing dates for stage start and page confirmation", () => {
   assert.equal(confirmationDateFor(us), "2026-08-29");
   assert.equal(latestConfirmationDate([china, us, crypto], { excludeCrypto: true }), "2026-08-29");
   assert.equal(latestConfirmationDate([china, us, crypto]), "2026-08-31");
+});
+
+test("global header separates traditional and crypto confirmation dates from generation time", () => {
+  const assets = [
+    market("美股", "NYSE", { stageAsOf: "2026-09-04" }),
+    market("A股", "SSE", { stageAsOf: "2026-09-04" }),
+    market("加密", "CRYPTO", { stageAsOf: "2026-08-31", generatedAt: "2026-09-07T02:58:57Z" }),
+  ];
+  assert.deepEqual(globalConfirmationDates(assets), { traditional: "09-05", crypto: "09-07" });
+  assert.deepEqual(globalConfirmationDates(assets.slice(0, 2)), { traditional: "09-05", crypto: "—" });
+  assert.deepEqual(globalConfirmationDates([{ ...assets[2], cryptoFreshness: "unavailable" }]), { traditional: "—", crypto: "—" });
 });

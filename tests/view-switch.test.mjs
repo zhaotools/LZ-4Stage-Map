@@ -61,7 +61,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+LZ-4Stage介绍<\/button>/);
   assert.match(pageSource, /\{!isMember && <button className="member-auth-button register-member-button"[^\n]+注册会员<\/button>\}/);
   assert.ok(pageSource.indexOf("注册会员</button>") < pageSource.indexOf('className="member-auth-button login-button"'));
-  assert.match(pageSource, /className="confirmation-date"><CalendarDays size=\{16\} \/>确认至 \{commonConfirmationDate\}<\/span>/);
+  assert.match(pageSource, /传统市场确认至 \{globalDates.traditional\}/);
+  assert.match(pageSource, /加密确认至 \{globalDates.crypto\}/);
+  assert.match(pageSource, /确认至 \{commonConfirmationDate\}/);
   assert.match(pageSource, /数据生成于 \{formatDateTime\(activeGeneratedAt\)\}/);
   assert.doesNotMatch(pageSource, /RefreshCw|刷新页面|window\.location\.reload/);
   assert.doesNotMatch(pageSource, />完整周线<\/span>/);

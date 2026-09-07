@@ -24,7 +24,7 @@ import {
 import dashboardData from "@/data/dashboard.json";
 import { newerSnapshot, startWeeklyRefresh, validateSnapshot } from "@/app/lib/weekly-refresh.mjs";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
-import { latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
+import { globalConfirmationDates, latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
 import {
   getMemberProfile,
@@ -306,10 +306,15 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
               } as CSSProperties}
               aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               title={chartLinkTitleFor(item)}
-              onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
+              onPointerMove={(event) => { if (event.pointerType !== "touch" && !event.currentTarget.dataset.hoverDismissed) onMarketMove(item, event); }}
+              onPointerDown={(event) => { event.currentTarget.dataset.hoverDismissed = "true"; onMarketLeave(); }}
               onClick={() => onMarketTap(item)}
-              onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
-              onFocus={(event) => onMarketFocus(item, event.currentTarget)}
+              onPointerLeave={(event) => { delete event.currentTarget.dataset.hoverDismissed; if (event.pointerType !== "touch") onMarketLeave(); }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") event.currentTarget.dataset.hoverDismissed = "true";
+                else if (event.key === "Tab") delete event.currentTarget.dataset.hoverDismissed;
+              }}
+              onFocus={(event) => { if (!event.currentTarget.dataset.hoverDismissed) onMarketFocus(item, event.currentTarget); }}
               onBlur={onMarketLeave}
             >
               <strong>{item.shortCode}</strong>
@@ -865,6 +870,7 @@ export default function Home() {
   }, [regionData]);
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? publicSnapshot.commonStageAsOf;
   const commonConfirmationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: view === "global" }) ?? commonStageAsOf;
+  const globalDates = globalConfirmationDates(activeUniverse);
   const activeGeneratedAt = stockRadarActive && stockRadarSnapshot
     ? stockRadarSnapshot.generatedAt
     : radarActive && radarSnapshot
@@ -1162,7 +1168,9 @@ export default function Home() {
             <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1><p className="site-subtitle">LZ-4Stage · 全球资产四阶段观察</p></div>
             <div className="top-actions">
               <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
-              <span className="confirmation-date"><CalendarDays size={16} />确认至 {commonConfirmationDate}</span>
+              <span className="confirmation-date"><CalendarDays size={16} />{view === "global"
+                ? <span className="confirmation-label"><span>传统市场确认至 {globalDates.traditional}</span><span className="confirmation-divider">｜</span><span>加密确认至 {globalDates.crypto}</span></span>
+                : <>确认至 {commonConfirmationDate}</>}</span>
               {!isMember && <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>}
               {isMember ? (
                 <div className="member-account-menu" ref={accountMenuRef}>

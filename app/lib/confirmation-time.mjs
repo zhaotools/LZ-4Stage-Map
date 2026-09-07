@@ -87,3 +87,11 @@ export function latestConfirmationDate(markets, { excludeCrypto = false } = {}) 
   const eligible = excludeCrypto ? markets.filter((market) => market.region !== "加密") : markets;
   return eligible.map(confirmationDateFor).sort().at(-1) ?? null;
 }
+
+export function globalConfirmationDates(markets) {
+  const available = markets.filter((market) => market.cryptoFreshness !== "unavailable");
+  return {
+    traditional: latestConfirmationDate(available, { excludeCrypto: true })?.slice(5) ?? "—",
+    crypto: latestConfirmationDate(available.filter((market) => market.region === "加密"))?.slice(5) ?? "—",
+  };
+}
