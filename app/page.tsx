@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import dashboardData from "@/data/dashboard.json";
+import { newerSnapshot, startWeeklyRefresh, validateSnapshot } from "@/app/lib/weekly-refresh.mjs";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
@@ -173,7 +174,6 @@ function hydrateMarkets(items: DashboardMarket[]): Market[] {
   });
 }
 
-const publicMarkets = hydrateMarkets(dashboardData.markets.filter((item) => item.collections.includes("global")));
 
 const stageMeta: Record<Stage, { title: string; season: string; color: string; dark: string }> = {
   S1: { title: "筑底阶段", season: "春", color: "#397ff6", dark: "#1c5bd0" },
@@ -547,6 +547,7 @@ function StockRadarPage({
 
 export default function Home() {
   const [authReady, setAuthReady] = useState(false);
+  const [publicSnapshot, setPublicSnapshot] = useState(dashboardData);
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [memberSnapshots, setMemberSnapshots] = useState<Partial<Record<MemberView, MemberSnapshot<DashboardMarket>>>>({});
   const [radarSnapshot, setRadarSnapshot] = useState<TrendRadarSnapshot<DashboardMarket> | null>(null);
@@ -587,6 +588,62 @@ export default function Home() {
   const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
   const memberDisplayName = memberProfile?.display_name || "会员";
   const handleCaptchaToken = useCallback((token: string | null) => setCaptchaToken(token), []);
+  const snapshotsRef = useRef({ memberSnapshots, radarSnapshot, stockRadarSnapshot });
+  useEffect(() => {
+    snapshotsRef.current = { memberSnapshots, radarSnapshot, stockRadarSnapshot };
+  }, [memberSnapshots, radarSnapshot, stockRadarSnapshot]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let abort: AbortController | null = null;
+    const refresh = async () => {
+      const request = new AbortController();
+      abort = request;
+      const timeout = setTimeout(() => request.abort(), 30000);
+      try {
+        const jobs: Promise<unknown>[] = [(async () => {
+          const response = await fetch(`${import.meta.env.BASE_URL}data/dashboard.json`, { cache: "no-store", signal: request.signal });
+          if (!response.ok) throw new Error("Public data unavailable");
+          const snapshot = validateSnapshot(await response.json(), "markets") as typeof dashboardData;
+          if (!cancelled) setPublicSnapshot((current) => newerSnapshot(current, snapshot));
+        })()];
+        if (isMember) {
+          // Refresh previously opened protected pages; unopened pages fetch normally on entry.
+          for (const key of Object.keys(snapshotsRef.current.memberSnapshots) as MemberView[]) {
+            jobs.push(getMemberSnapshot<DashboardMarket>(key, request.signal).then((snapshot) => {
+              validateSnapshot(snapshot, "markets");
+              if (!cancelled) setMemberSnapshots((current) => ({ ...current, [key]: newerSnapshot(current[key], snapshot) }));
+            }));
+          }
+          if (snapshotsRef.current.radarSnapshot) jobs.push(getTrendRadarSnapshot<DashboardMarket>(request.signal).then((snapshot) => {
+            validateSnapshot(snapshot, "matches");
+            if (!cancelled) setRadarSnapshot((current) => newerSnapshot(current, snapshot));
+          }));
+          if (snapshotsRef.current.stockRadarSnapshot) jobs.push(getStockRadarSnapshot<StockRadarMarket>(request.signal).then((snapshot) => {
+            validateSnapshot(snapshot, "matches");
+            if (!cancelled) setStockRadarSnapshot((current) => newerSnapshot(current, snapshot));
+          }));
+        }
+        const results = await Promise.allSettled(jobs);
+        return results.every((result) => result.status === "fulfilled");
+      } finally {
+        clearTimeout(timeout);
+      }
+    };
+    const controller = startWeeklyRefresh(refresh);
+    const check = () => { void controller.check(); };
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("pageshow", check);
+    window.addEventListener("online", check);
+    return () => {
+      cancelled = true;
+      abort?.abort();
+      controller.stop();
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("pageshow", check);
+      window.removeEventListener("online", check);
+    };
+  }, [isMember, memberProfile?.user_id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -680,7 +737,7 @@ export default function Home() {
     setLoadingMemberView(nextView);
     try {
       const snapshot = await getMemberSnapshot<DashboardMarket>(nextView);
-      setMemberSnapshots((current) => ({ ...current, [nextView]: snapshot }));
+      setMemberSnapshots((current) => ({ ...current, [nextView]: newerSnapshot(current[nextView], snapshot) }));
       return snapshot;
     } catch {
       return null;
@@ -694,7 +751,7 @@ export default function Home() {
     setLoadingMemberView("trendRadar");
     try {
       const snapshot = await getTrendRadarSnapshot<DashboardMarket>();
-      setRadarSnapshot(snapshot);
+      setRadarSnapshot((current) => newerSnapshot(current, snapshot));
       return snapshot;
     } catch {
       return null;
@@ -708,7 +765,7 @@ export default function Home() {
     setLoadingMemberView("stockRadar");
     try {
       const snapshot = await getStockRadarSnapshot<StockRadarMarket>();
-      setStockRadarSnapshot(snapshot);
+      setStockRadarSnapshot((current) => newerSnapshot(current, snapshot));
       return snapshot;
     } catch {
       return null;
@@ -789,13 +846,13 @@ export default function Home() {
 
   const activeUniverse = useMemo(() => {
     const selected = view === "global"
-      ? publicMarkets
+      ? hydrateMarkets(publicSnapshot.markets.filter((item) => item.collections.includes("global")))
       : hydrateMarkets(memberSnapshots[view]?.markets ?? []);
     const order = collectionOrder[view];
     if (!order) return selected;
     const positions = new Map(order.map((code, index) => [code, index]));
     return [...selected].sort((a, b) => (positions.get(a.code) ?? Number.MAX_SAFE_INTEGER) - (positions.get(b.code) ?? Number.MAX_SAFE_INTEGER));
-  }, [memberSnapshots, view]);
+  }, [memberSnapshots, publicSnapshot, view]);
   const radarMarkets = useMemo<RadarMarket[]>(() => (radarSnapshot?.matches ?? []).map((item) => ({
     ...hydrateMarkets([item as DashboardMarket])[0],
     matchRules: item.matchRules,
@@ -806,13 +863,13 @@ export default function Home() {
     regionData.filter(item => item.cryptoFreshness !== "unavailable").forEach((item) => result[item.stage]++);
     return result;
   }, [regionData]);
-  const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? dashboardData.commonStageAsOf;
+  const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? publicSnapshot.commonStageAsOf;
   const commonConfirmationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: view === "global" }) ?? commonStageAsOf;
   const activeGeneratedAt = stockRadarActive && stockRadarSnapshot
     ? stockRadarSnapshot.generatedAt
     : radarActive && radarSnapshot
       ? radarSnapshot.generatedAt
-      : view === "global" ? dashboardData.generatedAt : memberSnapshots[view]?.generatedAt ?? dashboardData.generatedAt;
+      : view === "global" ? publicSnapshot.generatedAt : memberSnapshots[view]?.generatedAt ?? publicSnapshot.generatedAt;
   const week = isoWeek(commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {

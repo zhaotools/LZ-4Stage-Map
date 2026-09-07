@@ -108,32 +108,32 @@ export function isProfileActive(profile: MemberProfile, now = new Date()) {
   return Boolean(profile.expires_at && new Date(profile.expires_at).getTime() > now.getTime());
 }
 
-export async function getMemberSnapshot<TMarket>(viewKey: MemberView): Promise<MemberSnapshot<TMarket>> {
-  const { data, error } = await requireClient()
+export async function getMemberSnapshot<TMarket>(viewKey: MemberView, signal?: AbortSignal): Promise<MemberSnapshot<TMarket>> {
+  const query = requireClient()
     .from("market_snapshots")
     .select("payload")
-    .eq("view_key", viewKey)
-    .single();
+    .eq("view_key", viewKey);
+  const { data, error } = await (signal ? query.abortSignal(signal) : query).single();
   if (error) throw error;
   return data.payload as MemberSnapshot<TMarket>;
 }
 
-export async function getTrendRadarSnapshot<TMarket>(): Promise<TrendRadarSnapshot<TMarket>> {
-  const { data, error } = await requireClient()
+export async function getTrendRadarSnapshot<TMarket>(signal?: AbortSignal): Promise<TrendRadarSnapshot<TMarket>> {
+  const query = requireClient()
     .from("market_snapshots")
     .select("payload")
-    .eq("view_key", "trendRadar")
-    .single();
+    .eq("view_key", "trendRadar");
+  const { data, error } = await (signal ? query.abortSignal(signal) : query).single();
   if (error) throw error;
   return data.payload as TrendRadarSnapshot<TMarket>;
 }
 
-export async function getStockRadarSnapshot<TMarket>(): Promise<StockRadarSnapshot<TMarket>> {
-  const { data, error } = await requireClient()
+export async function getStockRadarSnapshot<TMarket>(signal?: AbortSignal): Promise<StockRadarSnapshot<TMarket>> {
+  const query = requireClient()
     .from("market_snapshots")
     .select("payload")
-    .eq("view_key", "stockRadar")
-    .single();
+    .eq("view_key", "stockRadar");
+  const { data, error } = await (signal ? query.abortSignal(signal) : query).single();
   if (error) throw error;
   return data.payload as StockRadarSnapshot<TMarket>;
 }
