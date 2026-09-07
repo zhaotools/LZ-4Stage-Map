@@ -24,7 +24,7 @@ import {
 import dashboardData from "@/data/dashboard.json";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
-import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
+import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -303,8 +303,8 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
                 gridRow: `span ${tileRows}`,
                 ...(observationChanged && observationStage ? { "--observation-border": stageMeta[observationStage].color } : {}),
               } as CSSProperties}
-              aria-label={item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
-              title={`在 TradingView 查看 ${item.shortCode} K线`}
+              aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
+              title={chartLinkTitleFor(item)}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onClick={() => onMarketTap(item)}
               onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
@@ -424,8 +424,8 @@ function TrendRadarPage({
                 href={tradingViewChartUrlFor(market)}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={`在 TradingView 查看 ${market.shortCode} 日线`}
-                aria-label={`${market.shortCode} ${market.name}，在 TradingView 新标签页打开日线`}
+                title={chartLinkTitleFor(market)}
+                aria-label={`${market.shortCode} ${market.name}，${chartLinkTitleFor(market)}，新标签页打开`}
                 style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}
               >
                 <div className="radar-result-title"><div><strong>{market.shortCode}</strong><span>{market.name}</span></div><em>{displayRegionName(market.region)}</em></div>
@@ -520,8 +520,8 @@ function StockRadarPage({
                 href={tradingViewChartUrlFor(market)}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={`在 TradingView 查看 ${market.shortCode} 日线`}
-                aria-label={`${market.shortCode} ${market.name}，在 TradingView 新标签页打开日线`}
+                title={chartLinkTitleFor(market)}
+                aria-label={`${market.shortCode} ${market.name}，${chartLinkTitleFor(market)}，新标签页打开`}
                 style={{ "--radar-stage-color": stageMeta[market.stage].color } as CSSProperties}
               >
                 <div className="radar-result-title"><div><strong>{market.shortCode}</strong><span>{market.name}</span></div><em>{market.region} · #{market.liquidityRank}</em></div>

@@ -13,7 +13,6 @@ const specialSymbols = {
   "BTC-USD": "BINANCE:BTCUSDT",
   "ETH-USD": "BINANCE:ETHUSDT",
   "SOL-USD": "BINANCE:SOLUSDT",
-  "HYPE-USD": "OKX:HYPEUSDT",
   "BRK.B": "NYSE:BRK.B",
 };
 
@@ -25,6 +24,7 @@ const tradingViewExchange = {
 };
 
 export function tradingViewSymbolFor(market) {
+  if (market.code === "HYPE-USD") return null; // Native spot chart, not a TradingView exchange proxy.
   if (specialSymbols[market.code]) return specialSymbols[market.code];
 
   if (market.region === "港股") {
@@ -47,5 +47,11 @@ export function tradingViewSymbolFor(market) {
 }
 
 export function tradingViewChartUrlFor(market) {
-  return `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tradingViewSymbolFor(market))}&interval=D`;
+  if (market.code === "HYPE-USD") return "https://app.hyperliquid.xyz/trade/HYPE/USDC";
+  return `https://cn.tradingview.com/chart/?symbol=${encodeURIComponent(tradingViewSymbolFor(market))}&interval=D`;
+}
+
+export function chartLinkTitleFor(market) {
+  return market.code === "HYPE-USD" ? "在 Hyperliquid 官网查看 HYPE/USDC 现货K线"
+    : `在 TradingView 中文站查看 ${market.shortCode || market.code} 日线`;
 }

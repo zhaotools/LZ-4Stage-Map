@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { tradingViewChartUrlFor, tradingViewSymbolFor } from "../app/lib/tradingview-link.mjs";
+import { tradingViewChartUrlFor, tradingViewSymbolFor, chartLinkTitleFor } from "../app/lib/tradingview-link.mjs";
 
 const market = (code, region, exchange) => ({ code, region, exchange });
 
@@ -20,14 +20,30 @@ test("maps every market family to its TradingView symbol", () => {
   assert.equal(tradingViewSymbolFor(market("US10Y", "大宗·宏观", "CBOE")), "TVC:US10Y");
   assert.equal(tradingViewSymbolFor(market("CL", "大宗·宏观", "NYMEX")), "NYMEX:CL1!");
   assert.equal(tradingViewSymbolFor(market("BTC-USD", "加密", "CRYPTO")), "BINANCE:BTCUSDT");
-  assert.equal(tradingViewSymbolFor(market("HYPE-USD", "加密", "CRYPTO")), "OKX:HYPEUSDT");
+  assert.equal(tradingViewSymbolFor(market("HYPE-USD", "加密", "CRYPTO")), null);
 });
 
 test("builds an encoded TradingView chart URL", () => {
   assert.equal(
     tradingViewChartUrlFor(market("000300.SH", "A股", "CSI")),
-    "https://www.tradingview.com/chart/?symbol=SSE%3A000300&interval=D",
+    "https://cn.tradingview.com/chart/?symbol=SSE%3A000300&interval=D",
   );
+});
+
+test("HYPE opens native Hyperliquid HYPE/USDC spot instead of OKX or perpetual", () => {
+  const hype = market("HYPE-USD", "加密", "CRYPTO");
+  assert.equal(tradingViewChartUrlFor(hype), "https://app.hyperliquid.xyz/trade/HYPE/USDC");
+  assert.match(chartLinkTitleFor(hype), /Hyperliquid.*现货/);
+  assert.doesNotMatch(tradingViewChartUrlFor(hype), /tradingview|okx|\/trade\/HYPE$/i);
+});
+
+test("all other assets retain their symbols and daily interval on the simplified Chinese site", () => {
+  for (const asset of [market("BTC-USD", "加密", "CRYPTO"), market("700.HK", "港股", "HKEX"), market("AAPL", "美股", "NASDAQ"), market("000300.SH", "A股", "CSI")]) {
+    const url = new URL(tradingViewChartUrlFor(asset));
+    assert.equal(url.hostname, "cn.tradingview.com");
+    assert.equal(url.searchParams.get("interval"), "D");
+    assert.equal(url.searchParams.get("symbol"), tradingViewSymbolFor(asset));
+  }
 });
 
 test("map tile clicks open TradingView in a separate tab", async () => {
