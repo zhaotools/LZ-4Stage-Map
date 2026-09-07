@@ -166,6 +166,7 @@ function hydrateMarkets(items: DashboardMarket[]): Market[] {
       region: item.region as MarketRegion,
       signal: item.signal as Market["signal"],
       dataStatus: item.dataStatus as Market["dataStatus"],
+      cryptoFreshness: item.cryptoFreshness as Market["cryptoFreshness"],
       collections: item.collections as View[],
       ...meta,
     };
