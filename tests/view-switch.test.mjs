@@ -65,6 +65,12 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /加密确认至 \{globalDates.crypto\}/);
   assert.match(pageSource, /确认至 \{commonConfirmationDate\}/);
   assert.match(pageSource, /数据生成于 \{formatDateTime\(activeGeneratedAt\)\}/);
+  const footerSource = pageSource.slice(pageSource.indexOf("<footer>"), pageSource.indexOf("</footer>"));
+  assert.match(footerSource, /footer-data-times/);
+  assert.ok(footerSource.indexOf("传统市场确认至") < footerSource.indexOf("数据生成于"));
+  assert.doesNotMatch(pageSource.slice(pageSource.indexOf('<header className="topbar">'), pageSource.indexOf("</header>")), /确认至|confirmation-date/);
+  assert.match(cssSource, /\.footer-data-times \{[^}]*display: flex;[^}]*font-size: 10px;[^}]*white-space: nowrap;/);
+  assert.doesNotMatch(pageSource, /title=\{chartLinkTitleFor/);
   assert.doesNotMatch(pageSource, /RefreshCw|刷新页面|window\.location\.reload/);
   assert.doesNotMatch(pageSource, />完整周线<\/span>/);
   assert.doesNotMatch(pageSource, /点击获取完整LZ-4Stage/);
