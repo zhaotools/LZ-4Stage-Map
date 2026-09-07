@@ -45,3 +45,13 @@ test("market tiles outline observation-stage changes", async () => {
   assert.match(source, /颜色代表当前所处阶段，外框代表本周观察变化/);
   assert.doesNotMatch(source, /方块大小体现资产重要性，颜色代表当前所处阶段/);
 });
+test("crypto pending and unavailable analysis is clearly labelled without changing normal assets", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /cryptoFreshness === "pending"/);
+  assert.match(source, /数据待更新 · 保留历史结果/);
+  assert.match(source, /cryptoFreshness === "unavailable"/);
+  assert.match(source, /tile-unavailable/);
+  assert.match(source, /行情来源/);
+  assert.match(source, /quoteCurrency/);
+  assert.match(source, /confirmationTimeForTradingDate\(market\)/);
+});

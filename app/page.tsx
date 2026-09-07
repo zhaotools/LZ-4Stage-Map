@@ -23,7 +23,7 @@ import {
 
 import dashboardData from "@/data/dashboard.json";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
-import { latestConfirmationDate, stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
+import { latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
 import {
   getMemberProfile,
@@ -71,6 +71,8 @@ type Market = {
   collections: View[];
   source: string;
   dataStatus: "live" | "cache";
+  cryptoFreshness?: "fresh" | "pending" | "unavailable";
+  cryptoQuality?: { verified: boolean; completedThrough: string; historyStart: string; quoteCurrency: string };
   marketAsOf: string;
   stageAsOf: string;
   cols: number;
@@ -254,6 +256,7 @@ function observationConfirmationFor(market: Market) {
 
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
+  if (market.cryptoFreshness === "unavailable") return <div className="market-hover-card" role="tooltip" style={{ left: point.x, top: point.y }}><div className="hover-card-title">{market.shortCode} · {market.name}</div><p className="crypto-data-note">数据暂不可用，等待完整周线。未使用未验证行情生成阶段判断。</p></div>;
   const maDirection = momentumDirection(market.momentum);
   const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
   const observationLabel = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
@@ -267,8 +270,10 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
         <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationTime}</dd></div>
-        <div><dt>本周观察</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
+        <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
+        {market.cryptoQuality && <div><dt>行情来源</dt><dd>{market.source}<small className="crypto-source-note">独立现货历史，自 {market.cryptoQuality.historyStart}；{market.cryptoQuality.quoteCurrency} 计价</small></dd></div>}
+        {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；确认至 {confirmationTimeForTradingDate(market)}</dd></div>}
       </dl>
     </div>
   );
@@ -283,7 +288,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
         {items.map((item) => {
           const faded = stageFilter !== "全部" && item.stage !== stageFilter;
           const observationStage = observationStageFor(item);
-          const observationChanged = Boolean(observationStage && observationStage !== item.stage);
+          const observationChanged = Boolean(observationStage && observationStage !== item.stage && (!item.cryptoFreshness || item.cryptoFreshness === "fresh"));
           const multiCryptoLayout = group === "加密" && items.length > 1;
           const tileCols = dense ? 1 : multiCryptoLayout
             ? 3
@@ -292,13 +297,13 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
           return (
             <button
               key={item.code}
-              className={`map-tile tile-${item.stage.toLowerCase()} ${observationChanged ? "tile-observation-change" : ""} ${faded ? "tile-faded" : ""}`}
+              className={`map-tile tile-${item.stage.toLowerCase()} ${item.cryptoFreshness === "unavailable" ? "tile-unavailable" : ""} ${observationChanged ? "tile-observation-change" : ""} ${faded ? "tile-faded" : ""}`}
               style={{
                 gridColumn: `span ${tileCols}`,
                 gridRow: `span ${tileRows}`,
                 ...(observationChanged && observationStage ? { "--observation-border": stageMeta[observationStage].color } : {}),
               } as CSSProperties}
-              aria-label={`${item.shortCode}，${item.name}，${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
+              aria-label={item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               title={`在 TradingView 查看 ${item.shortCode} K线`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onClick={() => onMarketTap(item)}
@@ -308,7 +313,8 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
             >
               <strong>{item.shortCode}</strong>
               <span>{item.name}</span>
-              <div><b>{item.subStage}</b><em>{item.weeks}周</em></div>
+              {item.cryptoFreshness === "unavailable" ? <small className="crypto-status-badge">数据暂不可用</small> : <div><b>{item.subStage}</b><em>{item.weeks}周</em></div>}
+              {item.cryptoFreshness === "pending" && <small className="crypto-status-badge">数据待更新 · 保留历史结果</small>}
             </button>
           );
         })}
@@ -796,18 +802,18 @@ export default function Home() {
   const regionData = useMemo(() => activeUniverse.filter((item) => region === "全球" || item.region === region), [activeUniverse, region]);
   const counts = useMemo(() => {
     const result: Record<Stage, number> = { S1: 0, S2: 0, S3: 0, S4: 0 };
-    regionData.forEach((item) => result[item.stage]++);
+    regionData.filter(item => item.cryptoFreshness !== "unavailable").forEach((item) => result[item.stage]++);
     return result;
   }, [regionData]);
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? dashboardData.commonStageAsOf;
-  const commonConfirmationDate = latestConfirmationDate(activeUniverse, { excludeCrypto: view === "global" }) ?? commonStageAsOf;
+  const commonConfirmationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: view === "global" }) ?? commonStageAsOf;
   const activeGeneratedAt = stockRadarActive && stockRadarSnapshot
     ? stockRadarSnapshot.generatedAt
     : radarActive && radarSnapshot
       ? radarSnapshot.generatedAt
       : view === "global" ? dashboardData.generatedAt : memberSnapshots[view]?.generatedAt ?? dashboardData.generatedAt;
   const week = isoWeek(commonStageAsOf);
-  const watches = regionData.filter((item) => item.signal !== "稳定").slice(0, 3);
+  const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
     const cardWidth = 350;
     const cardHeight = 250;
@@ -1146,7 +1152,8 @@ export default function Home() {
             <section className="stage-distribution" aria-label="阶段分布筛选">
               <div className="distribution-bar">
               {(["S1", "S2", "S3", "S4"] as Stage[]).map((stage) => {
-                const percent = regionData.length ? Math.round(counts[stage] / regionData.length * 100) : 0;
+                const availableCount = regionData.filter(item => item.cryptoFreshness !== "unavailable").length;
+                const percent = availableCount ? Math.round(counts[stage] / availableCount * 100) : 0;
                 const selected = stageFilter === stage;
                 const muted = stageFilter !== "全部" && !selected;
                 return <button
