@@ -20,7 +20,7 @@ test("maps every market family to its TradingView symbol", () => {
   assert.equal(tradingViewSymbolFor(market("US10Y", "大宗·宏观", "CBOE")), "TVC:US10Y");
   assert.equal(tradingViewSymbolFor(market("CL", "大宗·宏观", "NYMEX")), "NYMEX:CL1!");
   assert.equal(tradingViewSymbolFor(market("BTC-USD", "加密", "CRYPTO")), "BINANCE:BTCUSDT");
-  assert.equal(tradingViewSymbolFor(market("HYPE-USD", "加密", "CRYPTO")), null);
+  assert.equal(tradingViewSymbolFor(market("HYPE-USD", "加密", "CRYPTO")), "HYPERLIQUID:HYPEUSDC");
 });
 
 test("builds an encoded TradingView chart URL", () => {
@@ -30,11 +30,11 @@ test("builds an encoded TradingView chart URL", () => {
   );
 });
 
-test("HYPE opens native Hyperliquid HYPE/USDC spot instead of OKX or perpetual", () => {
+test("HYPE opens TradingView Chinese daily chart with Hyperliquid spot feed", () => {
   const hype = market("HYPE-USD", "加密", "CRYPTO");
-  assert.equal(tradingViewChartUrlFor(hype), "https://app.hyperliquid.xyz/trade/HYPE/USDC");
-  assert.match(chartLinkTitleFor(hype), /Hyperliquid.*现货/);
-  assert.doesNotMatch(tradingViewChartUrlFor(hype), /tradingview|okx|\/trade\/HYPE$/i);
+  assert.equal(tradingViewChartUrlFor(hype), "https://cn.tradingview.com/chart/?symbol=HYPERLIQUID%3AHYPEUSDC&interval=D");
+  assert.match(chartLinkTitleFor(hype), /TradingView 中文站.*Hyperliquid.*现货日线/);
+  assert.doesNotMatch(tradingViewChartUrlFor(hype), /app\.hyperliquid|okx|\.P/i);
 });
 
 test("all other assets retain their symbols and daily interval on the simplified Chinese site", () => {
