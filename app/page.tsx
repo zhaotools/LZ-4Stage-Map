@@ -1,6 +1,8 @@
 "use client";
 
 import { type CSSProperties, type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+import { createHoverResumeGuard } from "@/app/lib/hover-resume.mjs";
 import {
   BarChart3,
   BookOpenText,
@@ -306,15 +308,11 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
               } as CSSProperties}
               aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               title={chartLinkTitleFor(item)}
-              onPointerMove={(event) => { if (event.pointerType !== "touch" && !event.currentTarget.dataset.hoverDismissed) onMarketMove(item, event); }}
-              onPointerDown={(event) => { event.currentTarget.dataset.hoverDismissed = "true"; onMarketLeave(); }}
+              onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
+              onPointerDown={() => onMarketLeave()}
               onClick={() => onMarketTap(item)}
-              onPointerLeave={(event) => { delete event.currentTarget.dataset.hoverDismissed; if (event.pointerType !== "touch") onMarketLeave(); }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") event.currentTarget.dataset.hoverDismissed = "true";
-                else if (event.key === "Tab") delete event.currentTarget.dataset.hoverDismissed;
-              }}
-              onFocus={(event) => { if (!event.currentTarget.dataset.hoverDismissed) onMarketFocus(item, event.currentTarget); }}
+              onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
+              onFocus={(event) => onMarketFocus(item, event.currentTarget)}
               onBlur={onMarketLeave}
             >
               <strong>{item.shortCode}</strong>
@@ -585,9 +583,32 @@ export default function Home() {
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
   const [hoveredMarket, setHoveredMarket] = useState<Market | null>(null);
+  const hoverResumeGuard = useRef(createHoverResumeGuard());
   const [hoverPoint, setHoverPoint] = useState({ x: 0, y: 0 });
   const [touchCardOpen, setTouchCardOpen] = useState(false);
   const [showFullVersion, setShowFullVersion] = useState(false);
+  useEffect(() => {
+    const dismiss = () => {
+      hoverResumeGuard.current.dismiss();
+      setHoveredMarket(null);
+      setTouchCardOpen(false);
+    };
+    const resumeKeyboard = (event: KeyboardEvent) => {
+      if (event.key === "Tab") hoverResumeGuard.current.keyboardNavigation();
+    };
+    window.addEventListener("blur", dismiss);
+    window.addEventListener("focus", dismiss);
+    window.addEventListener("pageshow", dismiss);
+    document.addEventListener("visibilitychange", dismiss);
+    document.addEventListener("keydown", resumeKeyboard, true);
+    return () => {
+      window.removeEventListener("blur", dismiss);
+      window.removeEventListener("focus", dismiss);
+      window.removeEventListener("pageshow", dismiss);
+      document.removeEventListener("visibilitychange", dismiss);
+      document.removeEventListener("keydown", resumeKeyboard, true);
+    };
+  }, []);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileNavigationRef = useRef<HTMLElement | null>(null);
   const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
@@ -888,18 +909,22 @@ export default function Home() {
     });
   };
   const handleMarketMove = (item: Market, event: PointerEvent<HTMLButtonElement>) => {
+    if (document.hidden || !document.hasFocus() || !hoverResumeGuard.current.allowPointer(event.clientX, event.clientY)) return;
     setTouchCardOpen(false);
     setHoveredMarket(item);
     placeHoverCard(event.clientX, event.clientY);
   };
   const handleMarketFocus = (item: Market, element: HTMLButtonElement) => {
+    if (document.hidden || !document.hasFocus() || !hoverResumeGuard.current.allowFocus() || !element.matches(":focus-visible")) return;
     setTouchCardOpen(false);
     const rect = element.getBoundingClientRect();
     setHoveredMarket(item);
     placeHoverCard(rect.right, rect.top + rect.height / 2);
   };
   const handleMarketTap = (item: Market) => {
-    closeMarketCard();
+    hoverResumeGuard.current.dismiss();
+    // Commit removal before opening the new tab can suspend the original page.
+    flushSync(() => closeMarketCard());
     window.open(tradingViewChartUrlFor(item), "_blank", "noopener,noreferrer");
   };
   const closeMarketCard = () => {

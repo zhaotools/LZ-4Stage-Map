@@ -1,15 +1,38 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { createHoverResumeGuard } from "../app/lib/hover-resume.mjs";
 
 const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
-test("click dismisses hover details and suppresses focus restoration until the pointer leaves", () => {
-  assert.match(source, /onPointerDown=.*hoverDismissed = "true"; onMarketLeave\(\)/);
-  assert.match(source, /onPointerMove=.*!event\.currentTarget\.dataset\.hoverDismissed/);
-  assert.match(source, /onFocus=.*!event\.currentTarget\.dataset\.hoverDismissed/);
-  assert.match(source, /onPointerLeave=.*delete event\.currentTarget\.dataset\.hoverDismissed/);
-  assert.match(source, /const handleMarketTap = .*\n\s*closeMarketCard\(\);\n\s*window\.open/);
+test("chart clicks synchronously remove details and tab restoration cannot re-open them", () => {
+  assert.match(source, /flushSync\(\(\) => closeMarketCard\(\)\);\n\s*window\.open/);
+  assert.match(source, /!hoverResumeGuard\.current\.allowPointer/);
+  assert.match(source, /!hoverResumeGuard\.current\.allowFocus/);
+  assert.match(source, /document\.hidden \|\| !document\.hasFocus\(\)/);
+  assert.doesNotMatch(source, /hoverDismissed/);
+  for (const event of ["blur", "focus", "pageshow", "visibilitychange"]) {
+    assert.ok(source.includes(`addEventListener("${event}", dismiss)`));
+    assert.ok(source.includes(`removeEventListener("${event}", dismiss)`));
+  }
+});
+
+test("restored focus and stationary pointer stay dismissed; intentional movement restores hover", () => {
+  const guard = createHoverResumeGuard();
+  assert.equal(guard.allowPointer(100, 100), true);
+  guard.dismiss();
+  assert.equal(guard.allowFocus(), false);
+  // New tab / return events may dismiss again; a synthetic leave never clears the guard.
+  guard.dismiss();
+  assert.equal(guard.allowPointer(100, 100), false);
+  assert.equal(guard.allowPointer(100, 100), false);
+  assert.equal(guard.allowPointer(102, 102), false);
+  assert.equal(guard.allowFocus(), false);
+  assert.equal(guard.allowPointer(110, 100), true);
+  assert.equal(guard.allowFocus(), true);
+  guard.dismiss();
+  guard.keyboardNavigation();
+  assert.equal(guard.allowFocus(), true);
 });
 
 test("market tiles provide a pointer-following stage detail card", () => {
