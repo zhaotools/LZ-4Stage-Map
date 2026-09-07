@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-07T00:53:58.781Z",
+  "generatedAt": "2026-09-07T01:03:57.358Z",
   "updateScope": "crypto",
   "lastUpdatedAt": {
     "traditional": "2026-09-05T05:38:53.983Z",
-    "crypto": "2026-09-07T00:53:58.781Z"
+    "crypto": "2026-09-07T01:03:57.358Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-31",
@@ -336,7 +336,7 @@
       "momentum": -2.57,
       "distance": 15.17,
       "confidence": 35,
-      "close": 80131.66,
+      "close": 80213.42,
       "marketAsOf": "2026-09-07",
       "stageAsOf": "2026-08-31",
       "hasProvisionalBar": true
@@ -364,7 +364,7 @@
       "momentum": -3.79,
       "distance": 23.53,
       "confidence": 50,
-      "close": 2513.55,
+      "close": 2514.2,
       "marketAsOf": "2026-09-07",
       "stageAsOf": "2026-08-31",
       "hasProvisionalBar": true
