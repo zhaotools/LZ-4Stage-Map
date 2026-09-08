@@ -3,7 +3,6 @@
 import { type CSSProperties, type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { createHoverResumeGuard } from "@/app/lib/hover-resume.mjs";
-import { StageDurationChart, type StageDurationHistory } from "@/app/components/stage-duration-chart";
 import {
   BarChart3,
   BookOpenText,
@@ -75,7 +74,6 @@ type Market = {
   source: string;
   dataStatus: "live" | "cache";
   cryptoFreshness?: "fresh" | "pending" | "unavailable";
-  stageDurations?: StageDurationHistory | null;
   cryptoQuality?: { verified: boolean; completedThrough: string; historyStart: string; quoteCurrency: string };
   marketAsOf: string;
   stageAsOf: string;
@@ -1266,7 +1264,6 @@ export default function Home() {
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
           </section>
-          {view === "crypto7" && isMember && <StageDurationChart assets={activeUniverse} />}
           </>}
 
           <footer>
