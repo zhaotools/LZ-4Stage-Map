@@ -136,6 +136,17 @@ footer span:nth-child(2) { text-align: center; }
 footer span:last-child { text-align: right; }
 .footer-data-times { display: flex; align-items: center; gap: 12px; min-width: 0; overflow-x: auto; font-size: 10px; white-space: nowrap; }
 .footer-data-times span { flex: 0 0 auto; font-size: inherit; }
+.stage-duration-panel { margin-top: 18px; padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.duration-explanation { margin: 8px 0 16px; color: #7a879d; font-size: 12px; line-height: 1.7; }
+.duration-scroll { overflow-x: auto; }.duration-scroll:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+.duration-table { min-width: 690px; }.duration-row { display: grid; grid-template-columns: 115px minmax(0, 1fr) 136px; align-items: center; gap: 14px; }
+.duration-header { color: #52627e; font-size: 12px; font-weight: 700; }.duration-axis svg { width: 100%; }.duration-axis text { fill: #8996ac; font-size: 11px; }
+.duration-group { margin: 13px 0 4px; padding-top: 10px; border-top: 1px solid #e8edf5; font-size: 13px; color: #52627e; }
+.duration-asset { padding: 8px 0 12px; }.duration-name, .duration-current { display: grid; gap: 4px; }.duration-name strong, .duration-current strong { font-size: 15px; }.duration-name span, .duration-current span { color: #75839a; font-size: 11px; }
+.duration-bars { display: block; width: 100%; overflow: visible; }.duration-bars text { font-size: 12px; font-weight: 700; }.duration-empty { padding: 14px; color: #8a96a8; background: #f6f8fc; font-size: 12px; }
+.duration-notes { margin: 3px 150px 0 129px; color: #8490a3; font-size: 11px; line-height: 1.8; }.duration-notes > span { display: block; }.duration-notes details { margin-top: 2px; }.duration-notes summary { cursor: pointer; color: #536c91; }.duration-notes ul { padding-left: 16px; }
+.duration-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 16px; color: #718099; font-size: 12px; }.duration-legend span { display: inline-flex; align-items: center; gap: 6px; }.duration-legend i { width: 10px; height: 10px; border-radius: 3px; }
+@media (max-width: 780px) { .stage-duration-panel { padding: 16px 12px; }.duration-explanation { font-size: 12px; } }
 
 @media (max-width: 1180px) {
   .sidebar { width: 184px; }.main-content { width: calc(100% - 184px); margin-left: 184px; padding: 24px; }.market-map { height: 620px; }.map-tile > strong { font-size: 14px; }.map-tile > span { font-size: 8px; }
