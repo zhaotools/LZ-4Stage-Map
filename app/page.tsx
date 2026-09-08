@@ -274,7 +274,6 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
         <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationTime}</dd></div>
         <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
-        {market.cryptoQuality && <div><dt>行情来源</dt><dd>{market.source}<small className="crypto-source-note">独立现货历史，自 {market.cryptoQuality.historyStart}；{market.cryptoQuality.quoteCurrency} 计价</small></dd></div>}
         {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；确认至 {confirmationTimeForTradingDate(market)}</dd></div>}
       </dl>
     </div>

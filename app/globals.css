@@ -161,6 +161,5 @@ footer span:last-child { text-align: right; }
 }
 /* Crypto publication health: no layout or stage-color changes for normal assets. */
 .crypto-status-badge { display: block; margin-top: 8px; padding: 3px 7px; border-radius: 6px; background: rgba(10, 22, 44, .7); color: #fff; font-size: 12px; line-height: 1.4; }
-.crypto-source-note { display: block; margin-top: 4px; color: #9aa8be; font-size: 12px; line-height: 1.5; }
 .crypto-data-note { padding: 16px; line-height: 1.6; }
 .map-tile.tile-unavailable { background: #556176; border-color: #758198; }

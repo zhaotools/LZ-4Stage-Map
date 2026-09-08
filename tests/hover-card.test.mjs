@@ -82,7 +82,7 @@ test("crypto pending and unavailable analysis is clearly labelled without changi
   assert.match(source, /数据待更新 · 保留历史结果/);
   assert.match(source, /cryptoFreshness === "unavailable"/);
   assert.match(source, /tile-unavailable/);
-  assert.match(source, /行情来源/);
+  assert.doesNotMatch(source, /行情来源|crypto-source-note/);
   assert.match(source, /quoteCurrency/);
   assert.match(source, /confirmationTimeForTradingDate\(market\)/);
 });
