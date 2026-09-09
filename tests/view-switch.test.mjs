@@ -16,6 +16,8 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /requestView\("chinaIndices"\)/);
   assert.match(pageSource, /requestView\("hkSelected"\)/);
   assert.match(pageSource, /const switchView = \(nextView: View\) => \{[\s\S]*?scrollPageToTop\(\);[\s\S]*?\};/);
+  assert.match(pageSource, /const switchToTrendRadar = \(\) => \{[\s\S]*?setRadarActive\(true\);[\s\S]*?scrollPageToTop\(\);[\s\S]*?\};/);
+  assert.match(pageSource, /const switchToStockRadar = \(\) => \{[\s\S]*?setStockRadarActive\(true\);[\s\S]*?scrollPageToTop\(\);[\s\S]*?\};/);
   assert.match(pageSource, /className="mobile-navigation-menus" aria-label="手机端导航" ref=\{mobileNavigationRef\}/);
   assert.match(pageSource, /aria-label="手机端市场地图"[\s\S]*aria-haspopup="menu"[\s\S]*aria-expanded=\{mobileMenuOpen === "market"\}/);
   assert.match(pageSource, /id="mobile-market-menu" role="menu" aria-label="市场地图"/);

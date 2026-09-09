@@ -890,17 +890,9 @@ export default function Home() {
         return;
       }
       if (pendingView === "trendRadar") {
-        setRadarActive(true);
-        setStockRadarActive(false);
-        setRadarFilter("all");
-        setRadarRegion("全部");
-        closeMarketCard();
+        switchToTrendRadar();
       } else if (pendingView === "stockRadar") {
-        setStockRadarActive(true);
-        setRadarActive(false);
-        setStockRadarFilter("all");
-        setStockRadarRegion("全部");
-        closeMarketCard();
+        switchToStockRadar();
       } else {
         switchView(pendingView);
       }
@@ -987,6 +979,24 @@ export default function Home() {
     closeMarketCard();
     scrollPageToTop();
   };
+  const switchToTrendRadar = () => {
+    setRadarActive(true);
+    setStockRadarActive(false);
+    setIntroductionActive(false);
+    setRadarFilter("all");
+    setRadarRegion("全部");
+    closeMarketCard();
+    scrollPageToTop();
+  };
+  const switchToStockRadar = () => {
+    setStockRadarActive(true);
+    setRadarActive(false);
+    setIntroductionActive(false);
+    setStockRadarFilter("all");
+    setStockRadarRegion("全部");
+    closeMarketCard();
+    scrollPageToTop();
+  };
   const requestTrendRadar = async () => {
     if (!isMember) {
       setPendingView("trendRadar");
@@ -1002,12 +1012,7 @@ export default function Home() {
       closeMarketCard();
       return;
     }
-    setRadarActive(true);
-    setStockRadarActive(false);
-    setIntroductionActive(false);
-    setRadarFilter("all");
-    setRadarRegion("全部");
-    closeMarketCard();
+    switchToTrendRadar();
   };
   const requestStockRadar = async () => {
     if (!isMember) {
@@ -1024,12 +1029,7 @@ export default function Home() {
       closeMarketCard();
       return;
     }
-    setStockRadarActive(true);
-    setRadarActive(false);
-    setIntroductionActive(false);
-    setStockRadarFilter("all");
-    setStockRadarRegion("全部");
-    closeMarketCard();
+    switchToStockRadar();
   };
   const requestView = async (nextView: View) => {
     if (!isMember && isMemberView(nextView)) {
@@ -1146,19 +1146,9 @@ export default function Home() {
     const nextView = pendingView;
     closeMemberDialog();
     if (nextView === "trendRadar") {
-      setRadarActive(true);
-      setStockRadarActive(false);
-      setIntroductionActive(false);
-      setRadarFilter("all");
-      setRadarRegion("全部");
-      closeMarketCard();
+      switchToTrendRadar();
     } else if (nextView === "stockRadar") {
-      setStockRadarActive(true);
-      setRadarActive(false);
-      setIntroductionActive(false);
-      setStockRadarFilter("all");
-      setStockRadarRegion("全部");
-      closeMarketCard();
+      switchToStockRadar();
     } else {
       switchView(nextView);
     }
