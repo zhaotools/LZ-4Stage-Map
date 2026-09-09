@@ -150,6 +150,11 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(cssSource, /\.view-crypto7 \{ height: clamp\(380px, 41\.333vh, 480px\); \}/);
   assert.match(cssSource, /@media \(max-width: 1180px\)[\s\S]*?\.view-crypto7 \{ height: 413px; \}/);
   assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.view-crypto7 \.map-group \{ height: 180px; \}/);
+  assert.match(cssSource, /\.view-crypto7 \.map-tile > strong \{ font-size: clamp\(15px, calc\(1\.25vw \+ 2px\), 23px\); \}/);
+  assert.match(cssSource, /\.view-crypto7 \.map-tile > span \{ font-size: clamp\(10px, calc\(\.67vw \+ 2px\), 12px\); \}/);
+  assert.match(cssSource, /\.view-crypto7 \.map-tile b, \.view-crypto7 \.map-tile em \{ font-size: 12px; \}/);
+  assert.match(cssSource, /\.view-crypto7 \.crypto-status-badge \{ font-size: 14px; \}/);
+  assert.match(cssSource, /@media \(max-width: 1180px\)[\s\S]*?\.view-crypto7 \.map-tile > strong \{ font-size: 16px; \}[\s\S]*?\.view-crypto7 \.map-tile > span \{ font-size: 10px; \}/);
   assert.match(cssSource, /@media \(max-width: 780px\)/);
   assert.match(cssSource, /\.mobile-navigation-menus \{ display: none; \}/);
   assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*\.mobile-navigation-menus \{[^}]*display: flex;/);
