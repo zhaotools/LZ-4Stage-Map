@@ -183,7 +183,7 @@ const stageMeta: Record<Stage, { title: string; season: string; color: string; d
   S4: { title: "下降阶段", season: "冬", color: "#ed4859", dark: "#bd2638" },
 };
 const radarRuleMeta: Record<TrendRadarRuleId, { label: string; description: string; color: string }> = {
-  s4Recovery: { label: "转向S2观察", description: "当前主阶段 S4 / S3 · 本周观察转向 S2", color: "#18a567" },
+  s4Recovery: { label: "转向S2观察", description: "当前主阶段 S1 / S3 / S4 · 本周观察转向 S2", color: "#18a567" },
   s2aEntry: { label: "进入S2A", description: "当前进入S2A阶段", color: "#18a567" },
   s2Early: { label: "S2早期阶段", description: "S2持续时间不超过4周", color: "#087849" },
   s2Breakdown: { label: "转向S4观察", description: "当前主阶段 S2 / S3 · 本周观察转向 S4", color: "#ed4859" },
