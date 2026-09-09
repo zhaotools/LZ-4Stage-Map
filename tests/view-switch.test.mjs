@@ -147,6 +147,9 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /"2\.HK": \{ shortCode: "0002"/);
   assert.match(pageSource, /hydrateMarkets\(memberSnapshots\[view\]\?\.markets \?\? \[\]\)/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股/);
+  assert.match(cssSource, /\.view-crypto7 \{ height: clamp\(380px, 41\.333vh, 480px\); \}/);
+  assert.match(cssSource, /@media \(max-width: 1180px\)[\s\S]*?\.view-crypto7 \{ height: 413px; \}/);
+  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.view-crypto7 \.map-group \{ height: 180px; \}/);
   assert.match(cssSource, /@media \(max-width: 780px\)/);
   assert.match(cssSource, /\.mobile-navigation-menus \{ display: none; \}/);
   assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*\.mobile-navigation-menus \{[^}]*display: flex;/);
