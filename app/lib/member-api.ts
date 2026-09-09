@@ -6,6 +6,23 @@ export type MemberView = "crypto7" | "usSelected" | "chinaIndices" | "hkSelected
 export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early" | "s2Breakdown" | "s4aEntry" | "s4Early";
 export type StockRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
 
+export type MarketInterpretation = {
+  schemaVersion: "lz-market-interpretation-v1";
+  viewKey: "global" | MemberView;
+  mode: "system";
+  generatedAt: string;
+  commonStageAsOf: string;
+  sourceSnapshotSha256: string;
+  universeSize: number;
+  analyzedSize: number;
+  excludedSize: number;
+  stageCounts: Record<"S1" | "S2" | "S3" | "S4", number>;
+  headline: string;
+  summary: string;
+  insights: Array<{ id: "structure" | "maturity" | "observation" | "divergence"; label: string; text: string }>;
+  note: string;
+};
+
 export type MemberProfile = {
   user_id: string;
   display_name: string;
@@ -23,6 +40,7 @@ export type MemberSnapshot<TMarket = unknown> = {
   commonStageAsOf: string;
   viewKey: MemberView;
   markets: TMarket[];
+  interpretation?: MarketInterpretation;
 };
 
 export type TrendRadarSnapshot<TMarket = unknown> = {

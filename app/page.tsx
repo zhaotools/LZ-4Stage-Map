@@ -37,6 +37,7 @@ import {
   signInMember,
   signOutMember,
   updateMemberPassword,
+  type MarketInterpretation,
   type MemberProfile,
   type MemberSnapshot,
   type MemberView,
@@ -543,6 +544,34 @@ function StockRadarPage({
   );
 }
 
+function MarketInterpretationPanel({ interpretation }: { interpretation: MarketInterpretation }) {
+  return (
+    <section className="market-interpretation" aria-labelledby="market-interpretation-title">
+      <div className="market-interpretation-head">
+        <div>
+          <span className="section-kicker">LZ-4STAGE INTERPRETATION</span>
+          <h2 id="market-interpretation-title">市场阶段解读</h2>
+        </div>
+        <span className="market-interpretation-mode"><BookOpenText size={14} />系统解读</span>
+      </div>
+      <div className="market-interpretation-overview">
+        <strong>{interpretation.headline}</strong>
+        <p>{interpretation.summary}</p>
+      </div>
+      <div className="market-interpretation-grid">
+        {interpretation.insights.map((insight) => (
+          <article key={insight.id} className={`market-interpretation-item interpretation-${insight.id}`}>
+            <h3>{insight.label}</h3>
+            <p>{insight.text}</p>
+          </article>
+        ))}
+      </div>
+      {interpretation.excludedSize > 0 && <p className="market-interpretation-quality">本期有{interpretation.excludedSize}个资产的数据尚未完成确认，未计入解读。</p>}
+      <p className="market-interpretation-note">{interpretation.note}</p>
+    </section>
+  );
+}
+
 export default function Home() {
   const [authReady, setAuthReady] = useState(false);
   const [publicSnapshot, setPublicSnapshot] = useState(dashboardData);
@@ -892,6 +921,9 @@ export default function Home() {
     : radarActive && radarSnapshot
       ? radarSnapshot.generatedAt
       : view === "global" ? publicSnapshot.generatedAt : memberSnapshots[view]?.generatedAt ?? publicSnapshot.generatedAt;
+  const activeInterpretation = view === "global"
+    ? (publicSnapshot as typeof dashboardData & { interpretation?: MarketInterpretation }).interpretation
+    : memberSnapshots[view]?.interpretation;
   const week = isoWeek(commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
@@ -1263,6 +1295,7 @@ export default function Home() {
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
           </section>
+          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} />}
           </>}
 
           <footer>
