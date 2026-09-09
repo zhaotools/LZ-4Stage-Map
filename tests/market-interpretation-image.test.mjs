@@ -18,14 +18,15 @@ const interpretation = {
 };
 
 test("image export model includes the selected market, data provenance and all interpretation content", () => {
-  const model = buildInterpretationImageModel(interpretation, "全球市场");
+  const model = buildInterpretationImageModel(interpretation, "全球市场", new Date("2026-09-10T00:30:00+08:00"));
 
   assert.equal(model.title, "全球市场阶段解读");
   assert.equal(model.headline, interpretation.headline);
-  assert.deepEqual(model.stageCounts.map(({ stage, count }) => [stage, count]), [["S1", 1], ["S2", 9], ["S3", 1], ["S4", 5]]);
+  assert.deepEqual(model.stageCounts.map(({ label, count }) => [label, count]), [["S1 春季", 1], ["S2 夏季", 9], ["S3 秋季", 1], ["S4 冬季", 5]]);
   assert.equal(model.insights.length, 2);
   assert.equal(model.source, "数据来自公开市场，由 LZ-4Stage 框架系统分析。");
-  assert.match(model.time, /确认至 2026-09-07/);
+  assert.equal(model.time, "数据确认至 2026-09-07 · 图片生成于 2026/09/10");
+  assert.equal(model.detailUrl, "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/");
 });
 
 test("image export paints a PNG and triggers a browser download", async () => {

@@ -1,8 +1,8 @@
 const STAGE_COLORS = {
-  S1: { color: "#397ff6", background: "#eef4ff" },
-  S2: { color: "#18a567", background: "#eefaf4" },
-  S3: { color: "#f09a18", background: "#fff7e8" },
-  S4: { color: "#ed4859", background: "#fff1f3" },
+  S1: { season: "春季", color: "#397ff6", background: "#eef4ff" },
+  S2: { season: "夏季", color: "#18a567", background: "#eefaf4" },
+  S3: { season: "秋季", color: "#f09a18", background: "#fff7e8" },
+  S4: { season: "冬季", color: "#ed4859", background: "#fff1f3" },
 };
 
 const INSIGHT_COLORS = {
@@ -14,19 +14,18 @@ const INSIGHT_COLORS = {
 
 const FONT_FAMILY = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif';
 
-function formatShanghaiDateTime(iso) {
-  return new Intl.DateTimeFormat("zh-CN", {
+function formatShanghaiDate(value) {
+  const parts = new Intl.DateTimeFormat("zh-CN", {
     timeZone: "Asia/Shanghai",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(iso));
+  }).formatToParts(new Date(value));
+  const get = (type) => parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}/${get("month")}/${get("day")}`;
 }
 
-export function buildInterpretationImageModel(interpretation, marketTitle) {
+export function buildInterpretationImageModel(interpretation, marketTitle, imageGeneratedAt = new Date()) {
   return {
     kicker: "LZ-4STAGE · MARKET INTERPRETATION",
     title: `${marketTitle}阶段解读`,
@@ -35,6 +34,7 @@ export function buildInterpretationImageModel(interpretation, marketTitle) {
     summary: interpretation.summary,
     stageCounts: ["S1", "S2", "S3", "S4"].map((stage) => ({
       stage,
+      label: `${stage} ${STAGE_COLORS[stage].season}`,
       count: interpretation.stageCounts[stage] ?? 0,
       ...STAGE_COLORS[stage],
     })),
@@ -45,9 +45,10 @@ export function buildInterpretationImageModel(interpretation, marketTitle) {
     quality: interpretation.excludedSize > 0
       ? `本期有${interpretation.excludedSize}个资产的数据尚未完成确认，未计入解读。`
       : "",
-    time: `确认至 ${interpretation.commonStageAsOf} · 数据生成于 ${formatShanghaiDateTime(interpretation.generatedAt)}`,
+    time: `数据确认至 ${interpretation.commonStageAsOf} · 图片生成于 ${formatShanghaiDate(imageGeneratedAt)}`,
     source: "数据来自公开市场，由 LZ-4Stage 框架系统分析。",
     disclaimer: interpretation.note,
+    detailUrl: "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/",
   };
 }
 
@@ -148,7 +149,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   const overviewHeight = 118 + summaryLines.length * 38;
   const insightsHeight = rows.reduce((sum, row) => sum + row.height, 0) + Math.max(0, rows.length - 1) * gap;
   const qualityHeight = model.quality ? 42 : 0;
-  const height = 38 + 156 + 86 + 24 + overviewHeight + 24 + insightsHeight + qualityHeight + 174 + 38;
+  const height = 38 + 156 + 86 + 24 + overviewHeight + 24 + insightsHeight + qualityHeight + 218 + 38;
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -190,7 +191,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     paintCard(context, x, y, stageWidth, 70, 14, item.background, "#e1e8f2");
     context.fillStyle = item.color;
     context.font = `700 25px ${FONT_FAMILY}`;
-    context.fillText(item.stage, x + 20, y + 44);
+    context.fillText(item.label, x + 20, y + 44);
     context.fillStyle = "#42536d";
     context.font = `700 21px ${FONT_FAMILY}`;
     context.textAlign = "right";
@@ -249,6 +250,10 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.fillStyle = "#96a2b4";
   context.font = `18px ${FONT_FAMILY}`;
   context.fillText(model.disclaimer, contentX, y);
+  y += 36;
+  context.fillStyle = "#397ff6";
+  context.font = `18px ${FONT_FAMILY}`;
+  context.fillText(model.detailUrl, contentX, y);
 
   const fileName = safeFileName(`LZ-4Stage-${marketTitle}-阶段解读-${interpretation.commonStageAsOf}.png`);
   return downloadCanvas(canvas, fileName);
