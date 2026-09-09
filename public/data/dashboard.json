@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-09T10:55:58.426Z",
+  "generatedAt": "2026-09-09T15:06:53.110Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-09T10:55:58.426Z",
-    "crypto": "2026-09-09T10:55:58.426Z"
+    "traditional": "2026-09-09T15:06:53.110Z",
+    "crypto": "2026-09-09T15:06:53.110Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-31",
@@ -32,8 +32,8 @@
       "momentum": 1.85,
       "distance": 6.52,
       "confidence": 95,
-      "close": 7673.52001953125,
-      "marketAsOf": "2026-09-08",
+      "close": 7642.27978515625,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -60,8 +60,8 @@
       "momentum": 6.97,
       "distance": 9.13,
       "confidence": 95,
-      "close": 528.4000244140625,
-      "marketAsOf": "2026-09-08",
+      "close": 532.2899780273438,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -88,7 +88,7 @@
       "momentum": -1.9,
       "distance": -23.49,
       "confidence": 95,
-      "close": 16.200000762939453,
+      "close": 16.049999237060547,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -171,7 +171,7 @@
       "momentum": 3.58,
       "distance": 4.49,
       "confidence": 95,
-      "close": 65142.78125,
+      "close": 65142.78,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -198,7 +198,7 @@
       "momentum": 1.38,
       "distance": 4.99,
       "confidence": 95,
-      "close": 6299.31005859375,
+      "close": 6304.02001953125,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -226,7 +226,7 @@
       "momentum": 0.21,
       "distance": -0.28,
       "confidence": 95,
-      "close": 98.80799865722656,
+      "close": 98.65599822998047,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -254,8 +254,8 @@
       "momentum": 1.92,
       "distance": 7.63,
       "confidence": 95,
-      "close": 4.806000232696533,
-      "marketAsOf": "2026-09-08",
+      "close": 4.811999797821045,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -281,7 +281,7 @@
       "momentum": 4.6,
       "distance": 5.66,
       "confidence": 73,
-      "close": 95.2300033569336,
+      "close": 96.30000305175781,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -308,7 +308,7 @@
       "momentum": -1.07,
       "distance": -2.29,
       "confidence": 95,
-      "close": 4438.39990234375,
+      "close": 4461.60009765625,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -408,8 +408,8 @@
       "momentum": 2.54,
       "distance": 6.77,
       "confidence": 95,
-      "close": 29507.69921875,
-      "marketAsOf": "2026-09-08",
+      "close": 29453.6953125,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -469,5 +469,47 @@
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     }
-  ]
+  ],
+  "interpretation": {
+    "schemaVersion": "lz-market-interpretation-v1",
+    "viewKey": "global",
+    "mode": "system",
+    "generatedAt": "2026-09-09T15:06:53.110Z",
+    "commonStageAsOf": "2026-08-31",
+    "sourceSnapshotSha256": "b253e36a168cdcb90d4a75b341c432291f29c7c7c2ece40bed1b18a71a2849ff",
+    "universeSize": 16,
+    "analyzedSize": 16,
+    "excludedSize": 0,
+    "stageCounts": {
+      "S1": 1,
+      "S2": 9,
+      "S3": 1,
+      "S4": 5
+    },
+    "headline": "全球市场以S2上升阶段为主",
+    "summary": "S2资产占9/16，上升结构占比较高；同时仍有5个资产处于S4，市场并非同步运行。",
+    "insights": [
+      {
+        "id": "structure",
+        "label": "阶段结构",
+        "text": "16个有效资产中，S1 1个、S2 9个、S3 1个、S4 5个。"
+      },
+      {
+        "id": "maturity",
+        "label": "趋势位置",
+        "text": "比特币、以太坊处于S2早期；iShares半导体ETF、日经225指数、欧洲STOXX 50指数处于S2后期或减速段；创业板指处于S4早期；黄金（COMEX期货代理）、恒生指数处于S4后期或减速段。"
+      },
+      {
+        "id": "observation",
+        "label": "本周观察",
+        "text": "恒生指数由确认S4转向S1观察。观察信号尚未等同于阶段确认。"
+      },
+      {
+        "id": "divergence",
+        "label": "市场分化",
+        "text": "美股以S2为主；A股阶段分布在S3、S4之间较为分散；港股以S4为主；日股以S2为主；欧股以S2为主；大宗·宏观S2数量最多；加密以S2为主。不同类别资产的阶段含义应分别理解。"
+      }
+    ],
+    "note": "阶段数量用于描述当前周期位置，不代表资产等权配置、未来涨跌预测或投资建议。"
+  }
 }
