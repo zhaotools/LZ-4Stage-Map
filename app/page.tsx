@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Globe2,
   Grid2X2,
+  ImageDown,
   KeyRound,
   Landmark,
   LockKeyhole,
@@ -27,6 +28,7 @@ import { newerSnapshot, startWeeklyRefresh, validateSnapshot } from "@/app/lib/w
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { globalConfirmationDates, latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
+import { downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -544,7 +546,18 @@ function StockRadarPage({
   );
 }
 
-function MarketInterpretationPanel({ interpretation }: { interpretation: MarketInterpretation }) {
+function MarketInterpretationPanel({ interpretation, marketTitle }: { interpretation: MarketInterpretation; marketTitle: string }) {
+  const [imageStatus, setImageStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
+  const handleGenerateImage = async () => {
+    setImageStatus("generating");
+    try {
+      await downloadMarketInterpretationImage(interpretation, marketTitle);
+      setImageStatus("done");
+      window.setTimeout(() => setImageStatus("idle"), 1800);
+    } catch {
+      setImageStatus("error");
+    }
+  };
   return (
     <section className="market-interpretation" aria-labelledby="market-interpretation-title">
       <div className="market-interpretation-head">
@@ -552,7 +565,12 @@ function MarketInterpretationPanel({ interpretation }: { interpretation: MarketI
           <span className="section-kicker">LZ-4STAGE INTERPRETATION</span>
           <h2 id="market-interpretation-title">市场阶段解读</h2>
         </div>
-        <span className="market-interpretation-mode"><BookOpenText size={14} />系统解读</span>
+        <div className="market-interpretation-actions">
+          <span className="market-interpretation-mode"><BookOpenText size={14} />系统解读</span>
+          <button className="market-interpretation-image-button" type="button" onClick={handleGenerateImage} disabled={imageStatus === "generating"}>
+            <ImageDown size={15} />{imageStatus === "generating" ? "生成中" : imageStatus === "done" ? "已生成" : imageStatus === "error" ? "重试生成" : "生成图片"}
+          </button>
+        </div>
       </div>
       <div className="market-interpretation-overview">
         <strong>{interpretation.headline}</strong>
@@ -1295,7 +1313,7 @@ export default function Home() {
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
           </section>
-          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} />}
+          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} marketTitle={activeViewMeta.mapTitle} />}
           </>}
 
           <footer>
