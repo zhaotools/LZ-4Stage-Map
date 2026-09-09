@@ -29,6 +29,7 @@ import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { globalConfirmationDates, latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
 import { downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
+import { scrollPageToTop } from "@/app/lib/page-scroll.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -984,6 +985,7 @@ export default function Home() {
     setRegion("全球");
     setStageFilter("全部");
     closeMarketCard();
+    scrollPageToTop();
   };
   const requestTrendRadar = async () => {
     if (!isMember) {
