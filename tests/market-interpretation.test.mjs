@@ -14,8 +14,8 @@ test("market pages render the system interpretation below the stage map", () => 
   assert.ok(mapPosition >= 0);
   assert.ok(interpretationPosition > mapPosition);
   assert.ok(footerPosition > interpretationPosition);
-  assert.match(pageSource, /市场阶段解读/);
-  assert.match(pageSource, /系统解读/);
+  assert.match(pageSource, /\{marketTitle\}阶段解读/);
+  assert.doesNotMatch(pageSource, /系统解读/);
   assert.doesNotMatch(pageSource, /AI解读/);
 });
 

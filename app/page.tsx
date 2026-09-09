@@ -564,10 +564,9 @@ function MarketInterpretationPanel({ interpretation, marketTitle }: { interpreta
       <div className="market-interpretation-head">
         <div>
           <span className="section-kicker">LZ-4STAGE INTERPRETATION</span>
-          <h2 id="market-interpretation-title">市场阶段解读</h2>
+          <h2 id="market-interpretation-title">{marketTitle}阶段解读</h2>
         </div>
         <div className="market-interpretation-actions">
-          <span className="market-interpretation-mode"><BookOpenText size={14} />系统解读</span>
           <button className="market-interpretation-image-button" type="button" onClick={handleGenerateImage} disabled={imageStatus === "generating"}>
             <ImageDown size={15} />{imageStatus === "generating" ? "生成中" : imageStatus === "done" ? "已生成" : imageStatus === "error" ? "重试生成" : "生成图片"}
           </button>
