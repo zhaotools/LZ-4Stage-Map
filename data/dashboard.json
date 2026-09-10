@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-10T04:10:33.758Z",
+  "generatedAt": "2026-09-10T04:15:53.783Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-10T04:10:33.758Z",
-    "crypto": "2026-09-10T04:10:33.758Z"
+    "traditional": "2026-09-10T04:15:53.783Z",
+    "crypto": "2026-09-10T04:15:53.783Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-31",
@@ -183,7 +183,7 @@
       "momentum": 3.58,
       "distance": 4.49,
       "confidence": 95,
-      "close": 64703.51953125,
+      "close": 64725.390625,
       "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -242,8 +242,8 @@
       "momentum": 0.21,
       "distance": -0.28,
       "confidence": 95,
-      "close": 98.7699966430664,
-      "marketAsOf": "2026-09-09",
+      "close": 98.73500061035156,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -302,8 +302,8 @@
       "momentum": 4.6,
       "distance": 5.66,
       "confidence": 73,
-      "close": 96.05000305175781,
-      "marketAsOf": "2026-09-09",
+      "close": 96.12999725341797,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -332,8 +332,8 @@
       "momentum": -1.07,
       "distance": -2.29,
       "confidence": 95,
-      "close": 4416,
-      "marketAsOf": "2026-09-09",
+      "close": 4455.2998046875,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -508,9 +508,9 @@
     "schemaVersion": "lz-market-interpretation-v1",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-10T04:10:33.758Z",
+    "generatedAt": "2026-09-10T04:15:53.783Z",
     "commonStageAsOf": "2026-08-31",
-    "sourceSnapshotSha256": "19fc1960aec14ad2c68ae6805ac021d533340183e37183e6eb7aaec10014e1ce",
+    "sourceSnapshotSha256": "2828c368284975cb41afd3e8b536d9ad7fc38998c12f5fff6515ed01b5303960",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
