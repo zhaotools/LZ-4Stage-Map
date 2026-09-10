@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-09T15:06:53.110Z",
+  "generatedAt": "2026-09-10T00:54:51.085Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-09T15:06:53.110Z",
-    "crypto": "2026-09-09T15:06:53.110Z"
+    "traditional": "2026-09-10T00:54:51.085Z",
+    "crypto": "2026-09-10T00:54:51.085Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-31",
@@ -15,10 +15,12 @@
       "name": "标普500指数",
       "region": "美股",
       "exchange": "NYSE",
+      "category": null,
       "collections": [
         "global",
         "usSelected"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -32,7 +34,7 @@
       "momentum": 1.85,
       "distance": 6.52,
       "confidence": 95,
-      "close": 7642.27978515625,
+      "close": 7636.35986328125,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -43,10 +45,12 @@
       "name": "iShares半导体ETF",
       "region": "美股",
       "exchange": "NASDAQ",
+      "category": null,
       "collections": [
         "global",
         "usSelected"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -60,7 +64,7 @@
       "momentum": 6.97,
       "distance": 9.13,
       "confidence": 95,
-      "close": 532.2899780273438,
+      "close": 532,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -71,10 +75,12 @@
       "name": "VIX恐慌指数",
       "region": "美股",
       "exchange": "CBOE",
+      "category": null,
       "collections": [
         "global",
         "usSelected"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -88,7 +94,7 @@
       "momentum": -1.9,
       "distance": -23.49,
       "confidence": 95,
-      "close": 16.049999237060547,
+      "close": 16.459999084472656,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -99,11 +105,13 @@
       "name": "创业板指",
       "region": "A股",
       "exchange": "SZSE",
+      "category": null,
       "collections": [
         "global",
         "chinaIndices"
       ],
-      "source": "东方财富 · 前复权",
+      "radarEligible": true,
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -127,10 +135,12 @@
       "name": "恒生科技指数",
       "region": "港股",
       "exchange": "HKEX",
+      "category": null,
       "collections": [
         "global",
         "hkSelected"
       ],
+      "radarEligible": true,
       "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
@@ -155,9 +165,11 @@
       "name": "日经225指数",
       "region": "日股",
       "exchange": "OSE",
+      "category": null,
       "collections": [
         "global"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -171,8 +183,8 @@
       "momentum": 3.58,
       "distance": 4.49,
       "confidence": 95,
-      "close": 65142.78,
-      "marketAsOf": "2026-09-09",
+      "close": 64343.44140625,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -182,9 +194,11 @@
       "name": "欧洲STOXX 50指数",
       "region": "欧股",
       "exchange": "STOXX",
+      "category": null,
       "collections": [
         "global"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -198,7 +212,7 @@
       "momentum": 1.38,
       "distance": 4.99,
       "confidence": 95,
-      "close": 6304.02001953125,
+      "close": 6311.56,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -209,10 +223,12 @@
       "name": "美元指数",
       "region": "大宗·宏观",
       "exchange": "ICE",
+      "category": null,
       "collections": [
         "global",
         "usSelected"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -226,8 +242,8 @@
       "momentum": 0.21,
       "distance": -0.28,
       "confidence": 95,
-      "close": 98.65599822998047,
-      "marketAsOf": "2026-09-09",
+      "close": 98.80699920654297,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -237,10 +253,12 @@
       "name": "美国10年期国债收益率",
       "region": "大宗·宏观",
       "exchange": "CBOE",
+      "category": "利率",
       "collections": [
         "global",
         "usSelected"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -254,7 +272,7 @@
       "momentum": 1.92,
       "distance": 7.63,
       "confidence": 95,
-      "close": 4.811999797821045,
+      "close": 4.836999893188477,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -265,9 +283,12 @@
       "name": "WTI原油",
       "region": "大宗·宏观",
       "exchange": "NYMEX",
+      "category": "能源",
       "collections": [
-        "global"
+        "global",
+        "commodity"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -281,8 +302,8 @@
       "momentum": 4.6,
       "distance": 5.66,
       "confidence": 73,
-      "close": 96.30000305175781,
-      "marketAsOf": "2026-09-09",
+      "close": 96.58000183105469,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -292,9 +313,12 @@
       "name": "黄金（COMEX期货代理）",
       "region": "大宗·宏观",
       "exchange": "COMEX",
+      "category": "贵金属",
       "collections": [
-        "global"
+        "global",
+        "commodity"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -308,8 +332,8 @@
       "momentum": -1.07,
       "distance": -2.29,
       "confidence": 95,
-      "close": 4461.60009765625,
-      "marketAsOf": "2026-09-09",
+      "close": 4445,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -319,10 +343,12 @@
       "name": "比特币",
       "region": "加密",
       "exchange": "CRYPTO",
+      "category": "加密货币",
       "collections": [
         "global",
         "crypto7"
       ],
+      "radarEligible": true,
       "source": "Binance Spot · BTC/USDT",
       "dataStatus": "live",
       "dataWarning": null,
@@ -355,10 +381,12 @@
       "name": "以太坊",
       "region": "加密",
       "exchange": "CRYPTO",
+      "category": "加密货币",
       "collections": [
         "global",
         "crypto7"
       ],
+      "radarEligible": true,
       "source": "Binance Spot · ETH/USDT",
       "dataStatus": "live",
       "dataWarning": null,
@@ -391,10 +419,12 @@
       "name": "纳斯达克100指数",
       "region": "美股",
       "exchange": "NASDAQ",
+      "category": null,
       "collections": [
         "global",
         "usSelected"
       ],
+      "radarEligible": true,
       "source": "Yahoo Finance",
       "dataStatus": "live",
       "dataWarning": null,
@@ -408,7 +438,7 @@
       "momentum": 2.54,
       "distance": 6.77,
       "confidence": 95,
-      "close": 29453.6953125,
+      "close": 29421.552734375,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -419,10 +449,12 @@
       "name": "恒生指数",
       "region": "港股",
       "exchange": "HKEX",
+      "category": null,
       "collections": [
         "global",
         "hkSelected"
       ],
+      "radarEligible": true,
       "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
@@ -447,11 +479,13 @@
       "name": "沪深300",
       "region": "A股",
       "exchange": "CSI",
+      "category": null,
       "collections": [
         "global",
         "chinaIndices"
       ],
-      "source": "东方财富 · 前复权",
+      "radarEligible": true,
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S3",
@@ -474,9 +508,9 @@
     "schemaVersion": "lz-market-interpretation-v1",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-09T15:06:53.110Z",
+    "generatedAt": "2026-09-10T00:54:51.085Z",
     "commonStageAsOf": "2026-08-31",
-    "sourceSnapshotSha256": "b253e36a168cdcb90d4a75b341c432291f29c7c7c2ece40bed1b18a71a2849ff",
+    "sourceSnapshotSha256": "8f96ad5632330babff776b631b570bda200e3327aef7dcd883ec2bbd5dd062e1",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
