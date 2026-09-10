@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-10T00:54:51.085Z",
+  "generatedAt": "2026-09-10T01:21:06.659Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-10T00:54:51.085Z",
-    "crypto": "2026-09-10T00:54:51.085Z"
+    "traditional": "2026-09-10T01:21:06.659Z",
+    "crypto": "2026-09-10T01:21:06.659Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-31",
@@ -111,7 +111,7 @@
         "chinaIndices"
       ],
       "radarEligible": true,
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -183,7 +183,7 @@
       "momentum": 3.58,
       "distance": 4.49,
       "confidence": 95,
-      "close": 64343.44140625,
+      "close": 64382.0390625,
       "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -242,7 +242,7 @@
       "momentum": 0.21,
       "distance": -0.28,
       "confidence": 95,
-      "close": 98.80699920654297,
+      "close": 98.78399658203125,
       "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -302,7 +302,7 @@
       "momentum": 4.6,
       "distance": 5.66,
       "confidence": 73,
-      "close": 96.58000183105469,
+      "close": 96.66999816894531,
       "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -332,7 +332,7 @@
       "momentum": -1.07,
       "distance": -2.29,
       "confidence": 95,
-      "close": 4445,
+      "close": 4461.60009765625,
       "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -485,7 +485,7 @@
         "chinaIndices"
       ],
       "radarEligible": true,
-      "source": "腾讯行情 · 前复权",
+      "source": "东方财富 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S3",
@@ -508,9 +508,9 @@
     "schemaVersion": "lz-market-interpretation-v1",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-10T00:54:51.085Z",
+    "generatedAt": "2026-09-10T01:21:06.659Z",
     "commonStageAsOf": "2026-08-31",
-    "sourceSnapshotSha256": "8f96ad5632330babff776b631b570bda200e3327aef7dcd883ec2bbd5dd062e1",
+    "sourceSnapshotSha256": "c099748bb903ba2297688759b1829b3fbe5c0e2f78da4f5e6c0c7159d20b5fb2",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
