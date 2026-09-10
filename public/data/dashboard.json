@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-10T01:21:06.659Z",
+  "generatedAt": "2026-09-10T04:10:33.758Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-10T01:21:06.659Z",
-    "crypto": "2026-09-10T01:21:06.659Z"
+    "traditional": "2026-09-10T04:10:33.758Z",
+    "crypto": "2026-09-10T04:10:33.758Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-08-31",
@@ -111,7 +111,7 @@
         "chinaIndices"
       ],
       "radarEligible": true,
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -124,8 +124,8 @@
       "momentum": 0.8,
       "distance": -8.82,
       "confidence": 73,
-      "close": 3354.97,
-      "marketAsOf": "2026-09-09",
+      "close": 3350.08,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -154,8 +154,8 @@
       "momentum": -3.25,
       "distance": -5.26,
       "confidence": 95,
-      "close": 4420.79,
-      "marketAsOf": "2026-09-09",
+      "close": 4329.22,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -183,7 +183,7 @@
       "momentum": 3.58,
       "distance": 4.49,
       "confidence": 95,
-      "close": 64382.0390625,
+      "close": 64703.51953125,
       "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -212,7 +212,7 @@
       "momentum": 1.38,
       "distance": 4.99,
       "confidence": 95,
-      "close": 6311.56,
+      "close": 6311.56005859375,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -242,8 +242,8 @@
       "momentum": 0.21,
       "distance": -0.28,
       "confidence": 95,
-      "close": 98.78399658203125,
-      "marketAsOf": "2026-09-10",
+      "close": 98.7699966430664,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -302,8 +302,8 @@
       "momentum": 4.6,
       "distance": 5.66,
       "confidence": 73,
-      "close": 96.66999816894531,
-      "marketAsOf": "2026-09-10",
+      "close": 96.05000305175781,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -332,8 +332,8 @@
       "momentum": -1.07,
       "distance": -2.29,
       "confidence": 95,
-      "close": 4461.60009765625,
-      "marketAsOf": "2026-09-10",
+      "close": 4416,
+      "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -438,7 +438,7 @@
       "momentum": 2.54,
       "distance": 6.77,
       "confidence": 95,
-      "close": 29421.552734375,
+      "close": 29421.55078125,
       "marketAsOf": "2026-09-09",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
@@ -468,8 +468,8 @@
       "momentum": -0.75,
       "distance": 1.2,
       "confidence": 50,
-      "close": 25274.96,
-      "marketAsOf": "2026-09-09",
+      "close": 24949.52,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     },
@@ -485,7 +485,7 @@
         "chinaIndices"
       ],
       "radarEligible": true,
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S3",
@@ -498,8 +498,8 @@
       "momentum": -0.28,
       "distance": -3.37,
       "confidence": 73,
-      "close": 4572.6,
-      "marketAsOf": "2026-09-09",
+      "close": 4553.52,
+      "marketAsOf": "2026-09-10",
       "stageAsOf": "2026-09-04",
       "hasProvisionalBar": true
     }
@@ -508,9 +508,9 @@
     "schemaVersion": "lz-market-interpretation-v1",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-10T01:21:06.659Z",
+    "generatedAt": "2026-09-10T04:10:33.758Z",
     "commonStageAsOf": "2026-08-31",
-    "sourceSnapshotSha256": "c099748bb903ba2297688759b1829b3fbe5c0e2f78da4f5e6c0c7159d20b5fb2",
+    "sourceSnapshotSha256": "19fc1960aec14ad2c68ae6805ac021d533340183e37183e6eb7aaec10014e1ce",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
