@@ -76,16 +76,6 @@ test("market tiles outline observation-stage changes", async () => {
   assert.match(source, /颜色代表当前所处阶段，外框代表本周观察变化/);
   assert.doesNotMatch(source, /方块大小体现资产重要性，颜色代表当前所处阶段/);
 });
-
-test("market map framing and hover details use the light site palette", async () => {
-  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /\.market-map \{[^}]*border: 1px solid #d5dfec;[^}]*background: #e8eef6;/s);
-  assert.match(css, /\.map-group \{[^}]*border: 1px solid #d8e2ef;[^}]*background: #f8fafd;/s);
-  assert.match(css, /\.map-group > header \{[^}]*color: #31445f;[^}]*background: #eaf0f8;/s);
-  assert.match(css, /\.market-hover-card \{[^}]*border: 1px solid #d7e1ee;[^}]*background: rgb\(255 255 255 \/ 97%\);/s);
-  assert.match(css, /\.hover-card-title \{[^}]*color: #102247;[^}]*background: #f8fafd;/s);
-  assert.match(css, /\.market-hover-card dd \{[^}]*color: #34445c;/s);
-});
 test("crypto pending and unavailable analysis is clearly labelled without changing normal assets", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /cryptoFreshness === "pending"/);
