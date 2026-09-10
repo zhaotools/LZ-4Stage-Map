@@ -35,7 +35,7 @@ test("public dashboard contains only the global weekly analysis", () => {
     assert.match(market.stageAsOf, /^\d{4}-\d{2}-\d{2}$/);
     assert.match(market.marketAsOf, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(["live", "cache"].includes(market.dataStatus));
-    assert.ok(market.collections.every((collection) => ["global", "crypto7", "usSelected", "chinaIndices", "hkSelected"].includes(collection)));
+    assert.ok(market.collections.every((collection) => ["global", "crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected"].includes(collection)));
   }
   const btc = dashboard.markets.find((market) => market.code === "BTC-USD");
   assert.equal(btc?.providerSymbol, "BTCUSDT");

@@ -6,12 +6,13 @@ const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "
 const cssSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 const indexSource = await readFile(new URL("../pages-site/index.html", import.meta.url), "utf8");
 
-test("sidebar switches between the five stage-map collections", () => {
+test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /id="market-map-navigation-title">市场地图<\/h2>/);
   assert.match(pageSource, /id="member-tools-navigation-title">会员工具<\/h2>/);
   assert.ok(pageSource.indexOf("market-map-navigation-title") < pageSource.indexOf("member-tools-navigation-title"));
   assert.match(pageSource, /requestView\("global"\)/);
   assert.match(pageSource, /requestView\("crypto7"\)/);
+  assert.match(pageSource, /requestView\("commodity"\)/);
   assert.match(pageSource, /requestView\("usSelected"\)/);
   assert.match(pageSource, /requestView\("chinaIndices"\)/);
   assert.match(pageSource, /requestView\("hkSelected"\)/);
@@ -23,6 +24,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /id="mobile-market-menu" role="menu" aria-label="市场地图"/);
   assert.match(pageSource, /requestView\("global"\); \}\}><Grid2X2[^\n]+<span>全球<\/span>/);
   assert.match(pageSource, /requestView\("crypto7"\); \}\}><BarChart3[^\n]+<span>加密<\/span>/);
+  assert.match(pageSource, /requestView\("commodity"\); \}\}><Gem[^\n]+<span>商品<\/span>/);
   assert.match(pageSource, /requestView\("usSelected"\); \}\}><TrendingUp[^\n]+<span>美股<\/span>/);
   assert.match(pageSource, /requestView\("chinaIndices"\); \}\}><Landmark[^\n]+<span>A股<\/span>/);
   assert.match(pageSource, /requestView\("hkSelected"\); \}\}><Building2[^\n]+<span>港股<\/span>/);
@@ -31,7 +33,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /requestTrendRadar\(\); \}\}><Radar[^\n]+<span>全球阶段扫描<\/span>/);
   assert.match(pageSource, /requestStockRadar\(\); \}\}><TrendingUp[^\n]+<span>个股阶段扫描<\/span>/);
   assert.doesNotMatch(pageSource, /<select/);
-  assert.match(pageSource, /const memberOnlyViews = new Set<MemberView>\(\["crypto7", "usSelected", "chinaIndices", "hkSelected"\]\)/);
+  assert.match(pageSource, /const memberOnlyViews = new Set<MemberView>\(\["crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected"\]\)/);
   assert.match(pageSource, /if \(!isMember && isMemberView\(nextView\)\)/);
   assert.match(pageSource, /LZ会员专享/);
   assert.match(pageSource, /登录会员账号后查看完整市场趋势地图/);
@@ -110,6 +112,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(indexSource, /href="\.\/favicon-v2\.png"/);
   assert.match(pageSource, /global: \{ mapKicker: "GLOBAL MARKET", mapTitle: "全球市场"/);
   assert.match(pageSource, /crypto7: \{ mapKicker: "CRYPTO MARKET", mapTitle: "加密市场"/);
+  assert.match(pageSource, /commodity: \{ mapKicker: "COMMODITY MARKET", mapTitle: "商品市场"/);
   assert.match(pageSource, /usSelected: \{ mapKicker: "US INDEX", mapTitle: "美股指数"/);
   assert.match(pageSource, /chinaIndices: \{ mapKicker: "CHINA INDEX", mapTitle: "A股指数"/);
   assert.match(pageSource, /hkSelected: \{ mapKicker: "HONG KONG INDEX", mapTitle: "港股指数"/);
@@ -122,6 +125,7 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /return region === "大宗·宏观" \? "宏观" : region/);
   assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
   assert.match(pageSource, /crypto7: \["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"\]/);
+  assert.match(pageSource, /commodity: \["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"\]/);
   assert.match(pageSource, /"SOL-USD": \{ shortCode: "SOL", cols: 3, rows: 2 \}/);
   assert.doesNotMatch(pageSource, /item\.code === "BTC-USD" \? 6/);
   assert.match(pageSource, /usSelected: \["GSPC\.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK\.B", "WMT", "DXY", "US10Y"\]/);
@@ -147,6 +151,13 @@ test("sidebar switches between the five stage-map collections", () => {
   assert.match(pageSource, /"2\.HK": \{ shortCode: "0002"/);
   assert.match(pageSource, /hydrateMarkets\(memberSnapshots\[view\]\?\.markets \?\? \[\]\)/);
   assert.match(cssSource, /\.view-crypto7 \.map-美股/);
+  assert.match(pageSource, /label: "商品综合", className: "map-commodity-overall", codes: \["DJP"\]/);
+  assert.match(pageSource, /label: "贵金属", className: "map-commodity-precious", codes: \["XAU", "XAG"\]/);
+  assert.match(pageSource, /label: "工业金属", className: "map-commodity-industrial", codes: \["HG", "ALI"\]/);
+  assert.match(pageSource, /label: "能源", className: "map-commodity-energy", codes: \["CL", "NG"\]/);
+  assert.match(pageSource, /label: "农产品", className: "map-commodity-agriculture", codes: \["ZC", "ZW", "ZS"\]/);
+  assert.match(cssSource, /\.view-commodity \.map-commodity-overall \{ grid-area: 1 \/ 1 \/ 5 \/ 5; \}/);
+  assert.match(cssSource, /\.view-commodity \.map-commodity-agriculture \{ grid-area: 5 \/ 6 \/ 9 \/ 13; \}/);
   assert.match(cssSource, /\.view-crypto7 \{ height: clamp\(380px, 41\.333vh, 480px\); \}/);
   assert.match(cssSource, /@media \(max-width: 1180px\)[\s\S]*?\.view-crypto7 \{ height: 413px; \}/);
   assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.view-crypto7 \.map-group \{ height: 180px; \}/);

@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Globe2,
   Grid2X2,
+  Gem,
   ImageDown,
   KeyRound,
   Landmark,
@@ -66,6 +67,7 @@ type Market = {
   name: string;
   region: MarketRegion;
   exchange: string;
+  category?: string | null;
   stage: Stage;
   subStage: string;
   stageDetail: string;
@@ -75,6 +77,7 @@ type Market = {
   momentum: number;
   signal: "增强" | "稳定" | "减速" | "转弱" | "观察";
   collections: View[];
+  radarEligible?: boolean;
   source: string;
   dataStatus: "live" | "cache";
   cryptoFreshness?: "fresh" | "pending" | "unavailable";
@@ -92,7 +95,7 @@ type StockRadarMarket = Market & {
   matchRules: StockRadarRuleId[];
 };
 
-const memberOnlyViews = new Set<MemberView>(["crypto7", "usSelected", "chinaIndices", "hkSelected"]);
+const memberOnlyViews = new Set<MemberView>(["crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected"]);
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? "";
 
 function isMemberView(view: View): view is MemberView {
@@ -150,6 +153,14 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   US10Y: { shortCode: "US10Y", cols: 3, rows: 2 },
   CL: { shortCode: "OIL", cols: 3, rows: 2 },
   XAU: { shortCode: "GOLD", cols: 3, rows: 2 },
+  DJP: { shortCode: "BCOM", cols: 2, rows: 1 },
+  XAG: { shortCode: "SILVER", cols: 2, rows: 1 },
+  HG: { shortCode: "COPPER", cols: 2, rows: 1 },
+  ALI: { shortCode: "ALUMINUM", cols: 2, rows: 1 },
+  NG: { shortCode: "NATGAS", cols: 2, rows: 1 },
+  ZC: { shortCode: "CORN", cols: 2, rows: 1 },
+  ZW: { shortCode: "WHEAT", cols: 2, rows: 1 },
+  ZS: { shortCode: "SOYBEAN", cols: 2, rows: 1 },
   "BTC-USD": { shortCode: "BTC", cols: 6, rows: 4 },
   "ETH-USD": { shortCode: "ETH", cols: 3, rows: 2 },
   "SOL-USD": { shortCode: "SOL", cols: 3, rows: 2 },
@@ -204,6 +215,7 @@ const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "�
 const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { mapKicker: "GLOBAL MARKET", mapTitle: "全球市场", regions, groups: marketRegions },
   crypto7: { mapKicker: "CRYPTO MARKET", mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
+  commodity: { mapKicker: "COMMODITY MARKET", mapTitle: "商品市场", regions: ["全球"], groups: ["大宗·宏观"] },
   usSelected: { mapKicker: "US INDEX", mapTitle: "美股指数", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { mapKicker: "CHINA INDEX", mapTitle: "A股指数", regions: ["全球", "A股"], groups: ["A股"] },
   hkSelected: { mapKicker: "HONG KONG INDEX", mapTitle: "港股指数", regions: ["全球", "港股"], groups: ["港股"] },
@@ -211,6 +223,7 @@ const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Reg
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
   crypto7: ["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"],
+  commodity: ["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"],
   usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
   chinaIndices: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000016.SH", "SZ399006", "000688.SH", "000985.SH", "931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"],
   hkSelected: ["HSI", "HSTECH", "700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK", "1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"],
@@ -229,6 +242,13 @@ const hkMapGroups = [
   { label: "指数", className: "map-hk-index", codes: ["HSI", "HSTECH"] },
   { label: "核心蓝筹", className: "map-hk-mega", codes: ["700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK"] },
   { label: "行业代表", className: "map-hk-sector", codes: ["1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"] },
+] as const;
+const commodityMapGroups = [
+  { label: "商品综合", className: "map-commodity-overall", codes: ["DJP"] },
+  { label: "贵金属", className: "map-commodity-precious", codes: ["XAU", "XAG"] },
+  { label: "工业金属", className: "map-commodity-industrial", codes: ["HG", "ALI"] },
+  { label: "能源", className: "map-commodity-energy", codes: ["CL", "NG"] },
+  { label: "农产品", className: "map-commodity-agriculture", codes: ["ZC", "ZW", "ZS"] },
 ] as const;
 function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
@@ -330,7 +350,14 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
 
 function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market) => void }) {
   const groups = region === "全球" ? viewMeta[view].groups : [region as MarketRegion];
-  const dense = view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
+  const dense = view === "commodity" || view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
+  if (view === "commodity") {
+    return (
+      <div className="market-map view-commodity">
+        {commodityMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+      </div>
+    );
+  }
   if (view === "usSelected" && region === "全球") {
     return (
       <div className="market-map view-usSelected">
@@ -1165,6 +1192,7 @@ export default function Home() {
               <nav className="side-nav" aria-label="市场地图">
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "commodity" ? "active" : ""}`} onClick={() => requestView("commodity")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "commodity"}><Gem size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}商品市场</span></button>
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
@@ -1195,6 +1223,7 @@ export default function Home() {
                 <div className="mobile-dropdown-panel" id="mobile-market-menu" role="menu" aria-label="市场地图">
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("global"); }}><Grid2X2 size={15} /><span>全球</span></button>
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "commodity" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("commodity"); }}><Gem size={15} /><span>商品</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("usSelected"); }}><TrendingUp size={15} /><span>美股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("chinaIndices"); }}><Landmark size={15} /><span>A股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>

@@ -19,6 +19,14 @@ test("maps every market family to its TradingView symbol", () => {
   assert.equal(tradingViewSymbolFor(market("N225", "日股", "OSE")), "TVC:NI225");
   assert.equal(tradingViewSymbolFor(market("US10Y", "大宗·宏观", "CBOE")), "TVC:US10Y");
   assert.equal(tradingViewSymbolFor(market("CL", "大宗·宏观", "NYMEX")), "NYMEX:CL1!");
+  assert.equal(tradingViewSymbolFor(market("DJP", "大宗·宏观", "NYSEARCA")), "AMEX:DJP");
+  assert.equal(tradingViewSymbolFor(market("XAG", "大宗·宏观", "COMEX")), "COMEX:SI1!");
+  assert.equal(tradingViewSymbolFor(market("HG", "大宗·宏观", "COMEX")), "COMEX:HG1!");
+  assert.equal(tradingViewSymbolFor(market("ALI", "大宗·宏观", "COMEX")), "COMEX:ALI1!");
+  assert.equal(tradingViewSymbolFor(market("NG", "大宗·宏观", "NYMEX")), "NYMEX:NG1!");
+  assert.equal(tradingViewSymbolFor(market("ZC", "大宗·宏观", "CBOT")), "CBOT:ZC1!");
+  assert.equal(tradingViewSymbolFor(market("ZW", "大宗·宏观", "CBOT")), "CBOT:ZW1!");
+  assert.equal(tradingViewSymbolFor(market("ZS", "大宗·宏观", "CBOT")), "CBOT:ZS1!");
   assert.equal(tradingViewSymbolFor(market("BTC-USD", "加密", "CRYPTO")), "BINANCE:BTCUSDT");
   assert.equal(tradingViewSymbolFor(market("HYPE-USD", "加密", "CRYPTO")), "HYPERLIQUID:HYPEUSDC");
 });

@@ -2,7 +2,7 @@ import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "./supabase";
 
-export type MemberView = "crypto7" | "usSelected" | "chinaIndices" | "hkSelected";
+export type MemberView = "crypto7" | "commodity" | "usSelected" | "chinaIndices" | "hkSelected";
 export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early" | "s2Breakdown" | "s4aEntry" | "s4Early";
 export type StockRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
 

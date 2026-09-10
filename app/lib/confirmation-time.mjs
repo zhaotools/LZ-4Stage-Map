@@ -62,6 +62,9 @@ function marketCloseSpec(market) {
   if (market.region === "大宗·宏观" && ["ICE", "NYMEX", "COMEX"].includes(market.exchange)) {
     return { timeZone: "America/New_York", time: "17:00" };
   }
+  if (market.region === "大宗·宏观" && market.exchange === "CBOT") {
+    return { timeZone: "America/Chicago", time: "13:20" };
+  }
   return { timeZone: "America/New_York", time: "16:00" };
 }
 
