@@ -16,6 +16,14 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /requestView\("usSelected"\)/);
   assert.match(pageSource, /requestView\("chinaIndices"\)/);
   assert.match(pageSource, /requestView\("hkSelected"\)/);
+  const desktopMarketMenu = pageSource.slice(pageSource.indexOf('<nav className="side-nav" aria-label="市场地图">'), pageSource.indexOf('</nav>', pageSource.indexOf('<nav className="side-nav" aria-label="市场地图">')));
+  const mobileMarketMenu = pageSource.slice(pageSource.indexOf('id="mobile-market-menu"'), pageSource.indexOf('</div>', pageSource.indexOf('id="mobile-market-menu"')));
+  const expectedMarketOrder = ["global", "usSelected", "chinaIndices", "hkSelected", "commodity", "crypto7"];
+  for (const menuSource of [desktopMarketMenu, mobileMarketMenu]) {
+    for (let index = 1; index < expectedMarketOrder.length; index += 1) {
+      assert.ok(menuSource.indexOf(`requestView("${expectedMarketOrder[index - 1]}")`) < menuSource.indexOf(`requestView("${expectedMarketOrder[index]}")`));
+    }
+  }
   assert.match(pageSource, /const switchView = \(nextView: View\) => \{[\s\S]*?scrollPageToTop\(\);[\s\S]*?\};/);
   assert.match(pageSource, /const switchToTrendRadar = \(\) => \{[\s\S]*?setRadarActive\(true\);[\s\S]*?scrollPageToTop\(\);[\s\S]*?\};/);
   assert.match(pageSource, /const switchToStockRadar = \(\) => \{[\s\S]*?setStockRadarActive\(true\);[\s\S]*?scrollPageToTop\(\);[\s\S]*?\};/);
