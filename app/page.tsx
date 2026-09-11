@@ -30,7 +30,7 @@ import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { MyScanPage } from "@/app/components/my-scan-page";
 import { globalConfirmationDates, latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
-import { downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
+import { buildInterpretationImageModel, downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
 import { scrollPageToTop } from "@/app/lib/page-scroll.mjs";
 import {
   getMemberProfile,
@@ -78,9 +78,12 @@ type Market = {
   category?: string | null;
   stage: Stage;
   subStage: string;
+  previousStage?: Stage;
+  previousSubStage?: string;
   stageDetail: string;
   weeks: number;
   observationStage: string;
+  previousObservationStage?: string;
   observation: string;
   momentum: number;
   signal: "增强" | "稳定" | "减速" | "转弱" | "观察";
@@ -582,12 +585,13 @@ function StockRadarPage({
   );
 }
 
-function MarketInterpretationPanel({ interpretation, marketTitle }: { interpretation: MarketInterpretation; marketTitle: string }) {
+function MarketInterpretationPanel({ interpretation, marketTitle, confirmationLabel }: { interpretation: MarketInterpretation; marketTitle: string; confirmationLabel: string }) {
   const [imageStatus, setImageStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
+  const presentation = buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel);
   const handleGenerateImage = async () => {
     setImageStatus("generating");
     try {
-      await downloadMarketInterpretationImage(interpretation, marketTitle);
+      await downloadMarketInterpretationImage(interpretation, marketTitle, confirmationLabel);
       setImageStatus("done");
       window.setTimeout(() => setImageStatus("idle"), 1800);
     } catch {
@@ -602,22 +606,43 @@ function MarketInterpretationPanel({ interpretation, marketTitle }: { interpreta
           <h2 id="market-interpretation-title">{marketTitle}阶段解读</h2>
         </div>
         <div className="market-interpretation-actions">
+          <span className="market-interpretation-date">{presentation.confirmationLabel}</span>
           <button className="market-interpretation-image-button" type="button" onClick={handleGenerateImage} disabled={imageStatus === "generating"}>
             <ImageDown size={15} />{imageStatus === "generating" ? "生成中" : imageStatus === "done" ? "已生成" : imageStatus === "error" ? "重试生成" : "生成图片"}
           </button>
         </div>
       </div>
-      <div className="market-interpretation-overview">
-        <strong>{interpretation.headline}</strong>
-        <p>{interpretation.summary}</p>
-      </div>
-      <div className="market-interpretation-grid">
-        {interpretation.insights.map((insight) => (
-          <article key={insight.id} className={`market-interpretation-item interpretation-${insight.id}`}>
-            <h3>{insight.label}</h3>
-            <p>{insight.text}</p>
-          </article>
+      <div className="market-interpretation-stages">
+        {presentation.stageCounts.map((item) => (
+          <div key={item.stage} style={{ "--interpretation-stage-color": item.color, "--interpretation-stage-bg": item.background } as CSSProperties}>
+            <strong>{item.label}</strong><span>{item.count} · {item.percent}%</span>
+          </div>
         ))}
+      </div>
+      <div className="market-interpretation-distribution" aria-label="四阶段资产占比分布">
+        {presentation.stageCounts.map((item) => <span key={item.stage} style={{ width: `${item.count / Math.max(1, interpretation.analyzedSize) * 100}%`, background: item.color }} />)}
+      </div>
+      <div className="market-interpretation-overview">
+        <strong>{presentation.headline}</strong>
+        <p>{presentation.summary}</p>
+      </div>
+      <div className="market-interpretation-grid market-interpretation-v2">
+        <article className="market-interpretation-item">
+          <h3>市场结构</h3>
+          {presentation.marketStructure.length ? (
+            <dl className="market-structure-list">{presentation.marketStructure.map((row: { label: string; summary: string }) => <div key={row.label}><dt>{row.label}</dt><dd>{row.summary}</dd></div>)}</dl>
+          ) : <p>{presentation.marketStructureFallback}</p>}
+        </article>
+        <article className="market-interpretation-item">
+          <h3>关键位置</h3>
+          {presentation.keyPositions.length ? (
+            <div className="market-position-list">{presentation.keyPositions.map((group: { id: string; label: string; stage: Stage; assets: Array<{ code: string; name: string }> }) => <div key={group.id}><b style={{ "--position-stage-color": stageMeta[group.stage].color } as CSSProperties}>{group.label}</b><span>{group.assets.map((asset: { code: string; name: string }) => asset.name || asset.code).join("、")}</span></div>)}</div>
+          ) : <p>{presentation.keyPositionsFallback}</p>}
+        </article>
+        <article className="market-interpretation-item interpretation-changes">
+          <h3>本期变化</h3>
+          <div className="market-change-list">{presentation.changeLines.map((line, index) => <p key={`${index}-${line}`}>{line}</p>)}</div>
+        </article>
       </div>
       {interpretation.excludedSize > 0 && <p className="market-interpretation-quality">本期有{interpretation.excludedSize}个资产的数据尚未完成确认，未计入解读。</p>}
       <p className="market-interpretation-note">{interpretation.note}</p>
@@ -1003,6 +1028,11 @@ export default function Home() {
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? publicSnapshot.commonStageAsOf;
   const commonConfirmationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: view === "global" }) ?? commonStageAsOf;
   const globalDates = globalConfirmationDates(activeUniverse);
+  const traditionalInterpretationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: true });
+  const cryptoInterpretationDate = latestConfirmationDate(activeUniverse.filter(item => item.region === "加密" && item.cryptoFreshness !== "unavailable"));
+  const interpretationConfirmationLabel = view === "global"
+    ? `传统市场至 ${traditionalInterpretationDate ?? "—"}｜加密市场至 ${cryptoInterpretationDate ?? "—"}`
+    : `数据确认至 ${commonConfirmationDate}`;
   const myScanLatestGeneratedAt = [...myScanAssets]
     .map((asset) => asset.result?.generatedAt)
     .filter((value): value is string => Boolean(value))
@@ -1441,7 +1471,7 @@ export default function Home() {
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
           </section>
-          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} marketTitle={activeViewMeta.mapTitle} />}
+          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} />}
           </>}
 
           <footer>

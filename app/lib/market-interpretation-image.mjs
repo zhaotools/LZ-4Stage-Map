@@ -5,50 +5,105 @@ const STAGE_COLORS = {
   S4: { season: "冬季", color: "#ed4859", background: "#fff1f3" },
 };
 
-const INSIGHT_COLORS = {
-  structure: { color: "#397ff6", background: "#eef4ff" },
-  maturity: { color: "#18a567", background: "#eefaf4" },
-  observation: { color: "#f09a18", background: "#fff7e8" },
-  divergence: { color: "#ed4859", background: "#fff1f3" },
-};
-
 const FONT_FAMILY = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif';
 
-function formatShanghaiDate(value) {
-  const parts = new Intl.DateTimeFormat("zh-CN", {
-    timeZone: "Asia/Shanghai",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date(value));
-  const get = (type) => parts.find((part) => part.type === type)?.value ?? "";
-  return `${get("year")}/${get("month")}/${get("day")}`;
+function percentage(count, total) {
+  return total > 0 ? Math.round(count / total * 100) : 0;
 }
 
-export function buildInterpretationImageModel(interpretation, marketTitle, imageGeneratedAt = new Date()) {
+function fallbackOverview(marketTitle, stageCounts, total) {
+  const ranked = [...stageCounts].sort((a, b) => b.count - a.count);
+  const [first, second] = ranked;
+  const tied = first.count === second.count;
+  const opposite = first.stage === "S2" ? stageCounts.find((item) => item.stage === "S4") : first.stage === "S4" ? stageCounts.find((item) => item.stage === "S2") : null;
+  const headline = tied || first.count < total / 2
+    ? `${marketTitle}呈现多阶段分化`
+    : opposite && opposite.count / total >= 0.25
+      ? `${first.stage} ${first.season}占优，但市场分化明显`
+      : `${marketTitle}以${first.stage} ${first.season}为主`;
+  const summary = tied
+    ? `${total}个代表资产分布在多个阶段。`
+    : `${total}个代表资产中，${first.count}个处于${first.stage}（${first.percent}%）${second.count ? `；${second.count}个处于${second.stage}（${second.percent}%）` : ""}。`;
+  return { headline, summary };
+}
+
+function insightText(interpretation, ids) {
+  for (const id of ids) {
+    const match = interpretation.insights?.find((insight) => insight.id === id);
+    if (match?.text) return match.text;
+  }
+  return "";
+}
+
+function assetNames(assets) {
+  return assets.map((asset) => asset.name || asset.code).join("、");
+}
+
+function changeLines(interpretation) {
+  const confirmed = interpretation.confirmedChanges || [];
+  const observations = interpretation.observations || [];
+  const deltas = (interpretation.stageDistribution || []).filter((item) => item.delta !== 0);
+  if (!confirmed.length && !observations.length) {
+    return [insightText(interpretation, ["change", "observation"]) || "本期没有已确认主阶段变化，也没有跨主阶段观察信号。"];
+  }
+  const lines = [];
+  if (deltas.length) {
+    lines.push(`阶段净变化：${deltas.map((item) => `${item.stage} ${item.delta > 0 ? "+" : ""}${item.delta}`).join("｜")}`);
+  }
+  if (confirmed.length) {
+    lines.push(`已确认：${confirmed.map((item) => `${item.name || item.code} ${item.fromStage} → ${item.toStage}`).join("；")}`);
+  } else {
+    lines.push("已确认：本期没有主阶段变化");
+  }
+  if (observations.length) {
+    lines.push(`观察：${observations.map((item) => `${item.name || item.code} ${item.fromStage} → ${item.toStage}观察（${item.status === "new" ? "新增" : "延续"}）`).join("；")}`);
+    lines.push("观察信号尚未等同于阶段确认。");
+  } else {
+    lines.push("观察：当前没有跨主阶段观察信号");
+  }
+  return lines;
+}
+
+export function buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel = `数据确认至 ${interpretation.commonStageAsOf}`) {
+  const total = interpretation.analyzedSize || Object.values(interpretation.stageCounts).reduce((sum, count) => sum + count, 0);
+  const providedDistribution = new Map((interpretation.stageDistribution || []).map((item) => [item.stage, item]));
+  const stageCounts = ["S1", "S2", "S3", "S4"].map((stage) => {
+    const supplied = providedDistribution.get(stage);
+    const count = supplied?.count ?? interpretation.stageCounts[stage] ?? 0;
+    return {
+      stage,
+      label: `${stage} ${supplied?.season || STAGE_COLORS[stage].season}`,
+      count,
+      percent: supplied?.percent ?? percentage(count, total),
+      delta: supplied?.delta ?? 0,
+      ...STAGE_COLORS[stage],
+    };
+  });
+  const marketStructure = interpretation.marketStructure || [];
+  const keyPositions = interpretation.keyPositions || [];
+  const dateMatches = confirmationLabel.match(/\d{4}-\d{2}-\d{2}/g);
+  const overview = interpretation.schemaVersion === "lz-market-interpretation-v2"
+    ? { headline: interpretation.headline, summary: interpretation.summary }
+    : fallbackOverview(marketTitle, stageCounts, total);
   return {
     kicker: "LZ-4STAGE · MARKET INTERPRETATION",
     title: `${marketTitle}阶段解读`,
-    mode: "系统解读",
-    headline: interpretation.headline,
-    summary: interpretation.summary,
-    stageCounts: ["S1", "S2", "S3", "S4"].map((stage) => ({
-      stage,
-      label: `${stage} ${STAGE_COLORS[stage].season}`,
-      count: interpretation.stageCounts[stage] ?? 0,
-      ...STAGE_COLORS[stage],
-    })),
-    insights: interpretation.insights.map((insight) => ({
-      ...insight,
-      ...(INSIGHT_COLORS[insight.id] ?? { color: "#60718a", background: "#f5f7fa" }),
-    })),
+    confirmationLabel,
+    headline: overview.headline,
+    summary: overview.summary,
+    stageCounts,
+    marketStructure,
+    marketStructureFallback: marketStructure.length ? "" : insightText(interpretation, ["divergence", "structure"]) || `${marketTitle}样本按当前阶段分布展示。`,
+    keyPositions,
+    keyPositionsFallback: keyPositions.length ? "" : insightText(interpretation, ["maturity"]) || "当前没有需要单独标注的早期或后期阶段资产。",
+    changeLines: changeLines(interpretation),
     quality: interpretation.excludedSize > 0
       ? `本期有${interpretation.excludedSize}个资产的数据尚未完成确认，未计入解读。`
       : "",
-    time: `数据确认至 ${interpretation.commonStageAsOf} · 图片生成于 ${formatShanghaiDate(imageGeneratedAt)}`,
     source: "数据来自公开市场，由 LZ-4Stage 框架系统分析。",
     disclaimer: interpretation.note,
     detailUrl: "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/",
+    fileDate: dateMatches?.at(-1) || interpretation.commonStageAsOf,
   };
 }
 
@@ -92,6 +147,10 @@ function wrapText(context, text, maxWidth) {
   return lines.length ? lines : [""];
 }
 
+function wrapEntries(context, entries, maxWidth) {
+  return entries.flatMap((entry) => wrapText(context, entry, maxWidth));
+}
+
 function drawLines(context, lines, x, y, lineHeight, color) {
   context.fillStyle = color;
   lines.forEach((line, index) => context.fillText(line, x, y + index * lineHeight));
@@ -118,11 +177,40 @@ function downloadCanvas(canvas, fileName) {
   });
 }
 
-export async function downloadMarketInterpretationImage(interpretation, marketTitle) {
+function sectionLines(model, measure) {
+  measure.font = `21px ${FONT_FAMILY}`;
+  const halfWidth = 454;
+  const marketEntries = model.marketStructure.length
+    ? model.marketStructure.map((row) => `${row.label}　${row.summary}`)
+    : [model.marketStructureFallback];
+  const positionEntries = model.keyPositions.length
+    ? model.keyPositions.map((group) => `${group.label}　${assetNames(group.assets)}`)
+    : [model.keyPositionsFallback];
+  return {
+    market: wrapEntries(measure, marketEntries, halfWidth),
+    positions: wrapEntries(measure, positionEntries, halfWidth),
+    changes: wrapEntries(measure, model.changeLines, 974),
+  };
+}
+
+function drawSection(context, { x, y, width, height, title, lines }) {
+  paintCard(context, x, y, width, height, 17, "#fbfcfe", "#e1e8f2");
+  context.fillStyle = "#397ff6";
+  context.beginPath();
+  context.arc(x + 28, y + 34, 6, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#354964";
+  context.font = `700 23px ${FONT_FAMILY}`;
+  context.fillText(title, x + 44, y + 42);
+  context.font = `21px ${FONT_FAMILY}`;
+  drawLines(context, lines, x + 26, y + 78, 33, "#60718a");
+}
+
+export async function downloadMarketInterpretationImage(interpretation, marketTitle, confirmationLabel) {
   if (typeof document === "undefined") throw new Error("当前环境无法生成图片");
   await document.fonts?.ready;
 
-  const model = buildInterpretationImageModel(interpretation, marketTitle);
+  const model = buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel);
   const width = 1200;
   const outerX = 38;
   const outerY = 38;
@@ -136,20 +224,12 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
 
   measure.font = `24px ${FONT_FAMILY}`;
   const summaryLines = wrapText(measure, model.summary, contentWidth - 48);
-  const insightLayouts = model.insights.map((insight) => {
-    measure.font = `23px ${FONT_FAMILY}`;
-    return { ...insight, lines: wrapText(measure, insight.text, cardWidth - 52) };
-  });
-  const rows = [];
-  for (let index = 0; index < insightLayouts.length; index += 2) {
-    const cards = insightLayouts.slice(index, index + 2);
-    rows.push({ cards, height: Math.max(160, ...cards.map((card) => 82 + card.lines.length * 36)) });
-  }
-
+  const sections = sectionLines(model, measure);
   const overviewHeight = 118 + summaryLines.length * 38;
-  const insightsHeight = rows.reduce((sum, row) => sum + row.height, 0) + Math.max(0, rows.length - 1) * gap;
+  const pairedHeight = Math.max(168, 88 + Math.max(sections.market.length, sections.positions.length) * 33);
+  const changesHeight = Math.max(155, 88 + sections.changes.length * 33);
   const qualityHeight = model.quality ? 42 : 0;
-  const height = 38 + 156 + 86 + 24 + overviewHeight + 24 + insightsHeight + qualityHeight + 218 + 38;
+  const height = 38 + 148 + 104 + overviewHeight + 24 + pairedHeight + 18 + changesHeight + qualityHeight + 190 + 38;
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -176,12 +256,10 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.fillStyle = "#122849";
   context.font = `700 42px ${FONT_FAMILY}`;
   context.fillText(model.title, contentX, y);
-  const modeWidth = 132;
-  paintCard(context, contentX + contentWidth - modeWidth, y - 39, modeWidth, 48, 14, "#f2f6fc", "#d5dfed");
-  context.fillStyle = "#52647f";
-  context.font = `700 20px ${FONT_FAMILY}`;
-  context.textAlign = "center";
-  context.fillText(model.mode, contentX + contentWidth - modeWidth / 2, y - 7);
+  context.fillStyle = "#6a7890";
+  context.font = `600 18px ${FONT_FAMILY}`;
+  context.textAlign = "right";
+  context.fillText(model.confirmationLabel, contentX + contentWidth, y - 5);
   context.textAlign = "left";
   y += 44;
 
@@ -190,15 +268,24 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     const x = contentX + index * (stageWidth + gap);
     paintCard(context, x, y, stageWidth, 70, 14, item.background, "#e1e8f2");
     context.fillStyle = item.color;
-    context.font = `700 25px ${FONT_FAMILY}`;
-    context.fillText(item.label, x + 20, y + 44);
+    context.font = `700 24px ${FONT_FAMILY}`;
+    context.fillText(item.label, x + 18, y + 43);
     context.fillStyle = "#42536d";
-    context.font = `700 21px ${FONT_FAMILY}`;
+    context.font = `700 19px ${FONT_FAMILY}`;
     context.textAlign = "right";
-    context.fillText(`${item.count} 个`, x + stageWidth - 20, y + 43);
+    context.fillText(`${item.count} · ${item.percent}%`, x + stageWidth - 18, y + 42);
     context.textAlign = "left";
   });
-  y += 94;
+  y += 78;
+  let barX = contentX;
+  const total = Math.max(1, model.stageCounts.reduce((sum, stage) => sum + stage.count, 0));
+  model.stageCounts.forEach((item) => {
+    const barWidth = contentWidth * item.count / total;
+    context.fillStyle = item.color;
+    context.fillRect(barX, y, barWidth, 8);
+    barX += barWidth;
+  });
+  y += 26;
 
   paintCard(context, contentX, y, contentWidth, overviewHeight, 18, "#f4f8ff", "#dce6f5");
   context.fillStyle = "#16315d";
@@ -208,23 +295,11 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   drawLines(context, summaryLines, contentX + 24, y + 92, 38, "#5d6d85");
   y += overviewHeight + 24;
 
-  for (const row of rows) {
-    row.cards.forEach((card, index) => {
-      const x = contentX + index * (cardWidth + gap);
-      paintCard(context, x, y, cardWidth, row.height, 17, card.background, "#e1e8f2");
-      context.fillStyle = card.color;
-      context.beginPath();
-      context.arc(x + 28, y + 35, 7, 0, Math.PI * 2);
-      context.fill();
-      context.fillStyle = "#354964";
-      context.font = `700 24px ${FONT_FAMILY}`;
-      context.fillText(card.label, x + 46, y + 43);
-      context.font = `23px ${FONT_FAMILY}`;
-      drawLines(context, card.lines, x + 26, y + 82, 36, "#60718a");
-    });
-    y += row.height + gap;
-  }
-  y -= gap;
+  drawSection(context, { x: contentX, y, width: cardWidth, height: pairedHeight, title: "市场结构", lines: sections.market });
+  drawSection(context, { x: contentX + cardWidth + gap, y, width: cardWidth, height: pairedHeight, title: "关键位置", lines: sections.positions });
+  y += pairedHeight + gap;
+  drawSection(context, { x: contentX, y, width: contentWidth, height: changesHeight, title: "本期变化", lines: sections.changes });
+  y += changesHeight;
 
   if (model.quality) {
     y += 34;
@@ -232,29 +307,25 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     context.font = `20px ${FONT_FAMILY}`;
     context.fillText(model.quality, contentX, y);
   }
-  y += 54;
+  y += 52;
   context.strokeStyle = "#e2e8f1";
   context.beginPath();
   context.moveTo(contentX, y);
   context.lineTo(contentX + contentWidth, y);
   context.stroke();
-  y += 42;
-  context.fillStyle = "#52647f";
-  context.font = `20px ${FONT_FAMILY}`;
-  context.fillText(model.time, contentX, y);
-  y += 38;
+  y += 39;
   context.fillStyle = "#294c82";
   context.font = `700 21px ${FONT_FAMILY}`;
   context.fillText(model.source, contentX, y);
-  y += 36;
+  y += 34;
   context.fillStyle = "#96a2b4";
   context.font = `18px ${FONT_FAMILY}`;
   context.fillText(model.disclaimer, contentX, y);
-  y += 36;
+  y += 34;
   context.fillStyle = "#397ff6";
   context.font = `18px ${FONT_FAMILY}`;
   context.fillText(model.detailUrl, contentX, y);
 
-  const fileName = safeFileName(`LZ-4Stage-${marketTitle}-阶段解读-${interpretation.commonStageAsOf}.png`);
+  const fileName = safeFileName(`LZ-4Stage-${marketTitle}-阶段解读-${model.fileDate}.png`);
   return downloadCanvas(canvas, fileName);
 }

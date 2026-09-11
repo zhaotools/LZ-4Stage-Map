@@ -4,28 +4,42 @@ import test from "node:test";
 import { buildInterpretationImageModel, downloadMarketInterpretationImage } from "../app/lib/market-interpretation-image.mjs";
 
 const interpretation = {
+  schemaVersion: "lz-market-interpretation-v2",
   generatedAt: "2026-09-09T15:06:53.110Z",
-  commonStageAsOf: "2026-09-07",
+  commonStageAsOf: "2026-08-31",
+  analyzedSize: 16,
   stageCounts: { S1: 1, S2: 9, S3: 1, S4: 5 },
-  headline: "全球市场以S2上升阶段为主",
-  summary: "S2资产占9/16，上升结构占比较高。",
-  insights: [
-    { id: "structure", label: "阶段结构", text: "16个有效资产中，S1 1个、S2 9个、S3 1个、S4 5个。" },
-    { id: "observation", label: "本周观察", text: "观察信号尚未等同于阶段确认。" },
+  stageDistribution: [
+    { stage: "S1", season: "春季", count: 1, percent: 6, delta: 0 },
+    { stage: "S2", season: "夏季", count: 9, percent: 56, delta: 1 },
+    { stage: "S3", season: "秋季", count: 1, percent: 6, delta: 0 },
+    { stage: "S4", season: "冬季", count: 5, percent: 31, delta: -1 },
   ],
+  headline: "S2 夏季占优，但市场分化明显",
+  summary: "16个代表资产中，9个处于S2（56%）；5个处于S4（31%）。",
+  marketStructure: [{ label: "美股", summary: "S2为主", stageCounts: { S1: 0, S2: 3, S3: 0, S4: 1 } }],
+  keyPositions: [{ id: "s2Early", label: "S2早期", stage: "S2", assets: [{ code: "BTC", name: "比特币", subStage: "S2A", weeks: 1 }] }],
+  confirmedChanges: [{ code: "BTC", name: "比特币", fromStage: "S4", toStage: "S2" }],
+  observations: [{ code: "HSI", name: "恒生指数", fromStage: "S4", toStage: "S1", status: "continuing", progress: null }],
+  insights: [],
   excludedSize: 0,
   note: "阶段数量用于描述当前周期位置，不构成投资建议。",
 };
 
-test("image export model includes the selected market, data provenance and all interpretation content", () => {
-  const model = buildInterpretationImageModel(interpretation, "全球市场", new Date("2026-09-10T00:30:00+08:00"));
+test("image export model shares the page V2 structure, positions, changes and confirmation dates", () => {
+  const model = buildInterpretationImageModel(interpretation, "全球市场", "传统市场至 2026-09-05｜加密市场至 2026-09-07");
 
   assert.equal(model.title, "全球市场阶段解读");
   assert.equal(model.headline, interpretation.headline);
-  assert.deepEqual(model.stageCounts.map(({ label, count }) => [label, count]), [["S1 春季", 1], ["S2 夏季", 9], ["S3 秋季", 1], ["S4 冬季", 5]]);
-  assert.equal(model.insights.length, 2);
+  assert.deepEqual(model.stageCounts.map(({ label, count, percent }) => [label, count, percent]), [["S1 春季", 1, 6], ["S2 夏季", 9, 56], ["S3 秋季", 1, 6], ["S4 冬季", 5, 31]]);
+  assert.equal(model.marketStructure[0].summary, "S2为主");
+  assert.equal(model.keyPositions[0].assets[0].name, "比特币");
+  assert.match(model.changeLines.join("\n"), /阶段净变化：S2 \+1｜S4 -1/);
+  assert.match(model.changeLines.join("\n"), /比特币 S4 → S2/);
+  assert.match(model.changeLines.join("\n"), /恒生指数 S4 → S1观察（延续）/);
   assert.equal(model.source, "数据来自公开市场，由 LZ-4Stage 框架系统分析。");
-  assert.equal(model.time, "数据确认至 2026-09-07 · 图片生成于 2026/09/10");
+  assert.equal(model.confirmationLabel, "传统市场至 2026-09-05｜加密市场至 2026-09-07");
+  assert.equal(model.fileDate, "2026-09-07");
   assert.equal(model.detailUrl, "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/");
 });
 
@@ -62,7 +76,7 @@ test("image export paints a PNG and triggers a browser download", async () => {
   URL.revokeObjectURL = (url) => { revoked = url; };
 
   try {
-    const fileName = await downloadMarketInterpretationImage(interpretation, "全球市场");
+    const fileName = await downloadMarketInterpretationImage(interpretation, "全球市场", "传统市场至 2026-09-05｜加密市场至 2026-09-07");
     assert.equal(clicked, true);
     assert.equal(downloadedAs, fileName);
     assert.match(fileName, /^LZ-4Stage-全球市场-阶段解读-2026-09-07\.png$/);

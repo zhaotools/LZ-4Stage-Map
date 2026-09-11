@@ -6,7 +6,7 @@ const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "
 const memberApiSource = await readFile(new URL("../app/lib/member-api.ts", import.meta.url), "utf8");
 const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
 
-test("market pages render the system interpretation below the stage map", () => {
+test("market pages render the synchronized V2 interpretation below the stage map", () => {
   const mapPosition = pageSource.indexOf('<section className="map-panel" id="stage-map">');
   const interpretationPosition = pageSource.indexOf("<MarketInterpretationPanel interpretation={activeInterpretation}");
   const footerPosition = pageSource.indexOf("<footer>", interpretationPosition);
@@ -15,26 +15,34 @@ test("market pages render the system interpretation below the stage map", () => 
   assert.ok(interpretationPosition > mapPosition);
   assert.ok(footerPosition > interpretationPosition);
   assert.match(pageSource, /\{marketTitle\}阶段解读/);
+  assert.match(pageSource, /buildInterpretationImageModel\(interpretation, marketTitle, confirmationLabel\)/);
   assert.doesNotMatch(pageSource, /系统解读/);
   assert.doesNotMatch(pageSource, /AI解读/);
 });
 
-test("interpretation is typed, optional for legacy snapshots, and responsive", () => {
-  assert.match(memberApiSource, /schemaVersion: "lz-market-interpretation-v1"/);
+test("interpretation accepts legacy snapshots and the structured V2 payload", () => {
+  assert.match(memberApiSource, /"lz-market-interpretation-v1" \| "lz-market-interpretation-v2"/);
+  assert.match(memberApiSource, /stageDistribution\?:/);
+  assert.match(memberApiSource, /confirmedChanges\?:/);
+  assert.match(memberApiSource, /observations\?:/);
   assert.match(memberApiSource, /interpretation\?: MarketInterpretation/);
-  assert.match(styles, /\.market-interpretation-grid/);
 });
 
-test("interpretation cards use soft backgrounds without colored top borders", () => {
-  assert.match(styles, /\.interpretation-structure \{ background: #eef4ff; \}/);
-  assert.match(styles, /\.interpretation-maturity \{ background: #eefaf4; \}/);
-  assert.match(styles, /\.interpretation-observation \{ background: #fff7e8; \}/);
-  assert.match(styles, /\.interpretation-divergence \{ background: #fff1f3; \}/);
+test("interpretation uses seasonal colors only for stage summaries and neutral content cards", () => {
+  assert.match(styles, /\.market-interpretation-stages > div[^}]+background: var\(--interpretation-stage-bg\)/);
+  assert.match(styles, /\.market-interpretation-item[^}]+background: #fbfcfe/);
+  assert.match(pageSource, /<h3>市场结构<\/h3>/);
+  assert.match(pageSource, /<h3>关键位置<\/h3>/);
+  assert.match(pageSource, /<h3>本期变化<\/h3>/);
+  assert.doesNotMatch(styles, /\.interpretation-structure|\.interpretation-maturity|\.interpretation-observation|\.interpretation-divergence/);
   assert.doesNotMatch(styles, /border-top-color/);
 });
 
-test("interpretation panel offers the current market image export", () => {
-  assert.match(pageSource, /downloadMarketInterpretationImage\(interpretation, marketTitle\)/);
+test("interpretation panel exports the same content and explicit confirmation dates", () => {
+  assert.match(pageSource, /downloadMarketInterpretationImage\(interpretation, marketTitle, confirmationLabel\)/);
   assert.match(pageSource, /"生成图片"/);
   assert.match(pageSource, /marketTitle=\{activeViewMeta\.mapTitle\}/);
+  assert.match(pageSource, /confirmationLabel=\{interpretationConfirmationLabel\}/);
+  assert.match(pageSource, /传统市场至 \$\{traditionalInterpretationDate/);
+  assert.match(pageSource, /加密市场至 \$\{cryptoInterpretationDate/);
 });

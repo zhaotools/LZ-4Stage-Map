@@ -66,7 +66,7 @@ export type MyScanAsset = {
 };
 
 export type MarketInterpretation = {
-  schemaVersion: "lz-market-interpretation-v1";
+  schemaVersion: "lz-market-interpretation-v1" | "lz-market-interpretation-v2";
   viewKey: "global" | MemberView;
   mode: "system";
   generatedAt: string;
@@ -76,9 +76,15 @@ export type MarketInterpretation = {
   analyzedSize: number;
   excludedSize: number;
   stageCounts: Record<"S1" | "S2" | "S3" | "S4", number>;
+  previousStageCounts?: Record<"S1" | "S2" | "S3" | "S4", number>;
+  stageDistribution?: Array<{ stage: "S1" | "S2" | "S3" | "S4"; season: string; count: number; percent: number; delta: number }>;
+  marketStructure?: Array<{ label: string; summary: string; stageCounts: Record<"S1" | "S2" | "S3" | "S4", number> }>;
+  keyPositions?: Array<{ id: string; label: string; stage: "S2" | "S4"; assets: Array<{ code: string; name: string; subStage: string; weeks: number }> }>;
+  confirmedChanges?: Array<{ code: string; name: string; fromStage: "S1" | "S2" | "S3" | "S4"; toStage: "S1" | "S2" | "S3" | "S4" }>;
+  observations?: Array<{ code: string; name: string; fromStage: "S1" | "S2" | "S3" | "S4"; toStage: "S1" | "S2" | "S3" | "S4"; status: "new" | "continuing"; progress: string | null }>;
   headline: string;
   summary: string;
-  insights: Array<{ id: "structure" | "maturity" | "observation" | "divergence"; label: string; text: string }>;
+  insights: Array<{ id: "structure" | "maturity" | "observation" | "change" | "divergence"; label: string; text: string }>;
   note: string;
 };
 
