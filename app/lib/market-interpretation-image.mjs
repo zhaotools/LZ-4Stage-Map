@@ -39,6 +39,14 @@ function assetNames(assets) {
   return assets.map((asset) => asset.name || asset.code).join("、");
 }
 
+function reportDateLabel(confirmationLabel) {
+  const normalized = confirmationLabel
+    .replace(/^数据确认至\s*/u, "")
+    .replace(/^确认至\s*/u, "")
+    .replace(/市场至\s*/gu, "市场 ");
+  return `数据截至：${normalized}`;
+}
+
 function changeLines(interpretation) {
   const confirmed = interpretation.confirmedChanges || [];
   const observations = interpretation.observations || [];
@@ -89,6 +97,7 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
     kicker: "LZ-4STAGE · MARKET INTERPRETATION",
     title: `${marketTitle}阶段解读`,
     confirmationLabel,
+    reportDateLabel: reportDateLabel(confirmationLabel),
     headline: overview.headline,
     summary: overview.summary,
     stageCounts,
@@ -184,9 +193,9 @@ function downloadCanvas(canvas, fileName) {
   });
 }
 
-function sectionLines(model, measure, cardWidth, contentWidth) {
-  measure.font = `20px ${FONT_FAMILY}`;
-  const halfWidth = cardWidth - 52;
+function sectionLines(model, measure, contentWidth) {
+  measure.font = `28px ${FONT_FAMILY}`;
+  const lineWidth = contentWidth - 64;
   const marketEntries = model.marketStructure.length
     ? model.marketStructure.map((row) => `${row.label}　${row.summary}`)
     : [model.marketStructureFallback];
@@ -194,47 +203,46 @@ function sectionLines(model, measure, cardWidth, contentWidth) {
     ? model.keyPositions.map((group) => `${group.label}　${assetNames(group.assets)}`)
     : [model.keyPositionsFallback];
   return {
-    market: fitLines(wrapEntries(measure, marketEntries, halfWidth), 7),
-    positions: fitLines(wrapEntries(measure, positionEntries, halfWidth), 7),
-    changes: fitLines(wrapEntries(measure, model.changeLines, contentWidth - 52), 6),
+    market: fitLines(wrapEntries(measure, marketEntries, lineWidth), 7),
+    positions: fitLines(wrapEntries(measure, positionEntries, lineWidth), 5),
+    changes: fitLines(wrapEntries(measure, model.changeLines, lineWidth), 6),
   };
 }
 
 function drawSection(context, { x, y, width, height, title, lines }) {
-  paintCard(context, x, y, width, height, 17, "#fbfcfe", "#e1e8f2");
+  paintCard(context, x, y, width, height, 20, "#fbfcfe", "#e1e8f2");
   context.fillStyle = "#397ff6";
   context.beginPath();
-  context.arc(x + 28, y + 34, 6, 0, Math.PI * 2);
+  context.arc(x + 34, y + 42, 7, 0, Math.PI * 2);
   context.fill();
   context.fillStyle = "#354964";
-  context.font = `700 23px ${FONT_FAMILY}`;
-  context.fillText(title, x + 44, y + 42);
-  context.font = `21px ${FONT_FAMILY}`;
-  drawLines(context, lines, x + 26, y + 78, 31, "#60718a");
+  context.font = `700 34px ${FONT_FAMILY}`;
+  context.fillText(title, x + 56, y + 54);
+  context.font = `28px ${FONT_FAMILY}`;
+  drawLines(context, lines, x + 32, y + 104, 40, "#60718a");
 }
 
 function drawMarketStructureSection(context, { x, y, width, height, rows, fallbackLines }) {
-  paintCard(context, x, y, width, height, 17, "#fbfcfe", "#e1e8f2");
+  paintCard(context, x, y, width, height, 20, "#fbfcfe", "#e1e8f2");
   context.fillStyle = "#397ff6";
   context.beginPath();
-  context.arc(x + 28, y + 34, 6, 0, Math.PI * 2);
+  context.arc(x + 34, y + 42, 7, 0, Math.PI * 2);
   context.fill();
   context.fillStyle = "#354964";
-  context.font = `700 23px ${FONT_FAMILY}`;
-  context.fillText("市场结构", x + 44, y + 42);
-  context.font = `21px ${FONT_FAMILY}`;
+  context.font = `700 34px ${FONT_FAMILY}`;
+  context.fillText("市场结构", x + 56, y + 54);
+  context.font = `28px ${FONT_FAMILY}`;
   if (!rows.length) {
-    drawLines(context, fallbackLines, x + 26, y + 78, 31, "#60718a");
+    drawLines(context, fallbackLines, x + 32, y + 104, 40, "#60718a");
     return;
   }
-  rows.forEach((row, index) => {
-    const rowY = y + 78 + index * 31;
+  rows.slice(0, 7).forEach((row, index) => {
+    const rowY = y + 104 + index * 36;
     context.fillStyle = "#60718a";
     context.textAlign = "left";
-    context.fillText(row.label, x + 26, rowY);
+    context.fillText(row.label, x + 32, rowY);
     context.fillStyle = "#354964";
-    context.textAlign = "center";
-    context.fillText(row.summary, x + width / 2, rowY);
+    context.fillText(row.summary, x + 288, rowY);
   });
   context.textAlign = "left";
 }
@@ -245,23 +253,23 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
 
   const model = buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel);
   const width = 1080;
-  const height = 1350;
-  const outerX = 30;
-  const outerY = 30;
-  const contentX = 68;
-  const contentWidth = 944;
-  const gap = 16;
-  const cardWidth = (contentWidth - gap) / 2;
+  const height = 1920;
+  const outerX = 28;
+  const outerY = 28;
+  const contentX = 70;
+  const contentWidth = 940;
+  const gap = 20;
   const measureCanvas = document.createElement("canvas");
   const measure = measureCanvas.getContext("2d");
   if (!measure) throw new Error("浏览器不支持图片生成");
 
-  measure.font = `24px ${FONT_FAMILY}`;
+  measure.font = `30px ${FONT_FAMILY}`;
   const summaryLines = wrapText(measure, model.summary, contentWidth - 48);
-  const sections = sectionLines(model, measure, cardWidth, contentWidth);
-  const overviewHeight = 118 + summaryLines.length * 38;
-  const pairedHeight = Math.max(160, 88 + Math.max(sections.market.length, sections.positions.length) * 31);
-  const changesHeight = Math.max(150, 88 + sections.changes.length * 31);
+  const sections = sectionLines(model, measure, contentWidth);
+  const overviewHeight = 132 + summaryLines.length * 46;
+  const marketHeight = Math.max(176, 102 + (model.marketStructure.length || sections.market.length) * 36);
+  const positionsHeight = Math.max(178, 102 + sections.positions.length * 40);
+  const changesHeight = Math.max(178, 102 + sections.changes.length * 40);
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -280,82 +288,81 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   paintCard(context, outerX, outerY, width - outerX * 2, height - outerY * 2, 28, "#ffffff", "#dce5f1");
   context.shadowColor = "transparent";
 
-  let y = 74;
+  let y = 88;
   context.fillStyle = "#397ff6";
-  context.font = `700 18px ${FONT_FAMILY}`;
+  context.font = `700 22px ${FONT_FAMILY}`;
   context.fillText(model.kicker, contentX, y);
-  y += 52;
+  y += 72;
   context.fillStyle = "#122849";
-  context.font = `700 40px ${FONT_FAMILY}`;
+  context.font = `700 56px ${FONT_FAMILY}`;
   context.fillText(model.title, contentX, y);
   context.fillStyle = "#6a7890";
-  context.font = `600 18px ${FONT_FAMILY}`;
-  context.textAlign = "right";
-  context.fillText(model.confirmationLabel, contentX + contentWidth, y - 5);
-  context.textAlign = "left";
-  y += 44;
+  context.font = `600 24px ${FONT_FAMILY}`;
+  context.fillText(model.reportDateLabel, contentX, y + 46);
+  y += 82;
 
   const stageWidth = (contentWidth - gap * 3) / 4;
   model.stageCounts.forEach((item, index) => {
     const x = contentX + index * (stageWidth + gap);
-    paintCard(context, x, y, stageWidth, 70, 14, item.background, "#e1e8f2");
+    paintCard(context, x, y, stageWidth, 96, 16, item.background, "#e1e8f2");
     context.fillStyle = item.color;
-    context.font = `700 24px ${FONT_FAMILY}`;
-    context.fillText(item.label, x + 18, y + 43);
+    context.font = `700 27px ${FONT_FAMILY}`;
+    context.fillText(item.label, x + 16, y + 58);
     context.fillStyle = "#42536d";
-    context.font = `700 19px ${FONT_FAMILY}`;
+    context.font = `700 25px ${FONT_FAMILY}`;
     context.textAlign = "right";
-    context.fillText(`${item.percent}%`, x + stageWidth - 18, y + 42);
+    context.fillText(`${item.percent}%`, x + stageWidth - 16, y + 58);
     context.textAlign = "left";
   });
-  y += 78;
+  y += 108;
   let barX = contentX;
   const total = Math.max(1, model.stageCounts.reduce((sum, stage) => sum + stage.count, 0));
   model.stageCounts.forEach((item) => {
     const barWidth = contentWidth * item.count / total;
     context.fillStyle = item.color;
-    context.fillRect(barX, y, barWidth, 8);
+    context.fillRect(barX, y, barWidth, 10);
     barX += barWidth;
   });
-  y += 24;
+  y += 38;
 
-  paintCard(context, contentX, y, contentWidth, overviewHeight, 18, "#f4f8ff", "#dce6f5");
+  paintCard(context, contentX, y, contentWidth, overviewHeight, 20, "#f4f8ff", "#dce6f5");
   context.fillStyle = "#16315d";
-  context.font = `700 31px ${FONT_FAMILY}`;
-  context.fillText(model.headline, contentX + 24, y + 48);
-  context.font = `24px ${FONT_FAMILY}`;
-  drawLines(context, summaryLines, contentX + 24, y + 92, 38, "#5d6d85");
-  y += overviewHeight + 22;
+  context.font = `700 42px ${FONT_FAMILY}`;
+  context.fillText(model.headline, contentX + 30, y + 64);
+  context.font = `30px ${FONT_FAMILY}`;
+  drawLines(context, summaryLines, contentX + 30, y + 116, 46, "#5d6d85");
+  y += overviewHeight + 24;
 
-  drawMarketStructureSection(context, { x: contentX, y, width: cardWidth, height: pairedHeight, rows: model.marketStructure, fallbackLines: sections.market });
-  drawSection(context, { x: contentX + cardWidth + gap, y, width: cardWidth, height: pairedHeight, title: "关键位置", lines: sections.positions });
-  y += pairedHeight + gap;
+  drawMarketStructureSection(context, { x: contentX, y, width: contentWidth, height: marketHeight, rows: model.marketStructure, fallbackLines: sections.market });
+  y += marketHeight + gap;
+  drawSection(context, { x: contentX, y, width: contentWidth, height: positionsHeight, title: "关键位置", lines: sections.positions });
+  y += positionsHeight + gap;
   drawSection(context, { x: contentX, y, width: contentWidth, height: changesHeight, title: "本期变化", lines: sections.changes });
   y += changesHeight;
 
   if (model.quality) {
-    y += 32;
+    y += 34;
     context.fillStyle = "#b56a08";
-    context.font = `20px ${FONT_FAMILY}`;
+    context.font = `24px ${FONT_FAMILY}`;
     context.fillText(model.quality, contentX, y);
   }
-  y = height - outerY - 172;
+  y = height - outerY - 180;
   context.strokeStyle = "#e2e8f1";
   context.beginPath();
   context.moveTo(contentX, y);
   context.lineTo(contentX + contentWidth, y);
   context.stroke();
-  y += 39;
+  y += 43;
   context.fillStyle = "#294c82";
-  context.font = `700 21px ${FONT_FAMILY}`;
+  context.font = `700 24px ${FONT_FAMILY}`;
   context.fillText(model.source, contentX, y);
-  y += 34;
+  y += 40;
   context.fillStyle = "#96a2b4";
-  context.font = `18px ${FONT_FAMILY}`;
+  context.font = `22px ${FONT_FAMILY}`;
   context.fillText(model.disclaimer, contentX, y);
-  y += 34;
+  y += 40;
   context.fillStyle = "#397ff6";
-  context.font = `18px ${FONT_FAMILY}`;
+  context.font = `22px ${FONT_FAMILY}`;
   context.fillText(model.detailUrl, contentX, y);
 
   const fileName = safeFileName(`LZ-4Stage-${marketTitle}-阶段解读-${model.fileDate}.png`);

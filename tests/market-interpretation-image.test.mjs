@@ -39,6 +39,7 @@ test("image export model shares the page V2 structure, positions, changes and co
   assert.match(model.changeLines.join("\n"), /恒生指数 S4 → S1观察（延续）/);
   assert.equal(model.source, "数据来自公开市场，由 LZ-4Stage 框架系统分析。");
   assert.equal(model.confirmationLabel, "传统市场至 2026-09-05｜加密市场至 2026-09-07");
+  assert.equal(model.reportDateLabel, "数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
   assert.equal(model.fileDate, "2026-09-07");
   assert.equal(model.detailUrl, "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/");
 });
@@ -87,9 +88,10 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.ok(!paintedText.includes("1 · 6%"));
     assert.ok(paintedText.includes("美股"));
     assert.ok(paintedText.includes("S2为主"));
+    assert.ok(paintedText.includes("数据截至：传统市场 2026-09-05｜加密市场 2026-09-07"));
     assert.equal(canvas.width, 1080);
-    assert.equal(canvas.height, 1350);
-    assert.equal(canvas.width / canvas.height, 4 / 5);
+    assert.equal(canvas.height, 1920);
+    assert.equal(canvas.width / canvas.height, 9 / 16);
   } finally {
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;
