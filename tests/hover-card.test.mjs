@@ -76,6 +76,28 @@ test("market tiles outline observation-stage changes", async () => {
   assert.match(source, /颜色代表当前所处阶段，外框代表本周观察变化/);
   assert.doesNotMatch(source, /方块大小体现资产重要性，颜色代表当前所处阶段/);
 });
+
+test("market map uses the flat four-stage palette, light framing and white tile gaps", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(source, /S1: \{[^}]*color: "#507fba"/);
+  assert.match(source, /S2: \{[^}]*color: "#529c58"/);
+  assert.match(source, /S3: \{[^}]*color: "#c07f3f"/);
+  assert.match(source, /S4: \{[^}]*color: "#b14949"/);
+  assert.match(css, /\.market-map \{[^}]*border: 1px solid #e1e5ea;[^}]*background: #f0f2f5;/);
+  assert.match(css, /\.map-group \{[^}]*border: 1px solid #e2e6eb;[^}]*background: #fff;/);
+  assert.match(css, /\.map-tiles \{[^}]*gap: 1px;[^}]*padding: 0;[^}]*background: #fff;/);
+  assert.match(css, /\.tile-s1 \{ background: #507fba; \}/);
+  assert.match(css, /\.tile-s2 \{ background: #529c58; \}/);
+  assert.match(css, /\.tile-s3 \{ background: #c07f3f; \}/);
+  assert.match(css, /\.tile-s4 \{ background: #b14949; \}/);
+});
+
+test("market hover card uses a light gray surface", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /\.market-hover-card \{[^}]*border: 1px solid #e0e4e9;[^}]*color: #344054;[^}]*background: #f7f8fa;/);
+  assert.match(css, /\.market-hover-card dd \{[^}]*color: #344054;/);
+  assert.doesNotMatch(css, /\.market-hover-card \{[^}]*background: #202735;/);
+});
 test("crypto pending and unavailable analysis is clearly labelled without changing normal assets", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /cryptoFreshness === "pending"/);

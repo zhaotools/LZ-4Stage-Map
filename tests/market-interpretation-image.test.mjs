@@ -87,6 +87,9 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.ok(!paintedText.includes("1 · 6%"));
     assert.ok(paintedText.includes("美股"));
     assert.ok(paintedText.includes("S2为主"));
+    assert.equal(canvas.width, 1080);
+    assert.equal(canvas.height, 1350);
+    assert.equal(canvas.width / canvas.height, 4 / 5);
   } finally {
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;

@@ -151,6 +151,13 @@ function wrapEntries(context, entries, maxWidth) {
   return entries.flatMap((entry) => wrapText(context, entry, maxWidth));
 }
 
+function fitLines(lines, maximum) {
+  if (lines.length <= maximum) return lines;
+  const visible = lines.slice(0, maximum);
+  visible[maximum - 1] = `${visible[maximum - 1].replace(/[，；。、\s]+$/u, "")}…`;
+  return visible;
+}
+
 function drawLines(context, lines, x, y, lineHeight, color) {
   context.fillStyle = color;
   lines.forEach((line, index) => context.fillText(line, x, y + index * lineHeight));
@@ -177,9 +184,9 @@ function downloadCanvas(canvas, fileName) {
   });
 }
 
-function sectionLines(model, measure) {
-  measure.font = `21px ${FONT_FAMILY}`;
-  const halfWidth = 454;
+function sectionLines(model, measure, cardWidth, contentWidth) {
+  measure.font = `20px ${FONT_FAMILY}`;
+  const halfWidth = cardWidth - 52;
   const marketEntries = model.marketStructure.length
     ? model.marketStructure.map((row) => `${row.label}　${row.summary}`)
     : [model.marketStructureFallback];
@@ -187,9 +194,9 @@ function sectionLines(model, measure) {
     ? model.keyPositions.map((group) => `${group.label}　${assetNames(group.assets)}`)
     : [model.keyPositionsFallback];
   return {
-    market: wrapEntries(measure, marketEntries, halfWidth),
-    positions: wrapEntries(measure, positionEntries, halfWidth),
-    changes: wrapEntries(measure, model.changeLines, 974),
+    market: fitLines(wrapEntries(measure, marketEntries, halfWidth), 7),
+    positions: fitLines(wrapEntries(measure, positionEntries, halfWidth), 7),
+    changes: fitLines(wrapEntries(measure, model.changeLines, contentWidth - 52), 6),
   };
 }
 
@@ -203,7 +210,7 @@ function drawSection(context, { x, y, width, height, title, lines }) {
   context.font = `700 23px ${FONT_FAMILY}`;
   context.fillText(title, x + 44, y + 42);
   context.font = `21px ${FONT_FAMILY}`;
-  drawLines(context, lines, x + 26, y + 78, 33, "#60718a");
+  drawLines(context, lines, x + 26, y + 78, 31, "#60718a");
 }
 
 function drawMarketStructureSection(context, { x, y, width, height, rows, fallbackLines }) {
@@ -217,11 +224,11 @@ function drawMarketStructureSection(context, { x, y, width, height, rows, fallba
   context.fillText("市场结构", x + 44, y + 42);
   context.font = `21px ${FONT_FAMILY}`;
   if (!rows.length) {
-    drawLines(context, fallbackLines, x + 26, y + 78, 33, "#60718a");
+    drawLines(context, fallbackLines, x + 26, y + 78, 31, "#60718a");
     return;
   }
   rows.forEach((row, index) => {
-    const rowY = y + 78 + index * 33;
+    const rowY = y + 78 + index * 31;
     context.fillStyle = "#60718a";
     context.textAlign = "left";
     context.fillText(row.label, x + 26, rowY);
@@ -237,12 +244,13 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   await document.fonts?.ready;
 
   const model = buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel);
-  const width = 1200;
-  const outerX = 38;
-  const outerY = 38;
-  const contentX = 80;
-  const contentWidth = 1040;
-  const gap = 18;
+  const width = 1080;
+  const height = 1350;
+  const outerX = 30;
+  const outerY = 30;
+  const contentX = 68;
+  const contentWidth = 944;
+  const gap = 16;
   const cardWidth = (contentWidth - gap) / 2;
   const measureCanvas = document.createElement("canvas");
   const measure = measureCanvas.getContext("2d");
@@ -250,12 +258,10 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
 
   measure.font = `24px ${FONT_FAMILY}`;
   const summaryLines = wrapText(measure, model.summary, contentWidth - 48);
-  const sections = sectionLines(model, measure);
+  const sections = sectionLines(model, measure, cardWidth, contentWidth);
   const overviewHeight = 118 + summaryLines.length * 38;
-  const pairedHeight = Math.max(168, 88 + Math.max(sections.market.length, sections.positions.length) * 33);
-  const changesHeight = Math.max(155, 88 + sections.changes.length * 33);
-  const qualityHeight = model.quality ? 42 : 0;
-  const height = 38 + 148 + 104 + overviewHeight + 24 + pairedHeight + 18 + changesHeight + qualityHeight + 190 + 38;
+  const pairedHeight = Math.max(160, 88 + Math.max(sections.market.length, sections.positions.length) * 31);
+  const changesHeight = Math.max(150, 88 + sections.changes.length * 31);
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -274,13 +280,13 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   paintCard(context, outerX, outerY, width - outerX * 2, height - outerY * 2, 28, "#ffffff", "#dce5f1");
   context.shadowColor = "transparent";
 
-  let y = 82;
+  let y = 74;
   context.fillStyle = "#397ff6";
   context.font = `700 18px ${FONT_FAMILY}`;
   context.fillText(model.kicker, contentX, y);
-  y += 54;
+  y += 52;
   context.fillStyle = "#122849";
-  context.font = `700 42px ${FONT_FAMILY}`;
+  context.font = `700 40px ${FONT_FAMILY}`;
   context.fillText(model.title, contentX, y);
   context.fillStyle = "#6a7890";
   context.font = `600 18px ${FONT_FAMILY}`;
@@ -311,7 +317,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     context.fillRect(barX, y, barWidth, 8);
     barX += barWidth;
   });
-  y += 26;
+  y += 24;
 
   paintCard(context, contentX, y, contentWidth, overviewHeight, 18, "#f4f8ff", "#dce6f5");
   context.fillStyle = "#16315d";
@@ -319,7 +325,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.fillText(model.headline, contentX + 24, y + 48);
   context.font = `24px ${FONT_FAMILY}`;
   drawLines(context, summaryLines, contentX + 24, y + 92, 38, "#5d6d85");
-  y += overviewHeight + 24;
+  y += overviewHeight + 22;
 
   drawMarketStructureSection(context, { x: contentX, y, width: cardWidth, height: pairedHeight, rows: model.marketStructure, fallbackLines: sections.market });
   drawSection(context, { x: contentX + cardWidth + gap, y, width: cardWidth, height: pairedHeight, title: "关键位置", lines: sections.positions });
@@ -328,12 +334,12 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   y += changesHeight;
 
   if (model.quality) {
-    y += 34;
+    y += 32;
     context.fillStyle = "#b56a08";
     context.font = `20px ${FONT_FAMILY}`;
     context.fillText(model.quality, contentX, y);
   }
-  y += 52;
+  y = height - outerY - 172;
   context.strokeStyle = "#e2e8f1";
   context.beginPath();
   context.moveTo(contentX, y);
