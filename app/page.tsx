@@ -204,10 +204,10 @@ function hydrateMarkets(items: DashboardMarket[]): Market[] {
 
 
 const stageMeta: Record<Stage, { title: string; season: string; color: string; dark: string }> = {
-  S1: { title: "筑底阶段", season: "春", color: "#507fba", dark: "#507fba" },
-  S2: { title: "上升阶段", season: "夏", color: "#529c58", dark: "#529c58" },
-  S3: { title: "筑顶阶段", season: "秋", color: "#c07f3f", dark: "#c07f3f" },
-  S4: { title: "下降阶段", season: "冬", color: "#b14949", dark: "#b14949" },
+  S1: { title: "筑底阶段", season: "春", color: "#3f7fd2", dark: "#3f7fd2" },
+  S2: { title: "上升阶段", season: "夏", color: "#329b57", dark: "#329b57" },
+  S3: { title: "筑顶阶段", season: "秋", color: "#d68428", dark: "#d68428" },
+  S4: { title: "下降阶段", season: "冬", color: "#d0444e", dark: "#d0444e" },
 };
 const radarRuleMeta: Record<TrendRadarRuleId, { label: string; description: string; color: string }> = {
   s4Recovery: { label: "转向S2观察", description: "当前主阶段 S1 / S3 / S4 · 本周观察转向 S2", color: "#18a567" },
