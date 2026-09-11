@@ -206,6 +206,32 @@ function drawSection(context, { x, y, width, height, title, lines }) {
   drawLines(context, lines, x + 26, y + 78, 33, "#60718a");
 }
 
+function drawMarketStructureSection(context, { x, y, width, height, rows, fallbackLines }) {
+  paintCard(context, x, y, width, height, 17, "#fbfcfe", "#e1e8f2");
+  context.fillStyle = "#397ff6";
+  context.beginPath();
+  context.arc(x + 28, y + 34, 6, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = "#354964";
+  context.font = `700 23px ${FONT_FAMILY}`;
+  context.fillText("市场结构", x + 44, y + 42);
+  context.font = `21px ${FONT_FAMILY}`;
+  if (!rows.length) {
+    drawLines(context, fallbackLines, x + 26, y + 78, 33, "#60718a");
+    return;
+  }
+  rows.forEach((row, index) => {
+    const rowY = y + 78 + index * 33;
+    context.fillStyle = "#60718a";
+    context.textAlign = "left";
+    context.fillText(row.label, x + 26, rowY);
+    context.fillStyle = "#354964";
+    context.textAlign = "center";
+    context.fillText(row.summary, x + width / 2, rowY);
+  });
+  context.textAlign = "left";
+}
+
 export async function downloadMarketInterpretationImage(interpretation, marketTitle, confirmationLabel) {
   if (typeof document === "undefined") throw new Error("当前环境无法生成图片");
   await document.fonts?.ready;
@@ -273,7 +299,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     context.fillStyle = "#42536d";
     context.font = `700 19px ${FONT_FAMILY}`;
     context.textAlign = "right";
-    context.fillText(`${item.count} · ${item.percent}%`, x + stageWidth - 18, y + 42);
+    context.fillText(`${item.percent}%`, x + stageWidth - 18, y + 42);
     context.textAlign = "left";
   });
   y += 78;
@@ -295,7 +321,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   drawLines(context, summaryLines, contentX + 24, y + 92, 38, "#5d6d85");
   y += overviewHeight + 24;
 
-  drawSection(context, { x: contentX, y, width: cardWidth, height: pairedHeight, title: "市场结构", lines: sections.market });
+  drawMarketStructureSection(context, { x: contentX, y, width: cardWidth, height: pairedHeight, rows: model.marketStructure, fallbackLines: sections.market });
   drawSection(context, { x: contentX + cardWidth + gap, y, width: cardWidth, height: pairedHeight, title: "关键位置", lines: sections.positions });
   y += pairedHeight + gap;
   drawSection(context, { x: contentX, y, width: contentWidth, height: changesHeight, title: "本期变化", lines: sections.changes });

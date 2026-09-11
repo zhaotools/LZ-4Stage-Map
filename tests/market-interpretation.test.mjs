@@ -38,6 +38,12 @@ test("interpretation uses seasonal colors only for stage summaries and neutral c
   assert.doesNotMatch(styles, /border-top-color/);
 });
 
+test("stage summaries show only percentages and market structure centers the stage column", () => {
+  assert.match(pageSource, /<strong>\{item\.label\}<\/strong><span>\{item\.percent\}%<\/span>/);
+  assert.doesNotMatch(pageSource, /\{item\.count\} · \{item\.percent\}%/);
+  assert.match(styles, /\.market-structure-list dd \{[^}]*left: 50%;[^}]*transform: translateX\(-50%\);[^}]*text-align: center;/);
+});
+
 test("interpretation panel exports the same content and explicit confirmation dates", () => {
   assert.match(pageSource, /downloadMarketInterpretationImage\(interpretation, marketTitle, confirmationLabel\)/);
   assert.match(pageSource, /"生成图片"/);

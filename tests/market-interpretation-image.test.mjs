@@ -47,8 +47,9 @@ test("image export paints a PNG and triggers a browser download", async () => {
   let clicked = false;
   let downloadedAs = "";
   let revoked = "";
+  const paintedText = [];
   const context = {
-    beginPath() {}, moveTo() {}, lineTo() {}, arcTo() {}, closePath() {}, fill() {}, stroke() {}, fillRect() {}, fillText() {}, arc() {},
+    beginPath() {}, moveTo() {}, lineTo() {}, arcTo() {}, closePath() {}, fill() {}, stroke() {}, fillRect() {}, fillText(text) { paintedText.push(text); }, arc() {},
     measureText(text) { return { width: Array.from(text).length * 24 }; },
     createLinearGradient() { return { addColorStop() {} }; },
   };
@@ -81,6 +82,11 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.equal(downloadedAs, fileName);
     assert.match(fileName, /^LZ-4Stage-全球市场-阶段解读-2026-09-07\.png$/);
     assert.equal(revoked, "blob:interpretation-image");
+    assert.ok(paintedText.includes("6%"));
+    assert.ok(paintedText.includes("56%"));
+    assert.ok(!paintedText.includes("1 · 6%"));
+    assert.ok(paintedText.includes("美股"));
+    assert.ok(paintedText.includes("S2为主"));
   } finally {
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;

@@ -191,6 +191,7 @@ function hydrateMarkets(items: DashboardMarket[]): Market[] {
     return {
       ...item,
       stage: item.stage as Stage,
+      previousStage: item.previousStage as Stage | undefined,
       region: item.region as MarketRegion,
       signal: item.signal as Market["signal"],
       dataStatus: item.dataStatus as Market["dataStatus"],
@@ -615,7 +616,7 @@ function MarketInterpretationPanel({ interpretation, marketTitle, confirmationLa
       <div className="market-interpretation-stages">
         {presentation.stageCounts.map((item) => (
           <div key={item.stage} style={{ "--interpretation-stage-color": item.color, "--interpretation-stage-bg": item.background } as CSSProperties}>
-            <strong>{item.label}</strong><span>{item.count} · {item.percent}%</span>
+            <strong>{item.label}</strong><span>{item.percent}%</span>
           </div>
         ))}
       </div>
