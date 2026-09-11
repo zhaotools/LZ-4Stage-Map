@@ -33,6 +33,7 @@ const tradingViewExchange = {
 };
 
 export function tradingViewSymbolFor(market) {
+  if (market.tradingviewSymbol) return market.tradingviewSymbol;
   if (specialSymbols[market.code]) return specialSymbols[market.code];
 
   if (market.region === "港股") {

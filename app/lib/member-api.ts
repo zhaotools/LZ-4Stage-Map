@@ -5,6 +5,65 @@ import { supabase } from "./supabase";
 export type MemberView = "crypto7" | "commodity" | "usSelected" | "chinaIndices" | "hkSelected";
 export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early" | "s2Breakdown" | "s4aEntry" | "s4Early";
 export type StockRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
+export type MyScanRegion = "美股" | "A股" | "港股" | "加密";
+
+export type MyScanLookupAsset = {
+  assetKey: string;
+  region: MyScanRegion;
+  code: string;
+  displayCode: string;
+  providerSymbol: string;
+  name: string;
+  exchange: string;
+  assetType: "equity" | "crypto";
+  primaryProvider: string;
+  fallbackProviders: string[];
+  tradingviewSymbol: string;
+  currency: string | null;
+};
+
+export type MyScanStageResult = {
+  assetKey: string;
+  code: string;
+  providerSymbol: string;
+  shortCode: string;
+  name: string;
+  region: MyScanRegion;
+  exchange: string;
+  category: string;
+  tradingviewSymbol: string;
+  source: string;
+  dataStatus: "live";
+  stage: "S1" | "S2" | "S3" | "S4";
+  subStage: string;
+  stageDetail: string;
+  weeks: number;
+  observationStage: string;
+  observation: string;
+  signal: "增强" | "稳定" | "减速" | "转弱" | "观察";
+  momentum: number;
+  close: number;
+  marketAsOf: string;
+  stageAsOf: string;
+  generatedAt: string;
+};
+
+export type MyScanAsset = {
+  assetKey: string;
+  region: MyScanRegion;
+  code: string;
+  displayCode: string;
+  name: string;
+  exchange: string;
+  assetType: "equity" | "crypto";
+  primaryProvider: string;
+  tradingviewSymbol: string;
+  scanStatus: "pending" | "fresh" | "error";
+  lastScanAt: string | null;
+  lastScanError: string | null;
+  createdAt: string;
+  result: MyScanStageResult | null;
+};
 
 export type MarketInterpretation = {
   schemaVersion: "lz-market-interpretation-v1";
@@ -154,6 +213,53 @@ export async function getStockRadarSnapshot<TMarket>(signal?: AbortSignal): Prom
   const { data, error } = await (signal ? query.abortSignal(signal) : query).single();
   if (error) throw error;
   return data.payload as StockRadarSnapshot<TMarket>;
+}
+
+export async function getMyScanAssets(): Promise<MyScanAsset[]> {
+  const { data, error } = await requireClient().rpc("get_my_scan_assets");
+  if (error) throw error;
+  return Array.isArray(data) ? data as MyScanAsset[] : [];
+}
+
+async function functionErrorMessage(error: unknown, data: unknown) {
+  const payloadMessage = (data as { error?: { message?: string } } | null)?.error?.message;
+  if (payloadMessage) return payloadMessage;
+  const context = (error as { context?: Response } | null)?.context;
+  if (context) {
+    try {
+      const payload = await context.clone().json() as { error?: { message?: string } };
+      if (payload.error?.message) return payload.error.message;
+    } catch {
+      // Use the SDK error below when the response is not JSON.
+    }
+  }
+  return error instanceof Error ? error.message : "资产代码查询失败，请稍后重试";
+}
+
+export async function lookupMyScanAsset(region: MyScanRegion, code: string): Promise<MyScanLookupAsset> {
+  const { data, error } = await requireClient().functions.invoke("lookup-watchlist-asset", {
+    body: { region, code },
+  });
+  if (error || data?.error) throw new Error(await functionErrorMessage(error, data));
+  if (!data?.asset) throw new Error("资产代码查询没有返回结果");
+  return data.asset as MyScanLookupAsset;
+}
+
+export async function addMyScanAsset(assetKey: string) {
+  const { data, error } = await requireClient().rpc("add_my_scan_asset", { p_asset_key: assetKey });
+  if (error) {
+    const message = error.message.includes("WATCHLIST_LIMIT_REACHED") ? "我的扫描最多添加20个资产"
+      : error.message.includes("ASSET_NOT_VALIDATED") ? "该资产尚未通过代码验证，请重新查询"
+        : error.message;
+    throw new Error(message);
+  }
+  return data as { ok: boolean; created: boolean; count: number; limit: number };
+}
+
+export async function removeMyScanAsset(assetKey: string) {
+  const { data, error } = await requireClient().rpc("remove_my_scan_asset", { p_asset_key: assetKey });
+  if (error) throw error;
+  return data as { ok: boolean; removed: boolean; count: number; limit: number };
 }
 
 export function onMemberAuthChange(callback: (session: Session | null) => void) {

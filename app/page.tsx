@@ -27,6 +27,7 @@ import {
 import dashboardData from "@/data/dashboard.json";
 import { newerSnapshot, startWeeklyRefresh, validateSnapshot } from "@/app/lib/weekly-refresh.mjs";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
+import { MyScanPage } from "@/app/components/my-scan-page";
 import { globalConfirmationDates, latestConfirmationDate, stageConfirmationTimeFor, confirmationTimeForTradingDate } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
 import { downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
@@ -35,9 +36,13 @@ import {
   getMemberProfile,
   getMemberSession,
   getMemberSnapshot,
+  getMyScanAssets,
   getStockRadarSnapshot,
   getTrendRadarSnapshot,
+  addMyScanAsset,
   isProfileActive,
+  lookupMyScanAsset,
+  removeMyScanAsset,
   signInMember,
   signOutMember,
   updateMemberPassword,
@@ -45,6 +50,9 @@ import {
   type MemberProfile,
   type MemberSnapshot,
   type MemberView,
+  type MyScanAsset,
+  type MyScanLookupAsset,
+  type MyScanRegion,
   type StockRadarRuleId,
   type StockRadarSnapshot,
   type TrendRadarRuleId,
@@ -53,7 +61,7 @@ import {
 import { isSupabaseConfigured } from "@/app/lib/supabase";
 type Stage = "S1" | "S2" | "S3" | "S4";
 type View = "global" | MemberView;
-type ProtectedPage = MemberView | "trendRadar" | "stockRadar";
+type ProtectedPage = MemberView | "trendRadar" | "stockRadar" | "myScan";
 type RadarFilter = "all" | TrendRadarRuleId;
 type StockRadarFilter = "all" | StockRadarRuleId;
 type RadarScanMode = "s2" | "s4";
@@ -624,6 +632,9 @@ export default function Home() {
   const [memberSnapshots, setMemberSnapshots] = useState<Partial<Record<MemberView, MemberSnapshot<DashboardMarket>>>>({});
   const [radarSnapshot, setRadarSnapshot] = useState<TrendRadarSnapshot<DashboardMarket> | null>(null);
   const [stockRadarSnapshot, setStockRadarSnapshot] = useState<StockRadarSnapshot<StockRadarMarket> | null>(null);
+  const [myScanAssets, setMyScanAssets] = useState<MyScanAsset[]>([]);
+  const [myScanLoaded, setMyScanLoaded] = useState(false);
+  const [myScanLoadError, setMyScanLoadError] = useState<string | null>(null);
   const [memberDialog, setMemberDialog] = useState<"locked" | "login" | "dataError" | "password" | "passwordChanged" | null>(null);
   const [pendingView, setPendingView] = useState<ProtectedPage | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
@@ -643,6 +654,7 @@ export default function Home() {
   const [view, setView] = useState<View>("global");
   const [radarActive, setRadarActive] = useState(false);
   const [stockRadarActive, setStockRadarActive] = useState(false);
+  const [myScanActive, setMyScanActive] = useState(false);
   const [introductionActive, setIntroductionActive] = useState(false);
   const [radarFilter, setRadarFilter] = useState<RadarFilter>("all");
   const [radarRegion, setRadarRegion] = useState<"全部" | MarketRegion>("全部");
@@ -683,10 +695,10 @@ export default function Home() {
   const isMember = Boolean(memberProfile && isProfileActive(memberProfile));
   const memberDisplayName = memberProfile?.display_name || "会员";
   const handleCaptchaToken = useCallback((token: string | null) => setCaptchaToken(token), []);
-  const snapshotsRef = useRef({ memberSnapshots, radarSnapshot, stockRadarSnapshot });
+  const snapshotsRef = useRef({ memberSnapshots, radarSnapshot, stockRadarSnapshot, myScanLoaded });
   useEffect(() => {
-    snapshotsRef.current = { memberSnapshots, radarSnapshot, stockRadarSnapshot };
-  }, [memberSnapshots, radarSnapshot, stockRadarSnapshot]);
+    snapshotsRef.current = { memberSnapshots, radarSnapshot, stockRadarSnapshot, myScanLoaded };
+  }, [memberSnapshots, radarSnapshot, stockRadarSnapshot, myScanLoaded]);
 
   useEffect(() => {
     let cancelled = false;
@@ -717,6 +729,12 @@ export default function Home() {
           if (snapshotsRef.current.stockRadarSnapshot) jobs.push(getStockRadarSnapshot<StockRadarMarket>(request.signal).then((snapshot) => {
             validateSnapshot(snapshot, "matches");
             if (!cancelled) setStockRadarSnapshot((current) => newerSnapshot(current, snapshot));
+          }));
+          if (snapshotsRef.current.myScanLoaded) jobs.push(getMyScanAssets().then((assets) => {
+            if (!cancelled) {
+              setMyScanAssets(assets);
+              setMyScanLoadError(null);
+            }
           }));
         }
         const results = await Promise.allSettled(jobs);
@@ -869,6 +887,34 @@ export default function Home() {
     }
   };
 
+  const loadMyScan = async (force = false) => {
+    if (myScanLoaded && !force) return myScanAssets;
+    setLoadingMemberView("myScan");
+    setMyScanLoadError(null);
+    try {
+      const assets = await getMyScanAssets();
+      setMyScanAssets(assets);
+      setMyScanLoaded(true);
+      return assets;
+    } catch {
+      setMyScanLoadError("我的扫描暂时无法读取，请稍后重试。");
+      return null;
+    } finally {
+      setLoadingMemberView(null);
+    }
+  };
+
+  const handleMyScanLookup = (region: MyScanRegion, code: string): Promise<MyScanLookupAsset> => lookupMyScanAsset(region, code);
+  const handleMyScanAdd = async (assetKey: string) => {
+    await addMyScanAsset(assetKey);
+    const refreshed = await loadMyScan(true);
+    if (!refreshed) throw new Error("资产已加入，但列表刷新失败，请重新读取");
+  };
+  const handleMyScanRemove = async (assetKey: string) => {
+    await removeMyScanAsset(assetKey);
+    setMyScanAssets((current) => current.filter((asset) => asset.assetKey !== assetKey));
+  };
+
   const handleMemberLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setCheckingCredentials(true);
@@ -909,6 +955,8 @@ export default function Home() {
         ? await loadTrendRadar()
         : pendingView === "stockRadar"
           ? await loadStockRadar()
+          : pendingView === "myScan"
+            ? await loadMyScan()
           : await loadMemberView(pendingView);
       if (!snapshot) {
         setMemberDialog("dataError");
@@ -919,6 +967,8 @@ export default function Home() {
         switchToTrendRadar();
       } else if (pendingView === "stockRadar") {
         switchToStockRadar();
+      } else if (pendingView === "myScan") {
+        switchToMyScan();
       } else {
         switchView(pendingView);
       }
@@ -953,7 +1003,14 @@ export default function Home() {
   const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? publicSnapshot.commonStageAsOf;
   const commonConfirmationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: view === "global" }) ?? commonStageAsOf;
   const globalDates = globalConfirmationDates(activeUniverse);
-  const activeGeneratedAt = stockRadarActive && stockRadarSnapshot
+  const myScanLatestGeneratedAt = [...myScanAssets]
+    .map((asset) => asset.result?.generatedAt)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? publicSnapshot.generatedAt;
+  const activeGeneratedAt = myScanActive
+    ? myScanLatestGeneratedAt
+    : stockRadarActive && stockRadarSnapshot
     ? stockRadarSnapshot.generatedAt
     : radarActive && radarSnapshot
       ? radarSnapshot.generatedAt
@@ -998,6 +1055,7 @@ export default function Home() {
   const switchView = (nextView: View) => {
     setRadarActive(false);
     setStockRadarActive(false);
+    setMyScanActive(false);
     setIntroductionActive(false);
     setView(nextView);
     setRegion("全球");
@@ -1008,6 +1066,7 @@ export default function Home() {
   const switchToTrendRadar = () => {
     setRadarActive(true);
     setStockRadarActive(false);
+    setMyScanActive(false);
     setIntroductionActive(false);
     setRadarFilter("all");
     setRadarRegion("全部");
@@ -1017,9 +1076,18 @@ export default function Home() {
   const switchToStockRadar = () => {
     setStockRadarActive(true);
     setRadarActive(false);
+    setMyScanActive(false);
     setIntroductionActive(false);
     setStockRadarFilter("all");
     setStockRadarRegion("全部");
+    closeMarketCard();
+    scrollPageToTop();
+  };
+  const switchToMyScan = () => {
+    setMyScanActive(true);
+    setStockRadarActive(false);
+    setRadarActive(false);
+    setIntroductionActive(false);
     closeMarketCard();
     scrollPageToTop();
   };
@@ -1056,6 +1124,23 @@ export default function Home() {
       return;
     }
     switchToStockRadar();
+  };
+  const requestMyScan = async () => {
+    if (!isMember) {
+      setPendingView("myScan");
+      setMemberDialog("locked");
+      setLoginError(null);
+      closeMarketCard();
+      return;
+    }
+    const assets = await loadMyScan();
+    if (!assets) {
+      setPendingView("myScan");
+      setMemberDialog("dataError");
+      closeMarketCard();
+      return;
+    }
+    switchToMyScan();
   };
   const requestView = async (nextView: View) => {
     if (!isMember && isMemberView(nextView)) {
@@ -1102,6 +1187,7 @@ export default function Home() {
     setIntroductionActive(true);
     setRadarActive(false);
     setStockRadarActive(false);
+    setMyScanActive(false);
     setMobileMenuOpen(null);
     closeMarketCard();
   };
@@ -1112,6 +1198,9 @@ export default function Home() {
     setMemberSnapshots({});
     setRadarSnapshot(null);
     setStockRadarSnapshot(null);
+    setMyScanAssets([]);
+    setMyScanLoaded(false);
+    setMyScanLoadError(null);
     closeMemberDialog();
     switchView("global");
   };
@@ -1154,6 +1243,9 @@ export default function Home() {
     setMemberSnapshots({});
     setRadarSnapshot(null);
     setStockRadarSnapshot(null);
+    setMyScanAssets([]);
+    setMyScanLoaded(false);
+    setMyScanLoadError(null);
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
@@ -1167,6 +1259,8 @@ export default function Home() {
       ? await loadTrendRadar()
       : pendingView === "stockRadar"
         ? await loadStockRadar()
+        : pendingView === "myScan"
+          ? await loadMyScan(true)
         : await loadMemberView(pendingView);
     if (!snapshot) return;
     const nextView = pendingView;
@@ -1175,6 +1269,8 @@ export default function Home() {
       switchToTrendRadar();
     } else if (nextView === "stockRadar") {
       switchToStockRadar();
+    } else if (nextView === "myScan") {
+      switchToMyScan();
     } else {
       switchView(nextView);
     }
@@ -1190,12 +1286,12 @@ export default function Home() {
             <section className="side-nav-section" aria-labelledby="market-map-navigation-title">
               <h2 id="market-map-navigation-title">市场地图</h2>
               <nav className="side-nav" aria-label="市场地图">
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "commodity" ? "active" : ""}`} onClick={() => requestView("commodity")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "commodity"}><Gem size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}商品市场</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "commodity" ? "active" : ""}`} onClick={() => requestView("commodity")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "commodity"}><Gem size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}商品市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
               </nav>
             </section>
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
@@ -1203,6 +1299,7 @@ export default function Home() {
               <nav className="side-tools" aria-label="会员工具">
                 <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}全球阶段扫描</span></button>
                 <button className={`nav-item ${stockRadarActive ? "active" : ""}`} type="button" onClick={requestStockRadar} aria-pressed={stockRadarActive}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}个股阶段扫描</span></button>
+                <button className={`nav-item ${myScanActive ? "active" : ""}`} type="button" onClick={requestMyScan} aria-pressed={myScanActive}><MousePointerClick size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}我的扫描</span></button>
               </nav>
             </section>
           </div>
@@ -1210,7 +1307,7 @@ export default function Home() {
             <div className="mobile-nav-menu">
               <button
                 type="button"
-                className={`mobile-menu-trigger ${!introductionActive && !radarActive && !stockRadarActive ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
+                className={`mobile-menu-trigger ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
                 onClick={() => setMobileMenuOpen((current) => current === "market" ? null : "market")}
                 aria-label="手机端市场地图"
                 aria-haspopup="menu"
@@ -1221,19 +1318,19 @@ export default function Home() {
               </button>
               {mobileMenuOpen === "market" && (
                 <div className="mobile-dropdown-panel" id="mobile-market-menu" role="menu" aria-label="市场地图">
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "global" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("global"); }}><Grid2X2 size={15} /><span>全球</span></button>
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "usSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("usSelected"); }}><TrendingUp size={15} /><span>美股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "chinaIndices" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("chinaIndices"); }}><Landmark size={15} /><span>A股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "commodity" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("commodity"); }}><Gem size={15} /><span>商品</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "global" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("global"); }}><Grid2X2 size={15} /><span>全球</span></button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("usSelected"); }}><TrendingUp size={15} /><span>美股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("chinaIndices"); }}><Landmark size={15} /><span>A股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "commodity" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("commodity"); }}><Gem size={15} /><span>商品</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                 </div>
               )}
             </div>
             <div className="mobile-nav-menu mobile-tools-menu">
               <button
                 type="button"
-                className={`mobile-menu-trigger ${radarActive || stockRadarActive ? "active" : ""} ${mobileMenuOpen === "tools" ? "open" : ""}`}
+                className={`mobile-menu-trigger ${radarActive || stockRadarActive || myScanActive ? "active" : ""} ${mobileMenuOpen === "tools" ? "open" : ""}`}
                 onClick={() => setMobileMenuOpen((current) => current === "tools" ? null : "tools")}
                 aria-label="手机端会员工具"
                 aria-haspopup="menu"
@@ -1246,6 +1343,7 @@ export default function Home() {
                 <div className="mobile-dropdown-panel" id="mobile-tools-menu" role="menu" aria-label="会员工具">
                   <button type="button" role="menuitem" className={radarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestTrendRadar(); }}><Radar size={15} /><span>全球阶段扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                   <button type="button" role="menuitem" className={stockRadarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestStockRadar(); }}><TrendingUp size={15} /><span>个股阶段扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={myScanActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestMyScan(); }}><MousePointerClick size={15} /><span>我的扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                 </div>
               )}
             </div>
@@ -1295,6 +1393,16 @@ export default function Home() {
                 <p className="stage-introduction-closing">用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。</p>
               </div>
             </article>
+          ) : myScanActive ? (
+            <MyScanPage
+              assets={myScanAssets}
+              loading={loadingMemberView === "myScan"}
+              loadError={myScanLoadError}
+              onReload={async () => { await loadMyScan(true); }}
+              onLookup={handleMyScanLookup}
+              onAdd={handleMyScanAdd}
+              onRemove={handleMyScanRemove}
+            />
           ) : stockRadarActive && stockRadarSnapshot ? (
             <StockRadarPage snapshot={stockRadarSnapshot} markets={stockRadarSnapshot.matches} filter={stockRadarFilter} region={stockRadarRegion} onFilterChange={setStockRadarFilter} onRegionChange={setStockRadarRegion} />
           ) : radarActive && radarSnapshot ? (
@@ -1337,9 +1445,11 @@ export default function Home() {
           </>}
 
           <footer>
-            <span>{introductionActive ? "LZ-4Stage 四阶段趋势框架" : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span>
+            <span>{introductionActive ? "LZ-4Stage 四阶段趋势框架" : myScanActive ? `LZ-4Stage 我的扫描 · ${myScanAssets.length}/20 个资产` : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span>
             <div className="footer-data-times">
-              <span>{view === "global"
+              <span>{myScanActive
+                ? <>传统资产周六更新｜加密资产周一更新</>
+                : view === "global"
                 ? <>传统市场确认至 {globalDates.traditional}｜加密确认至 {globalDates.crypto}</>
                 : <>确认至 {commonConfirmationDate}</>}</span>
               <span>数据生成于 {formatDateTime(activeGeneratedAt)}</span>
@@ -1373,13 +1483,13 @@ export default function Home() {
             {memberDialog === "locked" ? (
               <>
                 <h2 id="access-gate-title">LZ会员专享</h2>
-                <p>{pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
+                <p>{pendingView === "myScan" ? "登录会员账号后建立自己的阶段扫描列表" : pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
                 <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
               </>
             ) : memberDialog === "dataError" ? (
               <>
                 <h2 id="access-gate-title">会员数据暂时不可用</h2>
-                <p>登录状态有效，但{pendingView === "stockRadar" ? "个股阶段扫描结果" : pendingView === "trendRadar" ? "全球阶段扫描结果" : "市场快照"}未能加载，请稍后重试。</p>
+                <p>登录状态有效，但{pendingView === "myScan" ? "我的扫描数据" : pendingView === "stockRadar" ? "个股阶段扫描结果" : pendingView === "trendRadar" ? "全球阶段扫描结果" : "市场快照"}未能加载，请稍后重试。</p>
                 <button className="member-login-cta" type="button" onClick={retryMemberData} disabled={Boolean(loadingMemberView)}>{loadingMemberView ? "正在重试…" : "重新加载"}</button>
               </>
             ) : memberDialog === "passwordChanged" ? (

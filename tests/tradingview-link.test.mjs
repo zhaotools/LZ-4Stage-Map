@@ -38,6 +38,12 @@ test("builds an encoded TradingView chart URL", () => {
   );
 });
 
+test("member-selected assets use the server-validated TradingView identity", () => {
+  const selected = { ...market("ABC-USD", "加密", "OKX"), tradingviewSymbol: "OKX:ABCUSDT" };
+  assert.equal(tradingViewSymbolFor(selected), "OKX:ABCUSDT");
+  assert.equal(tradingViewChartUrlFor(selected), "https://cn.tradingview.com/chart/?symbol=OKX%3AABCUSDT&interval=D");
+});
+
 test("HYPE opens TradingView Chinese daily chart with Hyperliquid spot feed", () => {
   const hype = market("HYPE-USD", "加密", "CRYPTO");
   assert.equal(tradingViewChartUrlFor(hype), "https://cn.tradingview.com/chart/?symbol=HYPERLIQUID%3AHYPEUSDC&interval=D");
