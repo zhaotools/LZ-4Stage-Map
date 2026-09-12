@@ -116,7 +116,8 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.doesNotMatch(pageSource, /ADMIN_USERNAME_HASH|ADMIN_PASSWORD_HASH|MEMBER_STORAGE_KEY|hashText/);
   assert.doesNotMatch(pageSource, /ACCESS_STORAGE_KEY|ACCESS_PASSWORD_HASH|accessGranted/);
   assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
-  assert.match(pageSource, /<strong>LZ-4STAGE MAP<\/strong><small>MARKET TOOLKIT<\/small>/);
+  assert.match(pageSource, /<strong>4STAGE MAP<\/strong><small>MARKET TOOLKIT<\/small>/);
+  assert.match(cssSource, /\.brand strong \{[^}]*font-size: 14px;[^}]*white-space: nowrap;/);
   assert.match(indexSource, /<title>LZ Map｜全球市场阶段地图<\/title>/);
   assert.match(indexSource, /<meta property="og:title" content="LZ Map｜全球市场阶段地图" \/>/);
   assert.match(indexSource, /href="\.\/favicon-v2\.png"/);

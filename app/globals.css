@@ -28,7 +28,7 @@ button, input { font: inherit; } button { color: inherit; }
 .sidebar { position: fixed; inset: 0 auto 0 0; width: 204px; padding: 25px 17px; background: #0d2047; color: #fff; display: flex; flex-direction: column; z-index: 20; }
 .brand { display: flex; align-items: center; gap: 11px; padding: 0 7px 29px; }
 .brand-mark { width: 38px; height: 38px; flex: 0 0 38px; display: block; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 20px #06132e77; }
-.brand strong { display: block; font-size: 15px; }.brand small { display: block; margin-top: 4px; color: #8499c0; font-size: 8px; letter-spacing: 1.25px; }
+.brand strong { display: block; font-size: 14px; white-space: nowrap; }.brand small { display: block; margin-top: 4px; color: #8499c0; font-size: 8px; letter-spacing: 1.25px; }
 .sidebar-navigation { display: grid; gap: 16px; }.side-nav-section h2 { margin: 0 13px 7px; color: #657ba7; font-size: 9px; font-weight: 800; letter-spacing: 1px; }.side-nav { display: grid; gap: 6px; }.nav-item { border: 0; background: transparent; color: #98aad0; display: flex; align-items: center; gap: 11px; padding: 11px 13px; border-radius: 9px; cursor: pointer; text-align: left; transition: .18s ease; font-size: 12px; }
 .nav-item:hover { color: #fff; background: #ffffff0b; }.nav-item.active { color: #fff; background: #2e68df; box-shadow: 0 8px 22px #06142f66; }
 .nav-label { display: inline-flex; align-items: center; gap: 5px; }.nav-lock { flex: 0 0 auto; color: currentColor; opacity: .8; }

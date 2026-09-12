@@ -1314,7 +1314,7 @@ export default function Home() {
     <>
       <div className="app-shell">
         <aside className="sidebar">
-          <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="38" height="38" /><div><strong>LZ-4STAGE MAP</strong><small>MARKET TOOLKIT</small></div></div>
+          <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="38" height="38" /><div><strong>4STAGE MAP</strong><small>MARKET TOOLKIT</small></div></div>
           <div className="sidebar-navigation">
             <section className="side-nav-section" aria-labelledby="market-map-navigation-title">
               <h2 id="market-map-navigation-title">市场地图</h2>
