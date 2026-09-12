@@ -1,9 +1,9 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-11T12:49:18.538Z",
-  "updateScope": "all",
+  "generatedAt": "2026-09-12T00:09:21.776Z",
+  "updateScope": "traditional",
   "lastUpdatedAt": {
-    "traditional": "2026-09-11T12:49:18.538Z",
+    "traditional": "2026-09-12T00:09:21.776Z",
     "crypto": "2026-09-11T12:49:18.538Z"
   },
   "analysisPeriod": "weekly-completed-bars",
@@ -29,18 +29,18 @@
       "previousStage": "S2",
       "previousSubStage": "S2",
       "stageDetail": "趋势减速",
-      "weeks": 20,
+      "weeks": 21,
       "observationStage": "S2",
       "previousObservationStage": "S2",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 1.85,
-      "distance": 6.52,
+      "momentum": 1.86,
+      "distance": 5.27,
       "confidence": 95,
-      "close": 7591.7001953125,
-      "marketAsOf": "2026-09-10",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "close": 7656.97998046875,
+      "marketAsOf": "2026-09-11",
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "SOXX",
@@ -62,18 +62,18 @@
       "previousStage": "S2",
       "previousSubStage": "S2B-",
       "stageDetail": "趋势减速",
-      "weeks": 64,
+      "weeks": 65,
       "observationStage": "S2B-",
       "previousObservationStage": "S2B-",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 6.97,
-      "distance": 9.13,
+      "momentum": 6.55,
+      "distance": 9.33,
       "confidence": 95,
-      "close": 517.4299926757812,
-      "marketAsOf": "2026-09-10",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "close": 527.07,
+      "marketAsOf": "2026-09-11",
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "VIX",
@@ -91,22 +91,22 @@
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
-      "subStage": "S4",
+      "subStage": "S4-",
       "previousStage": "S4",
       "previousSubStage": "S4",
       "stageDetail": "下降减速",
-      "weeks": 18,
-      "observationStage": "S4",
+      "weeks": 19,
+      "observationStage": "S4-",
       "previousObservationStage": "S4",
       "observation": "下降减速",
       "signal": "减速",
-      "momentum": -1.9,
-      "distance": -23.49,
+      "momentum": -2.78,
+      "distance": -15.89,
       "confidence": 95,
-      "close": 16.790000915527344,
+      "close": 15.84000015258789,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "SZ399006",
@@ -124,22 +124,22 @@
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
-      "subStage": "S4A",
-      "previousStage": "S2",
-      "previousSubStage": "S2B-",
+      "subStage": "S4",
+      "previousStage": "S4",
+      "previousSubStage": "S4A",
       "stageDetail": "正常下降",
-      "weeks": 1,
+      "weeks": 2,
       "observationStage": "S4",
-      "previousObservationStage": "S4A",
+      "previousObservationStage": "S4",
       "observation": "正常下降",
       "signal": "稳定",
-      "momentum": 0.8,
-      "distance": -8.82,
+      "momentum": 0.54,
+      "distance": -7.91,
       "confidence": 73,
       "close": 3322.04,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "HSTECH",
@@ -161,18 +161,18 @@
       "previousStage": "S4",
       "previousSubStage": "S4",
       "stageDetail": "下降减速",
-      "weeks": 30,
+      "weeks": 31,
       "observationStage": "S4",
       "previousObservationStage": "S4",
       "observation": "下降减速",
       "signal": "减速",
-      "momentum": -3.25,
-      "distance": -5.26,
+      "momentum": -3.41,
+      "distance": -9.78,
       "confidence": 95,
       "close": 4320.57,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "N225",
@@ -193,18 +193,18 @@
       "previousStage": "S2",
       "previousSubStage": "S2B-",
       "stageDetail": "趋势减速",
-      "weeks": 62,
+      "weeks": 63,
       "observationStage": "S2B-",
       "previousObservationStage": "S2B-",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 3.58,
-      "distance": 4.49,
+      "momentum": 3.19,
+      "distance": 2.48,
       "confidence": 95,
-      "close": 64011.33984375,
+      "close": 64011.34,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "STOXX50E",
@@ -223,20 +223,20 @@
       "stage": "S2",
       "subStage": "S2-",
       "previousStage": "S2",
-      "previousSubStage": "S2",
+      "previousSubStage": "S2-",
       "stageDetail": "趋势减速",
-      "weeks": 12,
+      "weeks": 13,
       "observationStage": "S2-",
-      "previousObservationStage": "S2",
+      "previousObservationStage": "S2-",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 1.38,
-      "distance": 4.99,
+      "momentum": 1.27,
+      "distance": 3.68,
       "confidence": 95,
-      "close": 6318.2001953125,
+      "close": 6325.13,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "DXY",
@@ -258,18 +258,18 @@
       "previousStage": "S1",
       "previousSubStage": "S1",
       "stageDetail": "筑底阶段",
-      "weeks": 44,
+      "weeks": 45,
       "observationStage": "S1",
       "previousObservationStage": "S1",
       "observation": "S1",
       "signal": "稳定",
-      "momentum": 0.21,
-      "distance": -0.28,
+      "momentum": 0.27,
+      "distance": -0.42,
       "confidence": 95,
-      "close": 99.19599914550781,
+      "close": 99.09500122070312,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "US10Y",
@@ -291,18 +291,18 @@
       "previousStage": "S2",
       "previousSubStage": "S2",
       "stageDetail": "正常推进",
-      "weeks": 18,
+      "weeks": 19,
       "observationStage": "S2",
       "previousObservationStage": "S2",
       "observation": "正常推进",
       "signal": "稳定",
-      "momentum": 1.92,
-      "distance": 7.63,
+      "momentum": 2.24,
+      "distance": 11.16,
       "confidence": 95,
-      "close": 4.959000110626221,
+      "close": 4.974999904632568,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "CL",
@@ -324,18 +324,18 @@
       "previousStage": "S2",
       "previousSubStage": "S2",
       "stageDetail": "趋势减速",
-      "weeks": 28,
+      "weeks": 29,
       "observationStage": "S2",
-      "previousObservationStage": "S4A",
+      "previousObservationStage": "S2",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 4.6,
-      "distance": 5.66,
+      "momentum": 5.28,
+      "distance": 13.87,
       "confidence": 73,
-      "close": 99.12999725341797,
+      "close": 99.98999786376953,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "XAU",
@@ -357,100 +357,100 @@
       "previousStage": "S4",
       "previousSubStage": "S4-",
       "stageDetail": "下降减速",
-      "weeks": 10,
+      "weeks": 11,
       "observationStage": "S4-",
       "previousObservationStage": "S4-",
       "observation": "下降减速",
       "signal": "减速",
-      "momentum": -1.07,
-      "distance": -2.29,
+      "momentum": -1.42,
+      "distance": -2.72,
       "confidence": 95,
-      "close": 4385.7001953125,
+      "close": 4390,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "BTC-USD",
-      "providerSymbol": "BTCUSDT",
       "name": "比特币",
+      "close": 80341.83,
+      "stage": "S2",
+      "weeks": 1,
       "region": "加密",
-      "exchange": "CRYPTO",
+      "signal": "稳定",
+      "source": "Binance Spot · BTC/USDT",
       "category": "加密货币",
+      "distance": 15.17,
+      "exchange": "CRYPTO",
+      "momentum": -2.57,
+      "subStage": "S2A",
+      "stageAsOf": "2026-08-31",
+      "confidence": 35,
+      "dataStatus": "live",
+      "marketAsOf": "2026-08-31",
       "collections": [
         "global",
         "crypto7"
       ],
-      "radarEligible": true,
-      "source": "Binance Spot · BTC/USDT",
-      "dataStatus": "live",
       "dataWarning": null,
-      "stage": "S2",
-      "subStage": "S2A",
-      "previousStage": "S4",
-      "previousSubStage": "S4B-",
-      "stageDetail": "正常推进",
-      "weeks": 1,
-      "observationStage": "S2",
-      "previousObservationStage": "S2",
       "observation": "正常推进",
-      "signal": "稳定",
-      "momentum": -2.57,
-      "distance": 15.17,
-      "confidence": 35,
-      "close": 80341.83,
-      "marketAsOf": "2026-08-31",
-      "stageAsOf": "2026-08-31",
-      "hasProvisionalBar": false,
-      "cryptoFreshness": "fresh",
+      "stageDetail": "正常推进",
       "cryptoQuality": {
         "verified": true,
-        "completedThrough": "2026-09-06",
         "historyStart": "2017-08-14",
-        "quoteCurrency": "USDT"
+        "quoteCurrency": "USDT",
+        "completedThrough": "2026-09-06"
       },
-      "cryptoAttempts": []
+      "previousStage": "S4",
+      "radarEligible": true,
+      "cryptoAttempts": [],
+      "providerSymbol": "BTCUSDT",
+      "cryptoFreshness": "fresh",
+      "observationStage": "S2",
+      "previousSubStage": "S4B-",
+      "hasProvisionalBar": false,
+      "previousObservationStage": "S2"
     },
     {
       "code": "ETH-USD",
-      "providerSymbol": "ETHUSDT",
       "name": "以太坊",
+      "close": 2514.48,
+      "stage": "S2",
+      "weeks": 1,
       "region": "加密",
-      "exchange": "CRYPTO",
+      "signal": "稳定",
+      "source": "Binance Spot · ETH/USDT",
       "category": "加密货币",
+      "distance": 23.53,
+      "exchange": "CRYPTO",
+      "momentum": -3.79,
+      "subStage": "S2A",
+      "stageAsOf": "2026-08-31",
+      "confidence": 50,
+      "dataStatus": "live",
+      "marketAsOf": "2026-08-31",
       "collections": [
         "global",
         "crypto7"
       ],
-      "radarEligible": true,
-      "source": "Binance Spot · ETH/USDT",
-      "dataStatus": "live",
       "dataWarning": null,
-      "stage": "S2",
-      "subStage": "S2A",
-      "previousStage": "S4",
-      "previousSubStage": "S4-",
-      "stageDetail": "正常推进",
-      "weeks": 1,
-      "observationStage": "S2",
-      "previousObservationStage": "S2",
       "observation": "正常推进",
-      "signal": "稳定",
-      "momentum": -3.79,
-      "distance": 23.53,
-      "confidence": 50,
-      "close": 2514.48,
-      "marketAsOf": "2026-08-31",
-      "stageAsOf": "2026-08-31",
-      "hasProvisionalBar": false,
-      "cryptoFreshness": "fresh",
+      "stageDetail": "正常推进",
       "cryptoQuality": {
         "verified": true,
-        "completedThrough": "2026-09-06",
         "historyStart": "2017-08-14",
-        "quoteCurrency": "USDT"
+        "quoteCurrency": "USDT",
+        "completedThrough": "2026-09-06"
       },
-      "cryptoAttempts": []
+      "previousStage": "S4",
+      "radarEligible": true,
+      "cryptoAttempts": [],
+      "providerSymbol": "ETHUSDT",
+      "cryptoFreshness": "fresh",
+      "observationStage": "S2",
+      "previousSubStage": "S4-",
+      "hasProvisionalBar": false,
+      "previousObservationStage": "S2"
     },
     {
       "code": "NDQ",
@@ -472,18 +472,18 @@
       "previousStage": "S2",
       "previousSubStage": "S2",
       "stageDetail": "趋势减速",
-      "weeks": 20,
+      "weeks": 21,
       "observationStage": "S2",
       "previousObservationStage": "S2",
       "observation": "趋势减速",
       "signal": "减速",
-      "momentum": 2.54,
-      "distance": 6.77,
+      "momentum": 2.61,
+      "distance": 5.55,
       "confidence": 95,
-      "close": 29103.509765625,
-      "marketAsOf": "2026-09-10",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "close": 29368.439453125,
+      "marketAsOf": "2026-09-11",
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "HSI",
@@ -500,23 +500,23 @@
       "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
-      "stage": "S4",
-      "subStage": "S4-",
+      "stage": "S1",
+      "subStage": "S1",
       "previousStage": "S4",
       "previousSubStage": "S4-",
-      "stageDetail": "→S1筑底观察",
-      "weeks": 11,
+      "stageDetail": "筑底阶段",
+      "weeks": 1,
       "observationStage": "S1",
       "previousObservationStage": "S1",
-      "observation": "→S1筑底观察",
-      "signal": "观察",
-      "momentum": -0.75,
-      "distance": 1.2,
-      "confidence": 50,
+      "observation": "S1",
+      "signal": "稳定",
+      "momentum": -0.91,
+      "distance": -1.9,
+      "confidence": 95,
       "close": 24805.63,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     },
     {
       "code": "000300.SH",
@@ -538,56 +538,56 @@
       "previousStage": "S3",
       "previousSubStage": "S3",
       "stageDetail": "筑顶阶段",
-      "weeks": 21,
-      "observationStage": "S3",
+      "weeks": 22,
+      "observationStage": "S4",
       "previousObservationStage": "S3",
-      "observation": "S3",
-      "signal": "稳定",
-      "momentum": -0.28,
-      "distance": -3.37,
-      "confidence": 73,
+      "observation": "阶段转换 1/2",
+      "signal": "转弱",
+      "momentum": -0.42,
+      "distance": -4.08,
+      "confidence": 68,
       "close": 4510.16,
       "marketAsOf": "2026-09-11",
-      "stageAsOf": "2026-09-04",
-      "hasProvisionalBar": true
+      "stageAsOf": "2026-09-11",
+      "hasProvisionalBar": false
     }
   ],
   "interpretation": {
     "schemaVersion": "lz-market-interpretation-v2",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-11T12:49:18.538Z",
+    "generatedAt": "2026-09-12T00:09:21.776Z",
     "commonStageAsOf": "2026-08-31",
-    "sourceSnapshotSha256": "7c418e445064fa139a6b7e5735691d627938e5875ea417e99c3b72b23d32417f",
+    "sourceSnapshotSha256": "0716f59a4c53dc27391e6dd7bd12ead14873ecbda289f49dd5d82c9afdd7e0d3",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
     "stageCounts": {
-      "S1": 1,
+      "S1": 2,
       "S2": 9,
       "S3": 1,
-      "S4": 5
+      "S4": 4
     },
     "previousStageCounts": {
       "S1": 1,
-      "S2": 8,
+      "S2": 7,
       "S3": 1,
-      "S4": 6
+      "S4": 7
     },
     "stageDistribution": [
       {
         "stage": "S1",
         "season": "春季",
-        "count": 1,
-        "percent": 6,
-        "delta": 0
+        "count": 2,
+        "percent": 13,
+        "delta": 1
       },
       {
         "stage": "S2",
         "season": "夏季",
         "count": 9,
         "percent": 56,
-        "delta": 1
+        "delta": 2
       },
       {
         "stage": "S3",
@@ -599,9 +599,9 @@
       {
         "stage": "S4",
         "season": "冬季",
-        "count": 5,
-        "percent": 31,
-        "delta": -1
+        "count": 4,
+        "percent": 25,
+        "delta": -3
       }
     ],
     "marketStructure": [
@@ -627,12 +627,12 @@
       },
       {
         "label": "港股",
-        "summary": "S4为主",
+        "summary": "S1 / S4分化",
         "stageCounts": {
-          "S1": 0,
+          "S1": 1,
           "S2": 0,
           "S3": 0,
-          "S4": 2
+          "S4": 1
         }
       },
       {
@@ -705,32 +705,19 @@
             "code": "SOXX",
             "name": "iShares半导体ETF",
             "subStage": "S2B-",
-            "weeks": 64
+            "weeks": 65
           },
           {
             "code": "N225",
             "name": "日经225指数",
             "subStage": "S2B-",
-            "weeks": 62
+            "weeks": 63
           },
           {
             "code": "STOXX50E",
             "name": "欧洲STOXX 50指数",
             "subStage": "S2-",
-            "weeks": 12
-          }
-        ]
-      },
-      {
-        "id": "s4Early",
-        "label": "S4早期",
-        "stage": "S4",
-        "assets": [
-          {
-            "code": "SZ399006",
-            "name": "创业板指",
-            "subStage": "S4A",
-            "weeks": 1
+            "weeks": 13
           }
         ]
       },
@@ -740,14 +727,14 @@
         "stage": "S4",
         "assets": [
           {
-            "code": "XAU",
-            "name": "黄金（COMEX期货代理）",
+            "code": "VIX",
+            "name": "VIX恐慌指数",
             "subStage": "S4-",
-            "weeks": 10
+            "weeks": 19
           },
           {
-            "code": "HSI",
-            "name": "恒生指数",
+            "code": "XAU",
+            "name": "黄金（COMEX期货代理）",
             "subStage": "S4-",
             "weeks": 11
           }
@@ -755,12 +742,6 @@
       }
     ],
     "confirmedChanges": [
-      {
-        "code": "SZ399006",
-        "name": "创业板指",
-        "fromStage": "S2",
-        "toStage": "S4"
-      },
       {
         "code": "BTC-USD",
         "name": "比特币",
@@ -772,35 +753,41 @@
         "name": "以太坊",
         "fromStage": "S4",
         "toStage": "S2"
-      }
-    ],
-    "observations": [
+      },
       {
         "code": "HSI",
         "name": "恒生指数",
         "fromStage": "S4",
-        "toStage": "S1",
-        "status": "continuing",
-        "progress": null
+        "toStage": "S1"
+      }
+    ],
+    "observations": [
+      {
+        "code": "000300.SH",
+        "name": "沪深300",
+        "fromStage": "S3",
+        "toStage": "S4",
+        "status": "new",
+        "progress": "1/2"
       }
     ],
     "headline": "S2 夏季占优，但市场分化明显",
-    "summary": "16个代表资产中，9个处于S2（56%）；5个处于S4（31%）。",
+    "summary": "16个代表资产中，9个处于S2（56%）；4个处于S4（25%）。",
     "insights": [
       {
         "id": "maturity",
         "label": "趋势位置",
-        "text": "比特币、以太坊处于S2早期；iShares半导体ETF、日经225指数、欧洲STOXX 50指数处于S2后期或减速段；创业板指处于S4早期；黄金（COMEX期货代理）、恒生指数处于S4后期或减速段。"
+        "text": "比特币、以太坊处于S2早期；iShares半导体ETF、日经225指数、欧洲STOXX 50指数处于S2后期或减速段；VIX恐慌指数、黄金（COMEX期货代理）处于S4后期或减速段。"
       },
       {
         "id": "change",
         "label": "本期变化",
-        "text": "已确认：创业板指 S2→S4、比特币 S4→S2、以太坊 S4→S2；观察：恒生指数 S4→S1观察（延续）。观察信号尚未等同于阶段确认。"
+        "text": "已确认：比特币 S4→S2、以太坊 S4→S2、恒生指数 S4→S1；观察：沪深300 S3→S4观察（新增）。观察信号尚未等同于阶段确认。"
       },
       {
         "id": "divergence",
         "label": "市场分化",
-        "text": "美股以S2为主；A股阶段分布在S3、S4之间较为分散；港股以S4为主；日股以S2为主；欧股以S2为主；大宗·宏观S2数量最多；加密以S2为主。不同类别资产的阶段含义应分别理解。"
+        "text": "美股以S2为主；A股阶段分布在S3、S4之间较为分散；港股阶段分布在S1、S4之间较为分散；日股以S2为主；欧股以S2为主；大宗·宏观S2数量最多；加密以S2为主。不同类别资产的阶段含义应分别理解。"
       }
     ],
     "note": "阶段数量用于描述当前周期位置，不代表资产等权配置、未来涨跌预测或投资建议。"
