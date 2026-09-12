@@ -40,6 +40,7 @@ function momentumDirection(momentum: number) {
 
 export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove }: Props) {
   const [region, setRegion] = useState<MyScanRegion>("美股");
+  const [stageFilter, setStageFilter] = useState<(typeof stages)[number] | "全部">("全部");
   const [code, setCode] = useState("");
   const [candidate, setCandidate] = useState<MyScanLookupAsset | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -52,6 +53,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
     if (asset.result) counts[asset.result.stage] += 1;
     return counts;
   }, { S1: 0, S2: 0, S3: 0, S4: 0 });
+  const filteredAssets = stageFilter === "全部" ? assets : assets.filter((asset) => asset.result?.stage === stageFilter);
 
   const submitLookup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -134,22 +136,31 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
 
       <div className="my-scan-list-head">
         <div><h3>自选资产</h3><p>相同代码在全站只计算一次；删除只影响你自己的列表。</p></div>
+        <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
+          <div className="distribution-bar">
+            {stages.map((stage) => {
+              const percent = analyzedTotal ? Math.round((stageCounts[stage] / analyzedTotal) * 100) : 0;
+              const selected = stageFilter === stage;
+              const muted = stageFilter !== "全部" && !selected;
+              return (
+                <button
+                  key={stage}
+                  type="button"
+                  className={`distribution-segment ${selected ? "selected" : ""} ${muted ? "muted" : ""}`}
+                  style={{ background: `color-mix(in srgb, ${stageColors[stage]} 14%, var(--canvas))` }}
+                  onClick={() => setStageFilter(selected ? "全部" : stage)}
+                  aria-pressed={selected}
+                  aria-label={`${stage} ${stageSeasons[stage]}，占比 ${percent}%，${stageCounts[stage]} 个资产`}
+                >
+                  <span className="distribution-fill" aria-hidden="true" style={{ width: `${percent}%`, background: stageColors[stage] }} />
+                  <span className="distribution-label"><b style={{ color: stageColors[stage] }}>{stage} {stageSeasons[stage]}</b></span>
+                  <span className="distribution-value"><strong>{percent}%</strong></span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </div>
-
-      <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
-        <div className="distribution-bar">
-          {stages.map((stage) => {
-            const percent = analyzedTotal ? Math.round((stageCounts[stage] / analyzedTotal) * 100) : 0;
-            return (
-              <div key={stage} className="distribution-segment my-scan-distribution-segment">
-                <span className="distribution-fill" aria-hidden="true" style={{ width: `${percent}%`, background: stageColors[stage] }} />
-                <span className="distribution-label"><b style={{ color: stageColors[stage] }}>{stage} {stageSeasons[stage]}</b></span>
-                <span className="distribution-value"><strong>{percent}%</strong></span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
       {loadError ? (
         <div className="my-scan-empty error"><p>{loadError}</p><button type="button" onClick={() => void onReload()}>重新读取</button></div>
@@ -157,9 +168,11 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
         <div className="my-scan-empty"><p>正在读取我的扫描…</p></div>
       ) : !assets.length ? (
         <div className="my-scan-empty"><Search size={26} /><h3>还没有添加资产</h3><p>先选择市场，再输入精确资产代码。最多可添加20个。</p></div>
+      ) : !filteredAssets.length ? (
+        <div className="my-scan-empty"><Search size={26} /><h3>当前没有{stageFilter}资产</h3><p>再次点击已选阶段可恢复显示全部资产。</p></div>
       ) : (
         <div className="my-scan-grid">
-          {assets.map((asset) => {
+          {filteredAssets.map((asset) => {
             const result = asset.result;
             const staleAfterFailure = asset.scanStatus === "error" && Boolean(result);
             const observationLabel = result?.observationStage === "UNCONFIRMED"
