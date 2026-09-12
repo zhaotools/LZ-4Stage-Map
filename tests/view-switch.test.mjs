@@ -70,7 +70,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /await signOutMember\(\)/);
   assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
-  assert.match(pageSource, /GLOBAL STAGE MAP｜Power by LZ-4Stage/);
+  assert.match(pageSource, /LZ-4STAGE MAP｜全球趋势导航/);
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+LZ-4Stage介绍<\/button>/);
   assert.match(pageSource, /\{!isMember && <button className="member-auth-button register-member-button"[^\n]+注册会员<\/button>\}/);
   assert.ok(pageSource.indexOf("注册会员</button>") < pageSource.indexOf('className="member-auth-button login-button"'));
@@ -116,7 +116,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.doesNotMatch(pageSource, /ADMIN_USERNAME_HASH|ADMIN_PASSWORD_HASH|MEMBER_STORAGE_KEY|hashText/);
   assert.doesNotMatch(pageSource, /ACCESS_STORAGE_KEY|ACCESS_PASSWORD_HASH|accessGranted/);
   assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
-  assert.match(pageSource, /<strong>LZ-Map<\/strong><small>MARKET TOOLKIT<\/small>/);
+  assert.match(pageSource, /<strong>LZ-4STAGE MAP<\/strong><small>MARKET TOOLKIT<\/small>/);
   assert.match(indexSource, /<title>LZ Map｜全球市场阶段地图<\/title>/);
   assert.match(indexSource, /<meta property="og:title" content="LZ Map｜全球市场阶段地图" \/>/);
   assert.match(indexSource, /href="\.\/favicon-v2\.png"/);
@@ -128,8 +128,8 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /hkSelected: \{ mapKicker: "HONG KONG INDEX", mapTitle: "港股指数"/);
   assert.match(pageSource, /\{activeViewMeta\.mapKicker\}<\/span><h2>\{activeViewMeta\.mapTitle\}<\/h2>/);
   assert.match(pageSource, /"日股" \| "欧股"/);
-  assert.match(pageSource, /GLOBAL STAGE MAP/);
-  assert.match(pageSource, /<h1>全球市场阶段地图<\/h1>/);
+  assert.match(pageSource, /LZ-4STAGE MAP｜全球趋势导航/);
+  assert.match(pageSource, /<h1>全球市场四季图<\/h1>/);
   assert.doesNotMatch(pageSource, /LZ-Map · 全球资产四阶段观察|site-subtitle/);
   assert.match(cssSource, /\.topbar h1 \{[^}]*font-size: clamp\(20px, calc\(2\.2vw - 4px\), 30px\);/);
   assert.match(cssSource, /\.topbar \{[^}]*margin-bottom: 12px;/);
