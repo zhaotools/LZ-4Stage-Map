@@ -99,7 +99,7 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
     : fallbackOverview(marketTitle, stageCounts, total);
   return {
     kicker: "LZ-4STAGE · MARKET INTERPRETATION",
-    title: `${marketTitle}阶段解读`,
+    title: `${marketTitle}四季解读`,
     confirmationLabel,
     reportDateLabel: reportDateLabel(confirmationLabel),
     headline: overview.headline,
@@ -397,6 +397,6 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.font = `22px ${FONT_FAMILY}`;
   context.fillText(model.detailUrl, contentX, y);
 
-  const fileName = safeFileName(`LZ-4Stage-${marketTitle}-阶段解读-${model.fileDate}.png`);
+  const fileName = safeFileName(`LZ-4Stage-${marketTitle}-四季解读-${model.fileDate}.png`);
   return downloadCanvas(canvas, fileName);
 }
