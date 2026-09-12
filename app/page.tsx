@@ -1386,7 +1386,7 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1><p className="site-subtitle">LZ-Map · 全球资产四阶段观察</p></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> GLOBAL STAGE MAP｜Power by LZ-4Stage</div><h1>全球市场阶段地图</h1></div>
             <div className="top-actions">
               <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
               {!isMember && <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>}
