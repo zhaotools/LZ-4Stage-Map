@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import { Clock3, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
+import { Clock3, Plus, Search, Trash2 } from "lucide-react";
 
 import { stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
@@ -31,6 +31,8 @@ const stageColors = {
   S3: "#f09a18",
   S4: "#ed4859",
 } as const;
+const stages = ["S1", "S2", "S3", "S4"] as const;
+const stageSeasons = { S1: "春季", S2: "夏季", S3: "秋季", S4: "冬季" } as const;
 
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
@@ -45,6 +47,11 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const atLimit = assets.length >= 20;
+  const analyzedTotal = assets.reduce((total, asset) => total + (asset.result ? 1 : 0), 0);
+  const stageCounts = assets.reduce<Record<(typeof stages)[number], number>>((counts, asset) => {
+    if (asset.result) counts[asset.result.stage] += 1;
+    return counts;
+  }, { S1: 0, S2: 0, S3: 0, S4: 0 });
 
   const submitLookup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -127,8 +134,22 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
 
       <div className="my-scan-list-head">
         <div><h3>自选资产</h3><p>相同代码在全站只计算一次；删除只影响你自己的列表。</p></div>
-        <button type="button" onClick={() => void onReload()} disabled={loading}><RefreshCw size={15} />{loading ? "读取中…" : "重新读取"}</button>
       </div>
+
+      <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
+        <div className="distribution-bar">
+          {stages.map((stage) => {
+            const percent = analyzedTotal ? Math.round((stageCounts[stage] / analyzedTotal) * 100) : 0;
+            return (
+              <div key={stage} className="distribution-segment my-scan-distribution-segment">
+                <span className="distribution-fill" aria-hidden="true" style={{ width: `${percent}%`, background: stageColors[stage] }} />
+                <span className="distribution-label"><b style={{ color: stageColors[stage] }}>{stage} {stageSeasons[stage]}</b></span>
+                <span className="distribution-value"><strong>{percent}%</strong></span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {loadError ? (
         <div className="my-scan-empty error"><p>{loadError}</p><button type="button" onClick={() => void onReload()}>重新读取</button></div>

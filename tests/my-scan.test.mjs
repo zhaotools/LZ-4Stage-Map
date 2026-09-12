@@ -30,7 +30,13 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /stageConfirmationTimeFor\(result\)/);
   assert.match(component, /event\.stopPropagation\(\)/);
   assert.doesNotMatch(component, /my-scan-stage-result|my-scan-stage-code|行情确认至/);
+  assert.doesNotMatch(component, /RefreshCw/);
+  assert.match(component, /const analyzedTotal = assets\.reduce/);
+  assert.match(component, /我的扫描四阶段占比分布/);
+  assert.match(component, /\{stage\} \{stageSeasons\[stage\]\}/);
+  assert.match(component, /Math\.round\(\(stageCounts\[stage\] \/ analyzedTotal\) \* 100\)/);
   assert.match(css, /\.my-scan-grid \{[^}]*grid-template-columns: repeat\(3,/);
+  assert.match(css, /\.my-scan-stage-distribution \{[^}]*width: 100%;[^}]*min-width: 0;/);
   assert.match(css, /\.my-scan-card\.clickable:hover, \.my-scan-card\.clickable:focus-visible/);
   assert.match(css, /@media \(max-width: 480px\)[\s\S]*\.my-scan-grid \{ grid-template-columns: 1fr; \}/);
 });

@@ -39,6 +39,10 @@ function assetNames(assets) {
   return assets.map((asset) => asset.name || asset.code).join("、");
 }
 
+function withoutObservationDisclaimer(text) {
+  return text.replace(/\s*观察信号尚未等同于阶段确认。?/gu, "").trim();
+}
+
 function reportDateLabel(confirmationLabel) {
   const normalized = confirmationLabel
     .replace(/^数据确认至\s*/u, "")
@@ -52,7 +56,8 @@ function changeLines(interpretation) {
   const observations = interpretation.observations || [];
   const deltas = (interpretation.stageDistribution || []).filter((item) => item.delta !== 0);
   if (!confirmed.length && !observations.length) {
-    return [insightText(interpretation, ["change", "observation"]) || "本期没有已确认主阶段变化，也没有跨主阶段观察信号。"];
+    const fallback = withoutObservationDisclaimer(insightText(interpretation, ["change", "observation"]));
+    return [fallback || "本期没有已确认主阶段变化，也没有跨主阶段观察信号。"];
   }
   const lines = [];
   if (deltas.length) {
@@ -65,7 +70,6 @@ function changeLines(interpretation) {
   }
   if (observations.length) {
     lines.push(`观察：${observations.map((item) => `${item.name || item.code} ${item.fromStage} → ${item.toStage}观察（${item.status === "new" ? "新增" : "延续"}）`).join("；")}`);
-    lines.push("观察信号尚未等同于阶段确认。");
   } else {
     lines.push("观察：当前没有跨主阶段观察信号");
   }
@@ -202,11 +206,10 @@ function sectionLines(model, measure, contentWidth) {
   const positionEntries = model.keyPositions.length
     ? model.keyPositions.map((group) => `${group.label}　${assetNames(group.assets)}`)
     : [model.keyPositionsFallback];
-  const imageChangeLines = model.changeLines.filter((line) => line !== "观察信号尚未等同于阶段确认。");
   return {
     market: fitLines(wrapEntries(measure, marketEntries, lineWidth), 7),
     positions: fitLines(wrapEntries(measure, positionEntries, lineWidth), 5),
-    changes: fitLines(wrapEntries(measure, imageChangeLines, lineWidth), 5),
+    changes: fitLines(wrapEntries(measure, model.changeLines, lineWidth), 5),
   };
 }
 

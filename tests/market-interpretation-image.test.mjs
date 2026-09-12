@@ -37,6 +37,7 @@ test("image export model shares the page V2 structure, positions, changes and co
   assert.match(model.changeLines.join("\n"), /阶段净变化：S2 \+1｜S4 -1/);
   assert.match(model.changeLines.join("\n"), /比特币 S4 → S2/);
   assert.match(model.changeLines.join("\n"), /恒生指数 S4 → S1观察（延续）/);
+  assert.doesNotMatch(model.changeLines.join("\n"), /观察信号尚未等同于阶段确认/);
   assert.equal(model.source, "数据来自公开市场，由 LZ-4Stage 框架系统分析。");
   assert.equal(model.confirmationLabel, "传统市场至 2026-09-05｜加密市场至 2026-09-07");
   assert.equal(model.reportDateLabel, "数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
