@@ -118,8 +118,8 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /className="brand-mark" src=\{`\$\{import\.meta\.env\.BASE_URL\}lz-logo-v2\.png`\}/);
   assert.match(pageSource, /<strong>4STAGE MAP<\/strong><small>MARKET TOOLKIT<\/small>/);
   assert.match(cssSource, /\.brand strong \{[^}]*font-size: 14px;[^}]*white-space: nowrap;/);
-  assert.match(indexSource, /<title>LZ Map｜全球市场阶段地图<\/title>/);
-  assert.match(indexSource, /<meta property="og:title" content="LZ Map｜全球市场阶段地图" \/>/);
+  assert.match(indexSource, /<title>LZ-4Stage Map｜全球市场四季图<\/title>/);
+  assert.match(indexSource, /<meta property="og:title" content="LZ-4Stage Map｜全球市场四季图" \/>/);
   assert.match(indexSource, /href="\.\/favicon-v2\.png"/);
   assert.match(pageSource, /global: \{ mapKicker: "GLOBAL MARKET", mapTitle: "全球市场"/);
   assert.match(pageSource, /crypto7: \{ mapKicker: "CRYPTO MARKET", mapTitle: "加密市场"/);
