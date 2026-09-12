@@ -88,6 +88,7 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.ok(!paintedText.includes("1 · 6%"));
     assert.ok(paintedText.includes("美股"));
     assert.ok(paintedText.includes("S2为主"));
+    assert.ok(!paintedText.includes("观察信号尚未等同于阶段确认。"));
     assert.ok(paintedText.includes("数据截至：传统市场 2026-09-05｜加密市场 2026-09-07"));
     assert.equal(canvas.width, 1080);
     assert.equal(canvas.height, 1920);

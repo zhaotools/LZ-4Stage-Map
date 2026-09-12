@@ -202,10 +202,11 @@ function sectionLines(model, measure, contentWidth) {
   const positionEntries = model.keyPositions.length
     ? model.keyPositions.map((group) => `${group.label}　${assetNames(group.assets)}`)
     : [model.keyPositionsFallback];
+  const imageChangeLines = model.changeLines.filter((line) => line !== "观察信号尚未等同于阶段确认。");
   return {
     market: fitLines(wrapEntries(measure, marketEntries, lineWidth), 7),
     positions: fitLines(wrapEntries(measure, positionEntries, lineWidth), 5),
-    changes: fitLines(wrapEntries(measure, model.changeLines, lineWidth), 6),
+    changes: fitLines(wrapEntries(measure, imageChangeLines, lineWidth), 5),
   };
 }
 
@@ -217,9 +218,12 @@ function drawSection(context, { x, y, width, height, title, lines }) {
   context.fill();
   context.fillStyle = "#354964";
   context.font = `700 34px ${FONT_FAMILY}`;
-  context.fillText(title, x + 56, y + 54);
+  context.fillText(title, x + 56, y + 58);
   context.font = `28px ${FONT_FAMILY}`;
-  drawLines(context, lines, x + 32, y + 104, 40, "#60718a");
+  const lineHeight = lines.length > 1
+    ? Math.min(56, Math.max(46, (height - 154) / (lines.length - 1)))
+    : 48;
+  drawLines(context, lines, x + 32, y + 118, lineHeight, "#60718a");
 }
 
 function drawMarketStructureSection(context, { x, y, width, height, rows, fallbackLines }) {
@@ -230,14 +234,20 @@ function drawMarketStructureSection(context, { x, y, width, height, rows, fallba
   context.fill();
   context.fillStyle = "#354964";
   context.font = `700 34px ${FONT_FAMILY}`;
-  context.fillText("市场结构", x + 56, y + 54);
+  context.fillText("市场结构", x + 56, y + 58);
   context.font = `28px ${FONT_FAMILY}`;
   if (!rows.length) {
-    drawLines(context, fallbackLines, x + 32, y + 104, 40, "#60718a");
+    const lineHeight = fallbackLines.length > 1
+      ? Math.min(56, Math.max(46, (height - 154) / (fallbackLines.length - 1)))
+      : 48;
+    drawLines(context, fallbackLines, x + 32, y + 118, lineHeight, "#60718a");
     return;
   }
+  const rowStep = rows.length > 1
+    ? Math.min(52, Math.max(42, (height - 154) / (Math.min(rows.length, 7) - 1)))
+    : 48;
   rows.slice(0, 7).forEach((row, index) => {
-    const rowY = y + 104 + index * 36;
+    const rowY = y + 118 + index * rowStep;
     context.fillStyle = "#60718a";
     context.textAlign = "left";
     context.fillText(row.label, x + 32, rowY);
@@ -266,10 +276,6 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   measure.font = `30px ${FONT_FAMILY}`;
   const summaryLines = wrapText(measure, model.summary, contentWidth - 48);
   const sections = sectionLines(model, measure, contentWidth);
-  const overviewHeight = 132 + summaryLines.length * 46;
-  const marketHeight = Math.max(176, 102 + (model.marketStructure.length || sections.market.length) * 36);
-  const positionsHeight = Math.max(178, 102 + sections.positions.length * 40);
-  const changesHeight = Math.max(178, 102 + sections.changes.length * 40);
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -299,22 +305,22 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.fillStyle = "#6a7890";
   context.font = `600 24px ${FONT_FAMILY}`;
   context.fillText(model.reportDateLabel, contentX, y + 46);
-  y += 82;
+  y += 86;
 
   const stageWidth = (contentWidth - gap * 3) / 4;
   model.stageCounts.forEach((item, index) => {
     const x = contentX + index * (stageWidth + gap);
-    paintCard(context, x, y, stageWidth, 96, 16, item.background, "#e1e8f2");
+    paintCard(context, x, y, stageWidth, 102, 16, item.background, "#e1e8f2");
     context.fillStyle = item.color;
     context.font = `700 27px ${FONT_FAMILY}`;
-    context.fillText(item.label, x + 16, y + 58);
+    context.fillText(item.label, x + 16, y + 62);
     context.fillStyle = "#42536d";
     context.font = `700 25px ${FONT_FAMILY}`;
     context.textAlign = "right";
-    context.fillText(`${item.percent}%`, x + stageWidth - 16, y + 58);
+    context.fillText(`${item.percent}%`, x + stageWidth - 16, y + 62);
     context.textAlign = "left";
   });
-  y += 108;
+  y += 116;
   let barX = contentX;
   const total = Math.max(1, model.stageCounts.reduce((sum, stage) => sum + stage.count, 0));
   model.stageCounts.forEach((item) => {
@@ -323,20 +329,43 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     context.fillRect(barX, y, barWidth, 10);
     barX += barWidth;
   });
-  y += 38;
+  y += 42;
+
+  const sectionGap = 26;
+  const footerDividerY = height - outerY - 180;
+  const qualityReserve = model.quality ? 48 : 0;
+  const contentBottom = footerDividerY - 26 - qualityReserve;
+  const marketLineCount = model.marketStructure.length || sections.market.length;
+  const minimumHeights = [
+    Math.max(184, 154 + Math.max(0, summaryLines.length - 1) * 50),
+    Math.max(220, 154 + Math.max(0, marketLineCount - 1) * 46),
+    Math.max(210, 154 + Math.max(0, sections.positions.length - 1) * 48),
+    Math.max(226, 154 + Math.max(0, sections.changes.length - 1) * 48),
+  ];
+  const availableHeight = contentBottom - y - sectionGap * 3;
+  const minimumTotal = minimumHeights.reduce((sum, value) => sum + value, 0);
+  const extraHeight = Math.max(0, availableHeight - minimumTotal);
+  const minimumWeight = Math.max(1, minimumTotal);
+  const [overviewHeight, marketHeight, positionsHeight, changesHeight] = minimumHeights.map((value, index) => {
+    if (!extraHeight) return value;
+    const share = index === minimumHeights.length - 1
+      ? extraHeight - minimumHeights.slice(0, -1).reduce((sum, item) => sum + Math.round(extraHeight * item / minimumWeight), 0)
+      : Math.round(extraHeight * value / minimumWeight);
+    return value + share;
+  });
 
   paintCard(context, contentX, y, contentWidth, overviewHeight, 20, "#f4f8ff", "#dce6f5");
   context.fillStyle = "#16315d";
   context.font = `700 42px ${FONT_FAMILY}`;
-  context.fillText(model.headline, contentX + 30, y + 64);
+  context.fillText(model.headline, contentX + 30, y + 70);
   context.font = `30px ${FONT_FAMILY}`;
-  drawLines(context, summaryLines, contentX + 30, y + 116, 46, "#5d6d85");
-  y += overviewHeight + 24;
+  drawLines(context, summaryLines, contentX + 30, y + 132, 50, "#5d6d85");
+  y += overviewHeight + sectionGap;
 
   drawMarketStructureSection(context, { x: contentX, y, width: contentWidth, height: marketHeight, rows: model.marketStructure, fallbackLines: sections.market });
-  y += marketHeight + gap;
+  y += marketHeight + sectionGap;
   drawSection(context, { x: contentX, y, width: contentWidth, height: positionsHeight, title: "关键位置", lines: sections.positions });
-  y += positionsHeight + gap;
+  y += positionsHeight + sectionGap;
   drawSection(context, { x: contentX, y, width: contentWidth, height: changesHeight, title: "本期变化", lines: sections.changes });
   y += changesHeight;
 
@@ -346,7 +375,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
     context.font = `24px ${FONT_FAMILY}`;
     context.fillText(model.quality, contentX, y);
   }
-  y = height - outerY - 180;
+  y = footerDividerY;
   context.strokeStyle = "#e2e8f1";
   context.beginPath();
   context.moveTo(contentX, y);
