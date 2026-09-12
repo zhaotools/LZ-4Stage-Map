@@ -131,7 +131,8 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /GLOBAL STAGE MAP/);
   assert.match(pageSource, /<h1>全球市场阶段地图<\/h1>/);
   assert.doesNotMatch(pageSource, /LZ-Map · 全球资产四阶段观察|site-subtitle/);
-  assert.match(cssSource, /\.topbar h1 \{[^}]*font-size: clamp\(22px, calc\(2\.2vw - 2px\), 32px\);/);
+  assert.match(cssSource, /\.topbar h1 \{[^}]*font-size: clamp\(20px, calc\(2\.2vw - 4px\), 30px\);/);
+  assert.match(cssSource, /\.topbar \{[^}]*margin-bottom: 12px;/);
   assert.doesNotMatch(pageSource, /activeViewMeta\.(?:eyebrow|subtitle)/);
   assert.match(pageSource, /return region === "大宗·宏观" \? "宏观" : region/);
   assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
