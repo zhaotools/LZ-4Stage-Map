@@ -1,13 +1,14 @@
 const DAY = 86400000;
 const WEEK = 7 * DAY;
 
-// Saturday / Monday 14:00 Beijing = 06:00 UTC, after the usual publication retries.
+// Fixed weekly checkpoints after the two publication chains finish:
+// Monday 10:20 Beijing (02:20 UTC) and Saturday 12:20 Beijing (04:20 UTC).
 export function refreshWindow(now = Date.now()) {
   const date = new Date(now);
-  const slots = [1, 6].map((day) => {
+  const slots = [{ day: 1, hour: 2 }, { day: 6, hour: 4 }].map(({ day, hour }) => {
     const slot = new Date(now);
     slot.setUTCDate(date.getUTCDate() - (date.getUTCDay() - day + 7) % 7);
-    slot.setUTCHours(6, 0, 0, 0);
+    slot.setUTCHours(hour, 20, 0, 0);
     return +slot > now ? +slot - WEEK : +slot;
   });
   return { due: Math.max(...slots), next: Math.min(...slots.map((slot) => slot + WEEK)) };

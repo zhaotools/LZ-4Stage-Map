@@ -1164,7 +1164,9 @@ export default function Home() {
       closeMarketCard();
       return;
     }
-    const assets = await loadMyScan();
+    // My Scan is a small deduplicated member list; always reread it on entry so
+    // a completed weekly server update is visible without a browser reload.
+    const assets = await loadMyScan(true);
     if (!assets) {
       setPendingView("myScan");
       setMemberDialog("dataError");

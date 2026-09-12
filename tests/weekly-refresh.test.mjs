@@ -6,12 +6,12 @@ import { refreshWindow, newerSnapshot, validateSnapshot, startWeeklyRefresh } fr
 const time = (value) => Date.parse(value);
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test("checkpoints are Saturday and Monday 14:00 Beijing, independent of local timezone", () => {
+test("checkpoints follow Monday 10:20 and Saturday 12:20 Beijing, independent of local timezone", () => {
   for (const [now, due, next] of [
-    ["2026-09-05T13:59:59+08:00", "2026-08-31T14:00:00+08:00", "2026-09-05T14:00:00+08:00"],
-    ["2026-09-05T14:00:00+08:00", "2026-09-05T14:00:00+08:00", "2026-09-07T14:00:00+08:00"],
-    ["2026-09-07T14:00:00+08:00", "2026-09-07T14:00:00+08:00", "2026-09-12T14:00:00+08:00"],
-    ["2027-01-01T14:00:00+08:00", "2026-12-28T14:00:00+08:00", "2027-01-02T14:00:00+08:00"],
+    ["2026-09-05T12:19:59+08:00", "2026-08-31T10:20:00+08:00", "2026-09-05T12:20:00+08:00"],
+    ["2026-09-05T12:20:00+08:00", "2026-09-05T12:20:00+08:00", "2026-09-07T10:20:00+08:00"],
+    ["2026-09-07T10:20:00+08:00", "2026-09-07T10:20:00+08:00", "2026-09-12T12:20:00+08:00"],
+    ["2027-01-01T14:00:00+08:00", "2026-12-28T10:20:00+08:00", "2027-01-02T12:20:00+08:00"],
   ]) assert.deepEqual(refreshWindow(time(now)), { due: time(due), next: time(next) });
 });
 
@@ -28,7 +28,7 @@ test("only newer valid versions replace cached data; each snapshot is independen
 });
 
 function harness(refresh) {
-  let now = time("2026-09-05T13:00:00+08:00");
+  let now = time("2026-09-05T11:20:00+08:00");
   let visible = true;
   let online = true;
   let pending;
@@ -50,10 +50,10 @@ test("checks on open and at checkpoint, not on every foreground event", async ()
   assert.equal(h.timer().delay, 3600000);
   await h.controller.check();
   assert.equal(calls, 1);
-  h.setTime("2026-09-05T14:00:00+08:00");
+  h.setTime("2026-09-05T12:20:00+08:00");
   await h.timer().fn();
   assert.equal(calls, 2);
-  assert.equal(h.timer().delay, 2 * 86400000);
+  assert.equal(h.timer().delay, 46 * 3600000);
   h.controller.stop();
   assert.equal(h.timer(), null);
 });
@@ -63,7 +63,7 @@ test("missed background/offline checkpoints catch up on return, once", async () 
   const h = harness(async () => { calls++; });
   await settle();
   h.visible(false);
-  h.setTime("2026-09-05T14:00:00+08:00");
+  h.setTime("2026-09-05T12:20:00+08:00");
   await h.timer().fn();
   assert.equal(calls, 1);
   h.visible(true);
@@ -111,7 +111,7 @@ test("a request crossing a checkpoint does not consume the new checkpoint", asyn
   let calls = 0;
   let release;
   const h = harness(() => { calls++; return new Promise((resolve) => { release = resolve; }); });
-  h.setTime("2026-09-05T14:00:00+08:00");
+  h.setTime("2026-09-05T12:20:00+08:00");
   await h.timer().fn();
   assert.equal(calls, 1);
   release(true);

@@ -9,7 +9,7 @@ const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8
 
 test("My Scan is a member-only desktop and mobile page", () => {
   assert.match(page, /type ProtectedPage = MemberView \| "trendRadar" \| "stockRadar" \| "myScan"/);
-  assert.match(page, /const requestMyScan = async \(\) => \{[\s\S]*setPendingView\("myScan"\)[\s\S]*loadMyScan\(\)/);
+  assert.match(page, /const requestMyScan = async \(\) => \{[\s\S]*setPendingView\("myScan"\)[\s\S]*loadMyScan\(true\)/);
   assert.match(page, /onClick=\{requestMyScan\}.*我的扫描/);
   assert.match(page, /requestMyScan\(\); \}\}><MousePointerClick.*<span>我的扫描<\/span>/);
   assert.match(page, /const switchToMyScan = \(\) => \{[\s\S]*setMyScanActive\(true\);[\s\S]*scrollPageToTop\(\)/);
