@@ -1,8 +1,9 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import { Clock3, ExternalLink, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
+import { Clock3, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
 
+import { stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
 import type { MyScanAsset, MyScanLookupAsset, MyScanRegion } from "@/app/lib/member-api";
 
@@ -24,8 +25,15 @@ type Props = {
   onRemove: (assetKey: string) => Promise<void>;
 };
 
-function shortDate(value: string | null | undefined) {
-  return value ? value.slice(0, 10) : "—";
+const stageColors = {
+  S1: "#397ff6",
+  S2: "#18a567",
+  S3: "#f09a18",
+  S4: "#ed4859",
+} as const;
+
+function momentumDirection(momentum: number) {
+  return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
 }
 
 export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove }: Props) {
@@ -133,23 +141,41 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
           {assets.map((asset) => {
             const result = asset.result;
             const staleAfterFailure = asset.scanStatus === "error" && Boolean(result);
+            const observationLabel = result?.observationStage === "UNCONFIRMED"
+              ? result.observation.match(/^S[1-4]/)?.[0] ?? result.observation
+              : result?.observationStage;
+            const observationStage = observationLabel?.match(/^S[1-4]/)?.[0] as keyof typeof stageColors | undefined;
+            const maDirection = result ? momentumDirection(result.momentum) : "";
+            const maColor = maDirection === "上升" ? stageColors.S2 : maDirection === "下降" ? stageColors.S4 : undefined;
+            const openResult = () => {
+              if (result) window.open(tradingViewChartUrlFor(result), "_blank", "noopener,noreferrer");
+            };
             return (
-              <article key={asset.assetKey} className={`my-scan-card ${result ? `stage-${result.stage.toLowerCase()}` : "pending"}`}>
+              <article
+                key={asset.assetKey}
+                className={`my-scan-card ${result ? `stage-${result.stage.toLowerCase()} clickable` : "pending"}`}
+                role={result ? "link" : undefined}
+                tabIndex={result ? 0 : undefined}
+                aria-label={result ? `${asset.displayCode} ${asset.name}，在TradingView新标签页打开` : undefined}
+                onClick={result ? openResult : undefined}
+                onKeyDown={result ? (event) => {
+                  if (event.currentTarget !== event.target || (event.key !== "Enter" && event.key !== " ")) return;
+                  event.preventDefault();
+                  openResult();
+                } : undefined}
+              >
                 <div className="my-scan-card-head">
                   <div><span>{asset.region}</span><small>{asset.exchange}</small></div>
-                  <button type="button" onClick={() => void removeAsset(asset)} disabled={removing === asset.assetKey} aria-label={`移除 ${asset.displayCode}`}><Trash2 size={15} /></button>
+                  <button type="button" onClick={(event) => { event.stopPropagation(); void removeAsset(asset); }} disabled={removing === asset.assetKey} aria-label={`移除 ${asset.displayCode}`}><Trash2 size={15} /></button>
                 </div>
                 <div className="my-scan-card-title"><strong>{asset.displayCode}</strong><span>{asset.name}</span></div>
                 {result ? (
                   <>
-                    <button className="my-scan-stage-result" type="button" onClick={() => window.open(tradingViewChartUrlFor(result), "_blank", "noopener,noreferrer")}>
-                      <span className="my-scan-stage-code">{result.subStage}</span>
-                      <span>{result.stageDetail} · {result.weeks}周</span>
-                      <ExternalLink size={15} aria-hidden="true" />
-                    </button>
                     <dl className="my-scan-card-meta">
-                      <div><dt>本周观察</dt><dd>{result.observation}</dd></div>
-                      <div><dt>行情确认至</dt><dd>{shortDate(result.marketAsOf)}</dd></div>
+                      <div><dt>当前阶段</dt><dd><b style={{ color: stageColors[result.stage] }}>{result.subStage}</b> · {result.stageDetail}</dd></div>
+                      <div><dt>确认时间</dt><dd>{result.weeks}周 · {stageConfirmationTimeFor(result)}</dd></div>
+                      <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageColors[observationStage] : undefined }}>{observationLabel}</dd></div>
+                      <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {result.momentum.toFixed(2)}%</dd></div>
                     </dl>
                     {staleAfterFailure && <p className="my-scan-status warning">本次更新失败，保留上期结果</p>}
                   </>

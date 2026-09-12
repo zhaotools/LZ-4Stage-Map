@@ -19,10 +19,12 @@ test("member-only stock radar loads the protected 300-stock S2 snapshot", () => 
   assert.doesNotMatch(pageSource, /个机会/);
   assert.match(pageSource, /20日均额/);
   assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*href=\{tradingViewChartUrlFor\(market\)\}[\s\S]*target="_blank"/);
+  assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>确认时间<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>MA30趋势<\/dt>/);
   assert.match(pageSource, /stockRadarSnapshot\.matches/);
   assert.match(pageSource, /pendingView === "stockRadar"/);
   assert.match(pageSource, /登录会员账号后查看300只高流动性股票扫描结果/);
   assert.match(cssSource, /\.stock-market-health/);
   assert.match(cssSource, /\.stock-radar-status/);
+  assert.match(cssSource, /background: color-mix\(in srgb, var\(--radar-stage-color\) 4%, #fff\)/);
   assert.match(cssSource, /\.radar-result-card:hover, \.radar-result-card:focus-visible/);
 });

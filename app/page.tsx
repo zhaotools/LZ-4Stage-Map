@@ -475,8 +475,8 @@ function TrendRadarPage({
                 <div className="radar-match-tags">{market.matchRules.filter((ruleId) => ruleIds.includes(ruleId)).map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
+                  <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </a>
@@ -571,8 +571,8 @@ function StockRadarPage({
                 <div className="radar-match-tags">{market.matchRules.map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
+                  <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </a>

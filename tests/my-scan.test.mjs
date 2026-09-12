@@ -24,7 +24,14 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /等待周度首次计算/);
   assert.match(component, /本次更新失败，保留上期结果/);
   assert.match(component, /window\.open\(tradingViewChartUrlFor\(result\), "_blank", "noopener,noreferrer"\)/);
+  assert.match(component, /role=\{result \? "link" : undefined\}/);
+  assert.match(component, /className=\{`my-scan-card \$\{result \? `stage-\$\{result\.stage\.toLowerCase\(\)\} clickable` : "pending"\}`\}/);
+  assert.match(component, /<dt>当前阶段<\/dt>[\s\S]*<dt>确认时间<\/dt>[\s\S]*<dt>本周观察<\/dt>[\s\S]*<dt>MA30趋势<\/dt>/);
+  assert.match(component, /stageConfirmationTimeFor\(result\)/);
+  assert.match(component, /event\.stopPropagation\(\)/);
+  assert.doesNotMatch(component, /my-scan-stage-result|my-scan-stage-code|行情确认至/);
   assert.match(css, /\.my-scan-grid \{[^}]*grid-template-columns: repeat\(3,/);
+  assert.match(css, /\.my-scan-card\.clickable:hover, \.my-scan-card\.clickable:focus-visible/);
   assert.match(css, /@media \(max-width: 480px\)[\s\S]*\.my-scan-grid \{ grid-template-columns: 1fr; \}/);
 });
 
