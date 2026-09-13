@@ -92,9 +92,9 @@ test("market map uses the flat four-stage palette, light framing and white tile 
   assert.match(css, /\.tile-s4 \{ background: #d0444e; \}/);
 });
 
-test("market hover card uses a 15 percent transparent light gray surface", async () => {
+test("market hover card uses a 5 percent transparent light gray surface", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /\.market-hover-card \{[^}]*border: 1px solid #e0e4e9;[^}]*color: #344054;[^}]*background: rgba\(247, 248, 250, \.85\);/);
+  assert.match(css, /\.market-hover-card \{[^}]*border: 1px solid #e0e4e9;[^}]*color: #344054;[^}]*background: rgba\(247, 248, 250, \.95\);/);
   assert.match(css, /\.market-hover-card dd \{[^}]*color: #344054;/);
   assert.doesNotMatch(css, /\.market-hover-card \{[^}]*background: #202735;/);
 });
