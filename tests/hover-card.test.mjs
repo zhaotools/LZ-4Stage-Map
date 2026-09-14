@@ -67,8 +67,12 @@ test("market tiles provide a pointer-following stage detail card", () => {
 });
 
 test("touch taps open the detail card without navigating and support every close path", () => {
-  assert.match(source, /const pointerType = \(event\.nativeEvent as globalThis\.PointerEvent\)\.pointerType/);
-  assert.match(source, /pointerType === "touch" \|\| \(!pointerType && window\.matchMedia\("\(hover: none\), \(pointer: coarse\)"\)\.matches\)/);
+  assert.match(source, /onPointerDown=\{\(event\) => \{ onMarketPointerDown\(event\.pointerType\); onMarketLeave\(\); \}\}/);
+  assert.match(source, /onPointerCancel=\{\(\) => onMarketPointerDown\(""\)\}/);
+  assert.match(source, /const clickPointerType = \(event\.nativeEvent as globalThis\.PointerEvent\)\.pointerType/);
+  assert.match(source, /const pointerType = lastMarketPointerType\.current \|\| clickPointerType/);
+  assert.match(source, /pointerType === "touch" \|\| window\.matchMedia\("\(hover: none\) and \(pointer: coarse\)"\)\.matches/);
+  assert.match(source, /lastMarketPointerType\.current = ""/);
   assert.match(source, /if \(touchInteraction\) \{\s*setHoveredMarket\(item\);\s*setTouchCardOpen\(true\);\s*return;/s);
   assert.match(source, /target\.closest\("\.market-hover-card, \.map-tile"\)/);
   assert.match(source, /document\.addEventListener\("pointerdown", closeOnOutsidePointer\)/);

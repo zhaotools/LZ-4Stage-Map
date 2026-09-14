@@ -316,7 +316,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
   );
 }
 
-function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
+function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketPointerDown, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketPointerDown: (pointerType: string) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
   if (!items.length) return null;
   return (
     <section className={`map-group ${className ?? `map-${group.replace("·", "-")}`} ${compact ? "map-group-full" : ""}`}>
@@ -342,7 +342,8 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
               } as CSSProperties}
               aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
-              onPointerDown={() => onMarketLeave()}
+              onPointerDown={(event) => { onMarketPointerDown(event.pointerType); onMarketLeave(); }}
+              onPointerCancel={() => onMarketPointerDown("")}
               onClick={(event) => onMarketTap(item, event)}
               onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
               onFocus={(event) => onMarketFocus(item, event.currentTarget)}
@@ -360,41 +361,41 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
   );
 }
 
-function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
+function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketPointerDown, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketPointerDown: (pointerType: string) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
   const groups = region === "全球" ? viewMeta[view].groups : [region as MarketRegion];
   const dense = view === "commodity" || view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
   if (view === "commodity") {
     return (
       <div className="market-map view-commodity">
-        {commodityMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+        {commodityMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
       </div>
     );
   }
   if (view === "usSelected" && region === "全球") {
     return (
       <div className="market-map view-usSelected">
-        {usMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
-        <MarketMapGroup group="宏观" className="map-us-macro" items={source.filter((item) => usMacroCodes.includes(item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />
+        {usMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
+        <MarketMapGroup group="宏观" className="map-us-macro" items={source.filter((item) => usMacroCodes.includes(item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />
       </div>
     );
   }
   if (view === "chinaIndices") {
     return (
       <div className="market-map view-chinaIndices">
-        {chinaMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+        {chinaMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
       </div>
     );
   }
   if (view === "hkSelected") {
     return (
       <div className="market-map view-hkSelected">
-        {hkMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+        {hkMapGroups.map((group) => <MarketMapGroup key={group.className} group={group.label} className={group.className} items={source.filter((item) => group.codes.some((code) => code === item.code))} stageFilter={stageFilter} compact={false} dense onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
       </div>
     );
   }
   return (
     <div className={`market-map view-${view} ${region !== "全球" ? "single-map" : ""}`}>
-      {groups.map((group) => <MarketMapGroup key={group} group={displayRegionName(group)} className={`map-${group.replace("·", "-")}`} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketTap={onMarketTap} />)}
+      {groups.map((group) => <MarketMapGroup key={group} group={displayRegionName(group)} className={`map-${group.replace("·", "-")}`} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
     </div>
   );
 }
@@ -691,6 +692,7 @@ export default function Home() {
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
   const [hoveredMarket, setHoveredMarket] = useState<Market | null>(null);
   const hoverResumeGuard = useRef(createHoverResumeGuard());
+  const lastMarketPointerType = useRef("");
   const [hoverPoint, setHoverPoint] = useState({ x: 0, y: 0 });
   const [touchCardOpen, setTouchCardOpen] = useState(false);
   const [showFullVersion, setShowFullVersion] = useState(false);
@@ -1084,9 +1086,14 @@ export default function Home() {
     setHoveredMarket(item);
     placeHoverCard(rect.right, rect.top + rect.height / 2);
   };
+  const handleMarketPointerDown = (pointerType: string) => {
+    lastMarketPointerType.current = pointerType;
+  };
   const handleMarketTap = (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => {
-    const pointerType = (event.nativeEvent as globalThis.PointerEvent).pointerType;
-    const touchInteraction = pointerType === "touch" || (!pointerType && window.matchMedia("(hover: none), (pointer: coarse)").matches);
+    const clickPointerType = (event.nativeEvent as globalThis.PointerEvent).pointerType;
+    const pointerType = lastMarketPointerType.current || clickPointerType;
+    const touchInteraction = pointerType === "touch" || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    lastMarketPointerType.current = "";
     hoverResumeGuard.current.dismiss();
     if (touchInteraction) {
       setHoveredMarket(item);
@@ -1489,7 +1496,7 @@ export default function Home() {
             <div className="map-panel-head">
               <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>颜色代表当前所处阶段，外框代表本周观察变化</p></div>
             </div>
-            <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketTap={handleMarketTap} />
+            <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketPointerDown={handleMarketPointerDown} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
           </section>
           {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} />}
