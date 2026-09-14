@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-14T01:00:29.836Z",
+  "generatedAt": "2026-09-14T04:56:23.614Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-14T01:00:29.836Z",
-    "crypto": "2026-09-14T01:00:29.836Z"
+    "traditional": "2026-09-14T04:56:23.614Z",
+    "crypto": "2026-09-14T04:56:23.614Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-09-07",
@@ -136,10 +136,10 @@
       "momentum": 0.54,
       "distance": -7.91,
       "confidence": 73,
-      "close": 3322.04,
-      "marketAsOf": "2026-09-11",
+      "close": 3306.36,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "HSTECH",
@@ -169,10 +169,10 @@
       "momentum": -3.41,
       "distance": -9.78,
       "confidence": 95,
-      "close": 4320.57,
-      "marketAsOf": "2026-09-11",
+      "close": 4327.76,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "N225",
@@ -201,7 +201,7 @@
       "momentum": 3.19,
       "distance": 2.48,
       "confidence": 95,
-      "close": 63273.9609375,
+      "close": 63403.75,
       "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -266,7 +266,7 @@
       "momentum": 0.27,
       "distance": -0.39,
       "confidence": 95,
-      "close": 99.18599700927734,
+      "close": 99.36100006103516,
       "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -332,7 +332,7 @@
       "momentum": 5.28,
       "distance": 13.93,
       "confidence": 73,
-      "close": 102.75,
+      "close": 102.86000061035156,
       "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -365,7 +365,7 @@
       "momentum": -1.44,
       "distance": -3.23,
       "confidence": 95,
-      "close": 4380.89990234375,
+      "close": 4363.5,
       "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -513,10 +513,10 @@
       "momentum": -0.91,
       "distance": -1.9,
       "confidence": 95,
-      "close": 24805.63,
-      "marketAsOf": "2026-09-11",
+      "close": 24893.11,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "000300.SH",
@@ -546,19 +546,19 @@
       "momentum": -0.42,
       "distance": -4.08,
       "confidence": 68,
-      "close": 4510.16,
-      "marketAsOf": "2026-09-11",
+      "close": 4495.92,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     }
   ],
   "interpretation": {
     "schemaVersion": "lz-market-interpretation-v2",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-14T01:00:29.836Z",
+    "generatedAt": "2026-09-14T04:56:23.614Z",
     "commonStageAsOf": "2026-09-07",
-    "sourceSnapshotSha256": "ebad758f01ca95c8b70afcdb1de8403df6613218397d2fa29435d5f1d6b7e23c",
+    "sourceSnapshotSha256": "dd64114d53c08ba1745a322d570c1623515c7c2cdc5d39a38107383813cba25a",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
