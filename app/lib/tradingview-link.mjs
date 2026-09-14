@@ -27,7 +27,11 @@ const specialSymbols = {
 
 const tradingViewExchange = {
   NYSE: "NYSE",
+  NYQ: "NYSE",
   NASDAQ: "NASDAQ",
+  NMS: "NASDAQ",
+  NGM: "NASDAQ",
+  NCM: "NASDAQ",
   CBOE: "CBOE",
   NYSEARCA: "AMEX",
 };

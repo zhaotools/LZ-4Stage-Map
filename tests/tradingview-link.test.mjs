@@ -38,6 +38,16 @@ test("builds an encoded TradingView chart URL", () => {
   );
 });
 
+test("normalizes Yahoo US exchange codes used by the stock radar", () => {
+  assert.equal(tradingViewSymbolFor(market("CRM", "美股", "NYQ")), "NYSE:CRM");
+  assert.equal(tradingViewSymbolFor(market("FIG", "美股", "NYQ")), "NYSE:FIG");
+  assert.equal(tradingViewSymbolFor(market("NOW", "美股", "NYQ")), "NYSE:NOW");
+  assert.equal(tradingViewSymbolFor(market("UBER", "美股", "NYQ")), "NYSE:UBER");
+  assert.equal(tradingViewSymbolFor(market("NVDA", "美股", "NMS")), "NASDAQ:NVDA");
+  assert.equal(tradingViewSymbolFor(market("MDB", "美股", "NGM")), "NASDAQ:MDB");
+  assert.equal(tradingViewSymbolFor(market("MARA", "美股", "NCM")), "NASDAQ:MARA");
+});
+
 test("member-selected assets use the server-validated TradingView identity", () => {
   const selected = { ...market("ABC-USD", "加密", "OKX"), tradingviewSymbol: "OKX:ABCUSDT" };
   assert.equal(tradingViewSymbolFor(selected), "OKX:ABCUSDT");
