@@ -37,7 +37,7 @@ test("restored focus and stationary pointer stay dismissed; intentional movement
 
 test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /onPointerMove/);
-  assert.match(source, /onClick=\{\(\) => onMarketTap\(item\)\}/);
+  assert.match(source, /onClick=\{\(event\) => onMarketTap\(item, event\)\}/);
   assert.match(source, /pointerType !== "touch"/);
   assert.match(source, /touch-card/);
   assert.match(source, /关闭资产阶段信息/);
@@ -64,6 +64,16 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /<dd style=\{\{ color: maColor \}\}>\{maDirection\}/);
   assert.match(source, /momentum > 0 \? "上升" : momentum < 0 \? "下降" : "持平"/);
   assert.match(source, /5周.*toFixed\(2\).*%/s);
+});
+
+test("touch taps open the detail card without navigating and support every close path", () => {
+  assert.match(source, /const pointerType = \(event\.nativeEvent as globalThis\.PointerEvent\)\.pointerType/);
+  assert.match(source, /pointerType === "touch" \|\| \(!pointerType && window\.matchMedia\("\(hover: none\), \(pointer: coarse\)"\)\.matches\)/);
+  assert.match(source, /if \(touchInteraction\) \{\s*setHoveredMarket\(item\);\s*setTouchCardOpen\(true\);\s*return;/s);
+  assert.match(source, /target\.closest\("\.market-hover-card, \.map-tile"\)/);
+  assert.match(source, /document\.addEventListener\("pointerdown", closeOnOutsidePointer\)/);
+  assert.match(source, /document\.removeEventListener\("pointerdown", closeOnOutsidePointer\)/);
+  assert.match(source, /touchMode && <button[^>]*aria-label="关闭资产阶段信息"[^>]*onClick=\{onClose\}/);
 });
 
 test("market tiles outline observation-stage changes", async () => {

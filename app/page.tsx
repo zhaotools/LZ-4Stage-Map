@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, type FormEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type FormEvent, type MouseEvent as ReactMouseEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { createHoverResumeGuard } from "@/app/lib/hover-resume.mjs";
 import {
@@ -294,7 +294,7 @@ function observationConfirmationFor(market: Market) {
 
 function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market | null; point: { x: number; y: number }; touchMode: boolean; onClose: () => void }) {
   if (!market) return null;
-  if (market.cryptoFreshness === "unavailable") return <div className="market-hover-card" role="tooltip" style={{ left: point.x, top: point.y }}><div className="hover-card-title">{market.shortCode} · {market.name}</div><p className="crypto-data-note">数据暂不可用，等待完整周线。未使用未验证行情生成阶段判断。</p></div>;
+  if (market.cryptoFreshness === "unavailable") return <div className={`market-hover-card ${touchMode ? "touch-card" : ""}`} role={touchMode ? "dialog" : "tooltip"} aria-label={touchMode ? `${market.shortCode} 资产信息` : undefined} style={{ left: point.x, top: point.y }}><div className="hover-card-title">{market.shortCode} · {market.name}{touchMode && <button className="hover-close" type="button" aria-label="关闭资产阶段信息" onClick={onClose}><X size={17} /></button>}</div><p className="crypto-data-note">数据暂不可用，等待完整周线。未使用未验证行情生成阶段判断。</p></div>;
   const maDirection = momentumDirection(market.momentum);
   const maColor = maDirection === "上升" ? stageMeta.S2.color : maDirection === "下降" ? stageMeta.S4.color : undefined;
   const observationLabel = market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage;
@@ -316,7 +316,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
   );
 }
 
-function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market) => void }) {
+function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
   if (!items.length) return null;
   return (
     <section className={`map-group ${className ?? `map-${group.replace("·", "-")}`} ${compact ? "map-group-full" : ""}`}>
@@ -343,7 +343,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
               aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onPointerDown={() => onMarketLeave()}
-              onClick={() => onMarketTap(item)}
+              onClick={(event) => onMarketTap(item, event)}
               onPointerLeave={(event) => { if (event.pointerType !== "touch") onMarketLeave(); }}
               onFocus={(event) => onMarketFocus(item, event.currentTarget)}
               onBlur={onMarketLeave}
@@ -360,7 +360,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
   );
 }
 
-function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market) => void }) {
+function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMarketLeave, onMarketFocus, onMarketTap }: { source: Market[]; region: Region; stageFilter: Stage | "全部"; view: View; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
   const groups = region === "全球" ? viewMeta[view].groups : [region as MarketRegion];
   const dense = view === "commodity" || view === "usSelected" || view === "chinaIndices" || view === "hkSelected";
   if (view === "commodity") {
@@ -694,6 +694,17 @@ export default function Home() {
   const [hoverPoint, setHoverPoint] = useState({ x: 0, y: 0 });
   const [touchCardOpen, setTouchCardOpen] = useState(false);
   const [showFullVersion, setShowFullVersion] = useState(false);
+  useEffect(() => {
+    if (!touchCardOpen) return;
+    const closeOnOutsidePointer = (event: globalThis.PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element) || target.closest(".market-hover-card, .map-tile")) return;
+      setHoveredMarket(null);
+      setTouchCardOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [touchCardOpen]);
   useEffect(() => {
     const dismiss = () => {
       hoverResumeGuard.current.dismiss();
@@ -1073,8 +1084,15 @@ export default function Home() {
     setHoveredMarket(item);
     placeHoverCard(rect.right, rect.top + rect.height / 2);
   };
-  const handleMarketTap = (item: Market) => {
+  const handleMarketTap = (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => {
+    const pointerType = (event.nativeEvent as globalThis.PointerEvent).pointerType;
+    const touchInteraction = pointerType === "touch" || (!pointerType && window.matchMedia("(hover: none), (pointer: coarse)").matches);
     hoverResumeGuard.current.dismiss();
+    if (touchInteraction) {
+      setHoveredMarket(item);
+      setTouchCardOpen(true);
+      return;
+    }
     // Commit removal before opening the new tab can suspend the original page.
     flushSync(() => closeMarketCard());
     window.open(tradingViewChartUrlFor(item), "_blank", "noopener,noreferrer");

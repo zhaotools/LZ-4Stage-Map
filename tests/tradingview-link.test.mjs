@@ -60,9 +60,10 @@ test("all other assets retain their symbols and daily interval on the simplified
   }
 });
 
-test("map tile clicks open TradingView in a separate tab", async () => {
+test("desktop map tile clicks open TradingView in a separate tab", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  assert.match(source, /onClick=\{\(\) => onMarketTap\(item\)\}/);
+  assert.match(source, /onClick=\{\(event\) => onMarketTap\(item, event\)\}/);
+  assert.match(source, /if \(touchInteraction\).*?return;\s*\}/s);
   assert.match(source, /window\.open\(tradingViewChartUrlFor\(item\), "_blank", "noopener,noreferrer"\)/);
   assert.match(source, /点击在TradingView新标签页打开K线/);
 });
