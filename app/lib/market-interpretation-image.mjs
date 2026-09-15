@@ -197,65 +197,62 @@ function downloadCanvas(canvas, fileName) {
   });
 }
 
-function sectionLines(model, measure, contentWidth) {
-  measure.font = `28px ${FONT_FAMILY}`;
-  const lineWidth = contentWidth - 64;
-  const marketEntries = model.marketStructure.length
-    ? model.marketStructure.map((row) => `${row.label}　${row.summary}`)
-    : [model.marketStructureFallback];
+function sectionLines(model, measure, widths) {
+  measure.font = `20px ${FONT_FAMILY}`;
   const positionEntries = model.keyPositions.length
     ? model.keyPositions.map((group) => `${group.label}　${assetNames(group.assets)}`)
     : [model.keyPositionsFallback];
   return {
-    market: fitLines(wrapEntries(measure, marketEntries, lineWidth), 7),
-    positions: fitLines(wrapEntries(measure, positionEntries, lineWidth), 5),
-    changes: fitLines(wrapEntries(measure, model.changeLines, lineWidth), 5),
+    market: fitLines(wrapText(measure, model.marketStructureFallback, widths.market - 56), 7),
+    positions: fitLines(wrapEntries(measure, positionEntries, widths.positions - 56), 6),
+    changes: fitLines(wrapEntries(measure, model.changeLines, widths.changes - 56), 4),
   };
 }
 
 function drawSection(context, { x, y, width, height, title, lines }) {
-  paintCard(context, x, y, width, height, 20, "#fbfcfe", "#e1e8f2");
+  paintCard(context, x, y, width, height, 16, "#fbfcfe", "#e1e8f2");
   context.fillStyle = "#397ff6";
   context.beginPath();
-  context.arc(x + 34, y + 42, 7, 0, Math.PI * 2);
+  context.arc(x + 30, y + 35, 6, 0, Math.PI * 2);
   context.fill();
   context.fillStyle = "#354964";
-  context.font = `700 34px ${FONT_FAMILY}`;
-  context.fillText(title, x + 56, y + 58);
-  context.font = `28px ${FONT_FAMILY}`;
+  context.font = `700 26px ${FONT_FAMILY}`;
+  context.fillText(title, x + 50, y + 45);
+  context.font = `20px ${FONT_FAMILY}`;
   const lineHeight = lines.length > 1
-    ? Math.min(56, Math.max(46, (height - 154) / (lines.length - 1)))
-    : 48;
-  drawLines(context, lines, x + 32, y + 118, lineHeight, "#60718a");
+    ? Math.min(38, Math.max(26, (height - 114) / (lines.length - 1)))
+    : 32;
+  drawLines(context, lines, x + 28, y + 91, lineHeight, "#60718a");
 }
 
 function drawMarketStructureSection(context, { x, y, width, height, rows, fallbackLines }) {
-  paintCard(context, x, y, width, height, 20, "#fbfcfe", "#e1e8f2");
+  paintCard(context, x, y, width, height, 16, "#fbfcfe", "#e1e8f2");
   context.fillStyle = "#397ff6";
   context.beginPath();
-  context.arc(x + 34, y + 42, 7, 0, Math.PI * 2);
+  context.arc(x + 30, y + 35, 6, 0, Math.PI * 2);
   context.fill();
   context.fillStyle = "#354964";
-  context.font = `700 34px ${FONT_FAMILY}`;
-  context.fillText("市场结构", x + 56, y + 58);
-  context.font = `28px ${FONT_FAMILY}`;
+  context.font = `700 26px ${FONT_FAMILY}`;
+  context.fillText("市场结构", x + 50, y + 45);
+  context.font = `20px ${FONT_FAMILY}`;
   if (!rows.length) {
     const lineHeight = fallbackLines.length > 1
-      ? Math.min(56, Math.max(46, (height - 154) / (fallbackLines.length - 1)))
-      : 48;
-    drawLines(context, fallbackLines, x + 32, y + 118, lineHeight, "#60718a");
+      ? Math.min(38, Math.max(28, (height - 114) / (fallbackLines.length - 1)))
+      : 32;
+    drawLines(context, fallbackLines, x + 28, y + 91, lineHeight, "#60718a");
     return;
   }
   const rowStep = rows.length > 1
-    ? Math.min(52, Math.max(42, (height - 154) / (Math.min(rows.length, 7) - 1)))
-    : 48;
+    ? Math.min(34, Math.max(28, (height - 116) / (Math.min(rows.length, 7) - 1)))
+    : 32;
+  const summaryX = x + Math.round(width * 0.5);
   rows.slice(0, 7).forEach((row, index) => {
-    const rowY = y + 118 + index * rowStep;
+    const rowY = y + 91 + index * rowStep;
     context.fillStyle = "#60718a";
     context.textAlign = "left";
-    context.fillText(row.label, x + 32, rowY);
+    context.fillText(row.label, x + 28, rowY);
     context.fillStyle = "#354964";
-    context.fillText(row.summary, x + 288, rowY);
+    context.fillText(row.summary, summaryX, rowY);
   });
   context.textAlign = "left";
 }
@@ -265,20 +262,24 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   await document.fonts?.ready;
 
   const model = buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel);
-  const width = 1080;
-  const height = 1920;
-  const outerX = 28;
-  const outerY = 28;
-  const contentX = 70;
-  const contentWidth = 940;
-  const gap = 20;
+  const width = 1600;
+  const height = 1000;
+  const outerX = 24;
+  const outerY = 24;
+  const contentX = 72;
+  const contentWidth = 1456;
+  const gap = 18;
+  const overviewWidth = 810;
+  const changesWidth = contentWidth - overviewWidth - gap;
+  const marketWidth = 690;
+  const positionsWidth = contentWidth - marketWidth - gap;
   const measureCanvas = document.createElement("canvas");
   const measure = measureCanvas.getContext("2d");
   if (!measure) throw new Error("浏览器不支持图片生成");
 
-  measure.font = `30px ${FONT_FAMILY}`;
-  const summaryLines = wrapText(measure, model.summary, contentWidth - 48);
-  const sections = sectionLines(model, measure, contentWidth);
+  measure.font = `22px ${FONT_FAMILY}`;
+  const summaryLines = fitLines(wrapText(measure, model.summary, overviewWidth - 56), 2);
+  const sections = sectionLines(model, measure, { market: marketWidth, positions: positionsWidth, changes: changesWidth });
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -292,109 +293,88 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.fillStyle = background;
   context.fillRect(0, 0, width, height);
   context.shadowColor = "rgba(24, 50, 90, 0.12)";
-  context.shadowBlur = 30;
-  context.shadowOffsetY = 10;
-  paintCard(context, outerX, outerY, width - outerX * 2, height - outerY * 2, 28, "#ffffff", "#dce5f1");
+  context.shadowBlur = 24;
+  context.shadowOffsetY = 8;
+  paintCard(context, outerX, outerY, width - outerX * 2, height - outerY * 2, 24, "#ffffff", "#dce5f1");
   context.shadowColor = "transparent";
 
-  let y = 88;
+  let y = 66;
   context.fillStyle = "#397ff6";
-  context.font = `700 22px ${FONT_FAMILY}`;
+  context.font = `700 18px ${FONT_FAMILY}`;
   context.fillText(model.kicker, contentX, y);
-  y += 72;
+  y += 54;
   context.fillStyle = "#122849";
-  context.font = `700 56px ${FONT_FAMILY}`;
+  context.font = `700 46px ${FONT_FAMILY}`;
   context.fillText(model.title, contentX, y);
   context.fillStyle = "#6a7890";
-  context.font = `600 24px ${FONT_FAMILY}`;
-  context.fillText(model.reportDateLabel, contentX, y + 46);
-  y += 86;
+  context.font = `600 20px ${FONT_FAMILY}`;
+  context.textAlign = "right";
+  context.fillText(model.reportDateLabel, contentX + contentWidth, y - 5);
+  context.textAlign = "left";
+  y += 34;
 
   const stageWidth = (contentWidth - gap * 3) / 4;
   model.stageCounts.forEach((item, index) => {
     const x = contentX + index * (stageWidth + gap);
-    paintCard(context, x, y, stageWidth, 102, 16, item.background, "#e1e8f2");
+    paintCard(context, x, y, stageWidth, 76, 13, item.background, "#e1e8f2");
     context.fillStyle = item.color;
-    context.font = `700 27px ${FONT_FAMILY}`;
-    context.fillText(item.label, x + 16, y + 62);
+    context.font = `700 24px ${FONT_FAMILY}`;
+    context.fillText(item.label, x + 18, y + 48);
     context.fillStyle = "#42536d";
-    context.font = `700 25px ${FONT_FAMILY}`;
+    context.font = `700 23px ${FONT_FAMILY}`;
     context.textAlign = "right";
-    context.fillText(`${item.percent}%`, x + stageWidth - 16, y + 62);
+    context.fillText(`${item.percent}%`, x + stageWidth - 18, y + 48);
     context.textAlign = "left";
   });
-  y += 116;
+  y += 86;
   let barX = contentX;
   const total = Math.max(1, model.stageCounts.reduce((sum, stage) => sum + stage.count, 0));
   model.stageCounts.forEach((item) => {
     const barWidth = contentWidth * item.count / total;
     context.fillStyle = item.color;
-    context.fillRect(barX, y, barWidth, 10);
+    context.fillRect(barX, y, barWidth, 8);
     barX += barWidth;
   });
-  y += 42;
+  y += 28;
 
-  const sectionGap = 26;
-  const footerDividerY = height - outerY - 180;
-  const qualityReserve = model.quality ? 48 : 0;
-  const contentBottom = footerDividerY - 26 - qualityReserve;
-  const marketLineCount = model.marketStructure.length || sections.market.length;
-  const minimumHeights = [
-    Math.max(184, 154 + Math.max(0, summaryLines.length - 1) * 50),
-    Math.max(220, 154 + Math.max(0, marketLineCount - 1) * 46),
-    Math.max(210, 154 + Math.max(0, sections.positions.length - 1) * 48),
-    Math.max(226, 154 + Math.max(0, sections.changes.length - 1) * 48),
-  ];
-  const availableHeight = contentBottom - y - sectionGap * 3;
-  const minimumTotal = minimumHeights.reduce((sum, value) => sum + value, 0);
-  const extraHeight = Math.max(0, availableHeight - minimumTotal);
-  const minimumWeight = Math.max(1, minimumTotal);
-  const [overviewHeight, marketHeight, positionsHeight, changesHeight] = minimumHeights.map((value, index) => {
-    if (!extraHeight) return value;
-    const share = index === minimumHeights.length - 1
-      ? extraHeight - minimumHeights.slice(0, -1).reduce((sum, item) => sum + Math.round(extraHeight * item / minimumWeight), 0)
-      : Math.round(extraHeight * value / minimumWeight);
-    return value + share;
-  });
-
-  paintCard(context, contentX, y, contentWidth, overviewHeight, 20, "#f4f8ff", "#dce6f5");
+  const firstRowHeight = 184;
+  paintCard(context, contentX, y, overviewWidth, firstRowHeight, 16, "#f4f8ff", "#dce6f5");
   context.fillStyle = "#16315d";
-  context.font = `700 42px ${FONT_FAMILY}`;
-  context.fillText(model.headline, contentX + 30, y + 70);
-  context.font = `30px ${FONT_FAMILY}`;
-  drawLines(context, summaryLines, contentX + 30, y + 132, 50, "#5d6d85");
-  y += overviewHeight + sectionGap;
+  context.font = `700 34px ${FONT_FAMILY}`;
+  context.fillText(model.headline, contentX + 28, y + 62);
+  context.font = `22px ${FONT_FAMILY}`;
+  drawLines(context, summaryLines, contentX + 28, y + 112, 34, "#5d6d85");
+  drawSection(context, { x: contentX + overviewWidth + gap, y, width: changesWidth, height: firstRowHeight, title: "本期变化", lines: sections.changes });
+  y += firstRowHeight + gap;
 
-  drawMarketStructureSection(context, { x: contentX, y, width: contentWidth, height: marketHeight, rows: model.marketStructure, fallbackLines: sections.market });
-  y += marketHeight + sectionGap;
-  drawSection(context, { x: contentX, y, width: contentWidth, height: positionsHeight, title: "关键位置", lines: sections.positions });
-  y += positionsHeight + sectionGap;
-  drawSection(context, { x: contentX, y, width: contentWidth, height: changesHeight, title: "本期变化", lines: sections.changes });
-  y += changesHeight;
+  const secondRowHeight = 318;
+  drawMarketStructureSection(context, { x: contentX, y, width: marketWidth, height: secondRowHeight, rows: model.marketStructure, fallbackLines: sections.market });
+  drawSection(context, { x: contentX + marketWidth + gap, y, width: positionsWidth, height: secondRowHeight, title: "关键位置", lines: sections.positions });
 
   if (model.quality) {
-    y += 34;
+    y += secondRowHeight + 25;
     context.fillStyle = "#b56a08";
-    context.font = `24px ${FONT_FAMILY}`;
+    context.font = `17px ${FONT_FAMILY}`;
     context.fillText(model.quality, contentX, y);
   }
-  y = footerDividerY;
+  y = 838;
   context.strokeStyle = "#e2e8f1";
+  context.lineWidth = 1;
   context.beginPath();
   context.moveTo(contentX, y);
   context.lineTo(contentX + contentWidth, y);
   context.stroke();
-  y += 43;
+  y += 37;
   context.fillStyle = "#294c82";
-  context.font = `700 24px ${FONT_FAMILY}`;
+  context.font = `700 19px ${FONT_FAMILY}`;
   context.fillText(model.source, contentX, y);
-  y += 40;
+  y += 36;
   context.fillStyle = "#96a2b4";
-  context.font = `22px ${FONT_FAMILY}`;
+  context.font = `17px ${FONT_FAMILY}`;
   context.fillText(model.disclaimer, contentX, y);
-  y += 40;
+  y += 36;
   context.fillStyle = "#397ff6";
-  context.font = `22px ${FONT_FAMILY}`;
+  context.font = `17px ${FONT_FAMILY}`;
   context.fillText(model.detailUrl, contentX, y);
 
   const fileName = safeFileName(`LZ-4Stage-${marketTitle}-四季解读-${model.fileDate}.png`);

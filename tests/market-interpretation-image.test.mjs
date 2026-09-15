@@ -91,9 +91,9 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.ok(paintedText.includes("S2为主"));
     assert.ok(!paintedText.includes("观察信号尚未等同于阶段确认。"));
     assert.ok(paintedText.includes("数据截至：传统市场 2026-09-05｜加密市场 2026-09-07"));
-    assert.equal(canvas.width, 1080);
-    assert.equal(canvas.height, 1920);
-    assert.equal(canvas.width / canvas.height, 9 / 16);
+    assert.equal(canvas.width, 1600);
+    assert.equal(canvas.height, 1000);
+    assert.equal(canvas.width / canvas.height, 16 / 10);
   } finally {
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;
