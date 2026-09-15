@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-15T08:09:22.762Z",
+  "generatedAt": "2026-09-15T09:39:45.479Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-15T08:09:22.762Z",
-    "crypto": "2026-09-15T08:09:22.762Z"
+    "traditional": "2026-09-15T09:39:45.479Z",
+    "crypto": "2026-09-15T09:39:45.479Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-09-07",
@@ -103,7 +103,7 @@
       "momentum": -2.78,
       "distance": -15.89,
       "confidence": 95,
-      "close": 17.739999771118164,
+      "close": 17.90999984741211,
       "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -233,7 +233,7 @@
       "momentum": 1.27,
       "distance": 3.68,
       "confidence": 95,
-      "close": 6201.81005859375,
+      "close": 6211.240234375,
       "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -266,7 +266,7 @@
       "momentum": 0.27,
       "distance": -0.39,
       "confidence": 95,
-      "close": 99.5989990234375,
+      "close": 99.63899993896484,
       "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -332,7 +332,7 @@
       "momentum": 5.28,
       "distance": 13.93,
       "confidence": 73,
-      "close": 103.47000122070312,
+      "close": 104.01000213623047,
       "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -365,7 +365,7 @@
       "momentum": -1.41,
       "distance": -2.31,
       "confidence": 95,
-      "close": 4320.10009765625,
+      "close": 4306.89990234375,
       "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
@@ -556,9 +556,9 @@
     "schemaVersion": "lz-market-interpretation-v2",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-15T08:09:22.762Z",
+    "generatedAt": "2026-09-15T09:39:45.479Z",
     "commonStageAsOf": "2026-09-07",
-    "sourceSnapshotSha256": "d105da5864b8bcc4d5e9f6ea6b3f8fcc87457af04c5db7c0a4f6c1d25166c7cf",
+    "sourceSnapshotSha256": "8722fa21757cbad2e303537a33b22298b0faa396a8ca87b4b4699c13f5173d2a",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
