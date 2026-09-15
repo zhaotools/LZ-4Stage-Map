@@ -1,10 +1,10 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-09-14T04:56:23.614Z",
+  "generatedAt": "2026-09-15T08:09:22.762Z",
   "updateScope": "all",
   "lastUpdatedAt": {
-    "traditional": "2026-09-14T04:56:23.614Z",
-    "crypto": "2026-09-14T04:56:23.614Z"
+    "traditional": "2026-09-15T08:09:22.762Z",
+    "crypto": "2026-09-15T08:09:22.762Z"
   },
   "analysisPeriod": "weekly-completed-bars",
   "commonStageAsOf": "2026-09-07",
@@ -37,10 +37,10 @@
       "momentum": 1.86,
       "distance": 5.27,
       "confidence": 95,
-      "close": 7656.97998046875,
-      "marketAsOf": "2026-09-11",
+      "close": 7619.97998046875,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "SOXX",
@@ -70,10 +70,10 @@
       "momentum": 6.55,
       "distance": 9.33,
       "confidence": 95,
-      "close": 527.0700073242188,
-      "marketAsOf": "2026-09-11",
+      "close": 497.3999938964844,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "VIX",
@@ -103,10 +103,10 @@
       "momentum": -2.78,
       "distance": -15.89,
       "confidence": 95,
-      "close": 15.84000015258789,
-      "marketAsOf": "2026-09-11",
+      "close": 17.739999771118164,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "SZ399006",
@@ -136,8 +136,8 @@
       "momentum": 0.54,
       "distance": -7.91,
       "confidence": 73,
-      "close": 3306.36,
-      "marketAsOf": "2026-09-14",
+      "close": 3247.92,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -169,8 +169,8 @@
       "momentum": -3.41,
       "distance": -9.78,
       "confidence": 95,
-      "close": 4327.76,
-      "marketAsOf": "2026-09-14",
+      "close": 4291.34,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -201,8 +201,8 @@
       "momentum": 3.19,
       "distance": 2.48,
       "confidence": 95,
-      "close": 63403.75,
-      "marketAsOf": "2026-09-14",
+      "close": 63484.1015625,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -233,10 +233,10 @@
       "momentum": 1.27,
       "distance": 3.68,
       "confidence": 95,
-      "close": 6325.1298828125,
-      "marketAsOf": "2026-09-11",
+      "close": 6201.81005859375,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "DXY",
@@ -266,8 +266,8 @@
       "momentum": 0.27,
       "distance": -0.39,
       "confidence": 95,
-      "close": 99.36100006103516,
-      "marketAsOf": "2026-09-14",
+      "close": 99.5989990234375,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -299,10 +299,10 @@
       "momentum": 2.24,
       "distance": 11.16,
       "confidence": 95,
-      "close": 4.974999904632568,
-      "marketAsOf": "2026-09-11",
+      "close": 4.960999965667725,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "CL",
@@ -332,8 +332,8 @@
       "momentum": 5.28,
       "distance": 13.93,
       "confidence": 73,
-      "close": 102.86000061035156,
-      "marketAsOf": "2026-09-14",
+      "close": 103.47000122070312,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -362,11 +362,11 @@
       "previousObservationStage": "S4-",
       "observation": "下降减速",
       "signal": "减速",
-      "momentum": -1.44,
-      "distance": -3.23,
+      "momentum": -1.41,
+      "distance": -2.31,
       "confidence": 95,
-      "close": 4363.5,
-      "marketAsOf": "2026-09-14",
+      "close": 4320.10009765625,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -480,10 +480,10 @@
       "momentum": 2.61,
       "distance": 5.55,
       "confidence": 95,
-      "close": 29368.439453125,
-      "marketAsOf": "2026-09-11",
+      "close": 29127.16015625,
+      "marketAsOf": "2026-09-14",
       "stageAsOf": "2026-09-11",
-      "hasProvisionalBar": false
+      "hasProvisionalBar": true
     },
     {
       "code": "HSI",
@@ -513,8 +513,8 @@
       "momentum": -0.91,
       "distance": -1.9,
       "confidence": 95,
-      "close": 24893.11,
-      "marketAsOf": "2026-09-14",
+      "close": 24667.24,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     },
@@ -546,8 +546,8 @@
       "momentum": -0.42,
       "distance": -4.08,
       "confidence": 68,
-      "close": 4495.92,
-      "marketAsOf": "2026-09-14",
+      "close": 4450.04,
+      "marketAsOf": "2026-09-15",
       "stageAsOf": "2026-09-11",
       "hasProvisionalBar": true
     }
@@ -556,9 +556,9 @@
     "schemaVersion": "lz-market-interpretation-v2",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-09-14T04:56:23.614Z",
+    "generatedAt": "2026-09-15T08:09:22.762Z",
     "commonStageAsOf": "2026-09-07",
-    "sourceSnapshotSha256": "dd64114d53c08ba1745a322d570c1623515c7c2cdc5d39a38107383813cba25a",
+    "sourceSnapshotSha256": "d105da5864b8bcc4d5e9f6ea6b3f8fcc87457af04c5db7c0a4f6c1d25166c7cf",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
