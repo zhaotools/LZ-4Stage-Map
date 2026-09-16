@@ -268,6 +268,12 @@ export async function removeMyScanAsset(assetKey: string) {
   return data as { ok: boolean; removed: boolean; count: number; limit: number };
 }
 
+export async function reorderMyScanAssets(assetKeys: string[]) {
+  const { data, error } = await requireClient().rpc("reorder_my_scan_assets", { p_asset_keys: assetKeys });
+  if (error) throw error;
+  return data as { ok: boolean; count: number };
+}
+
 export function onMemberAuthChange(callback: (session: Session | null) => void) {
   const client = requireClient();
   const { data } = client.auth.onAuthStateChange((_event, session) => callback(session));

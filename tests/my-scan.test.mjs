@@ -2,8 +2,6 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { sortMyScanAssets } from "../app/lib/my-scan-sort.mjs";
-
 const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 const component = await readFile(new URL("../app/components/my-scan-page.tsx", import.meta.url), "utf8");
 const api = await readFile(new URL("../app/lib/member-api.ts", import.meta.url), "utf8");
@@ -27,7 +25,7 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /本次更新失败，保留上期结果/);
   assert.match(component, /window\.open\(tradingViewChartUrlFor\(result\), "_blank", "noopener,noreferrer"\)/);
   assert.match(component, /role=\{result \? "link" : undefined\}/);
-  assert.match(component, /className=\{`my-scan-card \$\{result \? `stage-\$\{result\.stage\.toLowerCase\(\)\} clickable` : "pending"\}`\}/);
+  assert.match(component, /className=\{`my-scan-card \$\{result \? `stage-\$\{result\.stage\.toLowerCase\(\)\} clickable` : "pending"\}/);
   assert.match(component, /<dt>当前阶段<\/dt>[\s\S]*<dt>确认时间<\/dt>[\s\S]*<dt>本周观察<\/dt>[\s\S]*<dt>MA30趋势<\/dt>/);
   assert.match(component, /stageConfirmationTimeFor\(result\)/);
   assert.match(component, /event\.stopPropagation\(\)/);
@@ -35,13 +33,12 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.doesNotMatch(component, /RefreshCw/);
   assert.match(component, /const analyzedTotal = assets\.reduce/);
   assert.match(component, /const \[stageFilter, setStageFilter\] = useState/);
-  assert.match(component, /const sortedAssets = useMemo\(\(\) => sortMyScanAssets\(assets, sortMode\)/);
-  assert.match(component, /const filteredAssets = stageFilter === "全部" \? sortedAssets : sortedAssets\.filter/);
-  assert.match(component, /加入顺序/);
-  assert.match(component, /阶段 S1 → S4/);
-  assert.match(component, /阶段 S4 → S1/);
-  assert.match(component, /市场顺序/);
-  assert.match(component, /代码顺序/);
+  assert.match(component, /拖动卡片左侧把手可调整显示顺序/);
+  assert.match(component, /data-my-scan-asset=\{asset\.assetKey\}/);
+  assert.match(component, /my-scan-drag-handle/);
+  assert.match(component, /onPointerDown=\{\(event\) =>/);
+  assert.match(component, /onReorder\(nextAssets\.map\(\(asset\) => asset\.assetKey\)\)/);
+  assert.match(component, /请先显示全部资产后再调整顺序/);
   assert.match(component, /我的扫描四阶段占比分布/);
   assert.match(component, /\{stage\} \{stageSeasons\[stage\]\}/);
   assert.match(component, /Math\.round\(\(stageCounts\[stage\] \/ analyzedTotal\) \* 100\)/);
@@ -56,26 +53,12 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(css, /@media \(max-width: 480px\)[\s\S]*\.my-scan-grid \{ grid-template-columns: 1fr; \}/);
 });
 
-test("My Scan sorting is deterministic and leaves pending assets after staged assets", () => {
-  const assets = [
-    { code: "700.HK", displayCode: "0700", region: "港股", createdAt: "2026-09-12T00:00:00Z", result: { stage: "S4" } },
-    { code: "BTC", displayCode: "BTC", region: "加密", createdAt: "2026-09-10T00:00:00Z", result: { stage: "S2" } },
-    { code: "600519.SH", displayCode: "600519", region: "A股", createdAt: "2026-09-11T00:00:00Z", result: null },
-    { code: "AAPL", displayCode: "AAPL", region: "美股", createdAt: "2026-09-09T00:00:00Z", result: { stage: "S1" } },
-  ];
-  assert.deepEqual(sortMyScanAssets(assets, "added").map((asset) => asset.displayCode), ["AAPL", "BTC", "600519", "0700"]);
-  assert.deepEqual(sortMyScanAssets(assets, "stageAsc").map((asset) => asset.displayCode), ["AAPL", "BTC", "0700", "600519"]);
-  assert.deepEqual(sortMyScanAssets(assets, "stageDesc").map((asset) => asset.displayCode), ["0700", "BTC", "AAPL", "600519"]);
-  assert.deepEqual(sortMyScanAssets(assets, "region").map((asset) => asset.displayCode), ["AAPL", "600519", "0700", "BTC"]);
-  assert.deepEqual(sortMyScanAssets(assets, "code").map((asset) => asset.displayCode), ["0700", "600519", "AAPL", "BTC"]);
-  assert.equal(assets[0].displayCode, "0700", "sorting must not mutate the API response array");
-});
-
 test("My Scan API never exposes direct table writes or provider requests in the browser", () => {
   assert.match(api, /functions\.invoke\("lookup-watchlist-asset"/);
   assert.match(api, /rpc\("add_my_scan_asset"/);
   assert.match(api, /rpc\("remove_my_scan_asset"/);
   assert.match(api, /rpc\("get_my_scan_assets"/);
+  assert.match(api, /rpc\("reorder_my_scan_assets"/);
   assert.doesNotMatch(component, /yahoo|eastmoney|binance|okx|bybit/i);
   assert.doesNotMatch(api, /service_role|SUPABASE_SECRET/);
 });

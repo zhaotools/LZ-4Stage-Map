@@ -43,6 +43,7 @@ import {
   isProfileActive,
   lookupMyScanAsset,
   removeMyScanAsset,
+  reorderMyScanAssets,
   signInMember,
   signOutMember,
   updateMemberPassword,
@@ -953,6 +954,13 @@ export default function Home() {
     await removeMyScanAsset(assetKey);
     setMyScanAssets((current) => current.filter((asset) => asset.assetKey !== assetKey));
   };
+  const handleMyScanReorder = async (assetKeys: string[]) => {
+    await reorderMyScanAssets(assetKeys);
+    setMyScanAssets((current) => {
+      const byKey = new Map(current.map((asset) => [asset.assetKey, asset]));
+      return assetKeys.map((key) => byKey.get(key)).filter((asset): asset is typeof current[number] => Boolean(asset));
+    });
+  };
 
   const handleMemberLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -1460,6 +1468,7 @@ export default function Home() {
               onLookup={handleMyScanLookup}
               onAdd={handleMyScanAdd}
               onRemove={handleMyScanRemove}
+              onReorder={handleMyScanReorder}
             />
           ) : stockRadarActive && stockRadarSnapshot ? (
             <StockRadarPage snapshot={stockRadarSnapshot} markets={stockRadarSnapshot.matches} filter={stockRadarFilter} region={stockRadarRegion} onFilterChange={setStockRadarFilter} onRegionChange={setStockRadarRegion} />

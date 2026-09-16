@@ -1,10 +1,9 @@
 "use client";
 
-import { type FormEvent, useMemo, useState } from "react";
-import { ArrowUpDown, Clock3, Plus, Search, Trash2 } from "lucide-react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { Clock3, GripVertical, Plus, Search, Trash2 } from "lucide-react";
 
 import { stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
-import { sortMyScanAssets } from "@/app/lib/my-scan-sort.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
 import type { MyScanAsset, MyScanLookupAsset, MyScanRegion } from "@/app/lib/member-api";
 
@@ -24,6 +23,7 @@ type Props = {
   onLookup: (region: MyScanRegion, code: string) => Promise<MyScanLookupAsset>;
   onAdd: (assetKey: string) => Promise<void>;
   onRemove: (assetKey: string) => Promise<void>;
+  onReorder: (assetKeys: string[]) => Promise<void>;
 };
 
 const stageColors = {
@@ -34,30 +34,79 @@ const stageColors = {
 } as const;
 const stages = ["S1", "S2", "S3", "S4"] as const;
 const stageSeasons = { S1: "春季", S2: "夏季", S3: "秋季", S4: "冬季" } as const;
-type SortMode = "added" | "stageAsc" | "stageDesc" | "region" | "code";
-
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
 }
 
-export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove }: Props) {
+export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove, onReorder }: Props) {
   const [region, setRegion] = useState<MyScanRegion>("美股");
   const [stageFilter, setStageFilter] = useState<(typeof stages)[number] | "全部">("全部");
-  const [sortMode, setSortMode] = useState<SortMode>("added");
   const [code, setCode] = useState("");
   const [candidate, setCandidate] = useState<MyScanLookupAsset | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [querying, setQuerying] = useState(false);
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [draggingKey, setDraggingKey] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+  const dragSourceRef = useRef<string | null>(null);
+  const dragOverRef = useRef<string | null>(null);
   const atLimit = assets.length >= 20;
   const analyzedTotal = assets.reduce((total, asset) => total + (asset.result ? 1 : 0), 0);
   const stageCounts = assets.reduce<Record<(typeof stages)[number], number>>((counts, asset) => {
     if (asset.result) counts[asset.result.stage] += 1;
     return counts;
   }, { S1: 0, S2: 0, S3: 0, S4: 0 });
-  const sortedAssets = useMemo(() => sortMyScanAssets(assets, sortMode) as MyScanAsset[], [assets, sortMode]);
-  const filteredAssets = stageFilter === "全部" ? sortedAssets : sortedAssets.filter((asset) => asset.result?.stage === stageFilter);
+  const filteredAssets = stageFilter === "全部" ? assets : assets.filter((asset) => asset.result?.stage === stageFilter);
+
+  const reorderAssets = async (sourceKey: string, targetKey: string) => {
+    if (stageFilter !== "全部") {
+      setMessage("请先显示全部资产后再调整顺序。");
+      return;
+    }
+    const sourceIndex = assets.findIndex((asset) => asset.assetKey === sourceKey);
+    const targetIndex = assets.findIndex((asset) => asset.assetKey === targetKey);
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return;
+    const nextAssets = [...assets];
+    const [moved] = nextAssets.splice(sourceIndex, 1);
+    nextAssets.splice(targetIndex, 0, moved);
+    try {
+      await onReorder(nextAssets.map((asset) => asset.assetKey));
+      setMessage("显示顺序已保存。");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "保存显示顺序失败，请稍后重试");
+    }
+  };
+
+  useEffect(() => {
+    if (!draggingKey) return undefined;
+    const handleMove = (event: PointerEvent) => {
+      event.preventDefault();
+      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-my-scan-asset]");
+      const key = target?.dataset.myScanAsset ?? null;
+      if (key && key !== dragSourceRef.current && key !== dragOverRef.current) {
+        dragOverRef.current = key;
+        setDragOverKey(key);
+      }
+    };
+    const handleEnd = () => {
+      const source = dragSourceRef.current;
+      const target = dragOverRef.current;
+      dragSourceRef.current = null;
+      dragOverRef.current = null;
+      setDraggingKey(null);
+      setDragOverKey(null);
+      if (source && target) void reorderAssets(source, target);
+    };
+    window.addEventListener("pointermove", handleMove, { passive: false });
+    window.addEventListener("pointerup", handleEnd, { once: true });
+    window.addEventListener("pointercancel", handleEnd, { once: true });
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleEnd);
+      window.removeEventListener("pointercancel", handleEnd);
+    };
+  }, [draggingKey, assets, stageFilter]);
 
   const submitLookup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -139,18 +188,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
       </div>
 
       <div className="my-scan-list-head">
-        <div><h3>自选资产</h3><p>相同代码在全站只计算一次；删除只影响你自己的列表。</p></div>
-        <label className="my-scan-sort" htmlFor="my-scan-sort">
-          <ArrowUpDown size={14} aria-hidden="true" />
-          <span>排序</span>
-          <select id="my-scan-sort" value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)}>
-            <option value="added">加入顺序</option>
-            <option value="stageAsc">阶段 S1 → S4</option>
-            <option value="stageDesc">阶段 S4 → S1</option>
-            <option value="region">市场顺序</option>
-            <option value="code">代码顺序</option>
-          </select>
-        </label>
+        <div><h3>自选资产</h3><p>拖动卡片左侧把手可调整显示顺序；相同代码在全站只计算一次。</p></div>
         <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
           <div className="distribution-bar">
             {stages.map((stage) => {
@@ -202,7 +240,8 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
             return (
               <article
                 key={asset.assetKey}
-                className={`my-scan-card ${result ? `stage-${result.stage.toLowerCase()} clickable` : "pending"}`}
+                data-my-scan-asset={asset.assetKey}
+                className={`my-scan-card ${result ? `stage-${result.stage.toLowerCase()} clickable` : "pending"} ${draggingKey === asset.assetKey ? "dragging" : ""} ${dragOverKey === asset.assetKey ? "drag-over" : ""}`}
                 role={result ? "link" : undefined}
                 tabIndex={result ? 0 : undefined}
                 aria-label={result ? `${asset.displayCode} ${asset.name}，在TradingView新标签页打开` : undefined}
@@ -214,7 +253,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
                 } : undefined}
               >
                 <div className="my-scan-card-head">
-                  <div><span>{asset.region}</span><small>{asset.exchange}</small></div>
+                  <div><button type="button" className="my-scan-drag-handle" aria-label={`拖动调整 ${asset.displayCode} 的显示顺序`} onPointerDown={(event) => { event.stopPropagation(); event.preventDefault(); if (stageFilter !== "全部") { setMessage("请先显示全部资产后再调整顺序。"); return; } dragSourceRef.current = asset.assetKey; dragOverRef.current = null; setDraggingKey(asset.assetKey); }} onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key) || stageFilter !== "全部") return; event.preventDefault(); const index = assets.findIndex((item) => item.assetKey === asset.assetKey); const target = event.key === "ArrowUp" || event.key === "ArrowLeft" ? assets[index - 1] : assets[index + 1]; if (target) void reorderAssets(asset.assetKey, target.assetKey); }}><GripVertical size={15} /></button><span>{asset.region}</span><small>{asset.exchange}</small></div>
                   <button type="button" onClick={(event) => { event.stopPropagation(); void removeAsset(asset); }} disabled={removing === asset.assetKey} aria-label={`移除 ${asset.displayCode}`}><Trash2 size={15} /></button>
                 </div>
                 <div className="my-scan-card-title"><strong>{asset.displayCode}</strong><span>{asset.name}</span></div>
