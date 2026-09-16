@@ -14,11 +14,17 @@ test("My Scan is a member-only desktop and mobile page", () => {
   assert.match(page, /requestMyScan\(\); \}\}><MousePointerClick.*<span>我的扫描<\/span>/);
   assert.match(page, /const switchToMyScan = \(\) => \{[\s\S]*setMyScanActive\(true\);[\s\S]*scrollPageToTop\(\)/);
   assert.match(page, /<MyScanPage/);
+  assert.match(page, /myScanOrderStorageKey/);
+  assert.match(page, /applyLocalMyScanOrder/);
+  assert.match(page, /code === "PGRST202"/);
 });
 
 test("My Scan UI supports exact lookup, four markets, 20 assets and retained results", () => {
   for (const region of ["美股", "A股", "港股", "加密"]) assert.match(component, new RegExp(region));
-  assert.match(component, /只查询精确代码/);
+  assert.doesNotMatch(component, /跟踪自己关心的资产阶段/);
+  assert.doesNotMatch(component, /只查询精确代码/);
+  assert.doesNotMatch(component, /<label[^>]*>资产代码<\/label>/);
+  assert.match(component, /<div className="my-scan-toolbar">[\s\S]*<h2 id="my-scan-title">我的扫描<\/h2>[\s\S]*className="my-scan-region-tabs"[\s\S]*<form className="my-scan-search"[\s\S]*className="my-scan-count"/);
   assert.match(component, /\{assets\.length\}<\/strong><span>\/ 20/);
   assert.match(component, /已达20个上限/);
   assert.match(component, /等待周度首次计算/);
@@ -33,10 +39,12 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.doesNotMatch(component, /RefreshCw/);
   assert.match(component, /const analyzedTotal = assets\.reduce/);
   assert.match(component, /const \[stageFilter, setStageFilter\] = useState/);
-  assert.match(component, /拖动卡片左侧把手可调整显示顺序/);
-  assert.match(component, /data-my-scan-asset=\{asset\.assetKey\}/);
-  assert.match(component, /my-scan-drag-handle/);
-  assert.match(component, /onPointerDown=\{\(event\) =>/);
+  assert.match(component, /使用卡片右上角的箭头调整显示顺序/);
+  assert.match(component, /my-scan-order-button/);
+  assert.match(component, /前移 \$\{asset\.displayCode\}/);
+  assert.match(component, /后移 \$\{asset\.displayCode\}/);
+  assert.match(component, /moveAsset\(asset\.assetKey, -1\)/);
+  assert.match(component, /moveAsset\(asset\.assetKey, 1\)/);
   assert.match(component, /onReorder\(nextAssets\.map\(\(asset\) => asset\.assetKey\)\)/);
   assert.match(component, /请先显示全部资产后再调整顺序/);
   assert.match(component, /我的扫描四阶段占比分布/);

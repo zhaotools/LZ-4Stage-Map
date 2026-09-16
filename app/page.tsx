@@ -65,6 +65,20 @@ type View = "global" | MemberView;
 type ProtectedPage = MemberView | "trendRadar" | "stockRadar" | "myScan";
 type RadarFilter = "all" | TrendRadarRuleId;
 type StockRadarFilter = "all" | StockRadarRuleId;
+
+const myScanOrderStorageKey = (userId: string) => `lz4stage-my-scan-order:${userId}`;
+
+function applyLocalMyScanOrder(assets: MyScanAsset[], userId?: string) {
+  if (!userId || typeof window === "undefined") return assets;
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(myScanOrderStorageKey(userId)) ?? "[]") as string[];
+    if (!Array.isArray(saved) || !saved.length) return assets;
+    const rank = new Map(saved.map((key, index) => [key, index]));
+    return [...assets].sort((left, right) => (rank.get(left.assetKey) ?? Number.MAX_SAFE_INTEGER) - (rank.get(right.assetKey) ?? Number.MAX_SAFE_INTEGER));
+  } catch {
+    return assets;
+  }
+}
 type RadarScanMode = "s2" | "s4";
 type Region = "全球" | "美股" | "A股" | "港股" | "日股" | "欧股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
@@ -932,7 +946,7 @@ export default function Home() {
     setLoadingMemberView("myScan");
     setMyScanLoadError(null);
     try {
-      const assets = await getMyScanAssets();
+      const assets = applyLocalMyScanOrder(await getMyScanAssets(), memberProfile?.user_id);
       setMyScanAssets(assets);
       setMyScanLoaded(true);
       return assets;
@@ -955,11 +969,22 @@ export default function Home() {
     setMyScanAssets((current) => current.filter((asset) => asset.assetKey !== assetKey));
   };
   const handleMyScanReorder = async (assetKeys: string[]) => {
-    await reorderMyScanAssets(assetKeys);
-    setMyScanAssets((current) => {
-      const byKey = new Map(current.map((asset) => [asset.assetKey, asset]));
-      return assetKeys.map((key) => byKey.get(key)).filter((asset): asset is typeof current[number] => Boolean(asset));
-    });
+    const previous = myScanAssets;
+    const byKey = new Map(previous.map((asset) => [asset.assetKey, asset]));
+    setMyScanAssets(assetKeys.map((key) => byKey.get(key)).filter((asset): asset is MyScanAsset => Boolean(asset)));
+    const storageKey = memberProfile?.user_id ? myScanOrderStorageKey(memberProfile.user_id) : null;
+    if (storageKey) window.localStorage.setItem(storageKey, JSON.stringify(assetKeys));
+    try {
+      await reorderMyScanAssets(assetKeys);
+      if (storageKey) window.localStorage.removeItem(storageKey);
+    } catch (error) {
+      const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+      const detail = typeof error === "object" && error && "message" in error ? String(error.message) : "";
+      if (code === "PGRST202" || detail.includes("reorder_my_scan_assets")) return;
+      setMyScanAssets(previous);
+      if (storageKey) window.localStorage.setItem(storageKey, JSON.stringify(previous.map((asset) => asset.assetKey)));
+      throw error;
+    }
   };
 
   const handleMemberLogin = async (event: FormEvent<HTMLFormElement>) => {
