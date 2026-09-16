@@ -1,9 +1,10 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
-import { Clock3, Plus, Search, Trash2 } from "lucide-react";
+import { type FormEvent, useMemo, useState } from "react";
+import { ArrowUpDown, Clock3, Plus, Search, Trash2 } from "lucide-react";
 
 import { stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
+import { sortMyScanAssets } from "@/app/lib/my-scan-sort.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
 import type { MyScanAsset, MyScanLookupAsset, MyScanRegion } from "@/app/lib/member-api";
 
@@ -33,6 +34,7 @@ const stageColors = {
 } as const;
 const stages = ["S1", "S2", "S3", "S4"] as const;
 const stageSeasons = { S1: "春季", S2: "夏季", S3: "秋季", S4: "冬季" } as const;
+type SortMode = "added" | "stageAsc" | "stageDesc" | "region" | "code";
 
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
@@ -41,6 +43,7 @@ function momentumDirection(momentum: number) {
 export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove }: Props) {
   const [region, setRegion] = useState<MyScanRegion>("美股");
   const [stageFilter, setStageFilter] = useState<(typeof stages)[number] | "全部">("全部");
+  const [sortMode, setSortMode] = useState<SortMode>("added");
   const [code, setCode] = useState("");
   const [candidate, setCandidate] = useState<MyScanLookupAsset | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -53,7 +56,8 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
     if (asset.result) counts[asset.result.stage] += 1;
     return counts;
   }, { S1: 0, S2: 0, S3: 0, S4: 0 });
-  const filteredAssets = stageFilter === "全部" ? assets : assets.filter((asset) => asset.result?.stage === stageFilter);
+  const sortedAssets = useMemo(() => sortMyScanAssets(assets, sortMode) as MyScanAsset[], [assets, sortMode]);
+  const filteredAssets = stageFilter === "全部" ? sortedAssets : sortedAssets.filter((asset) => asset.result?.stage === stageFilter);
 
   const submitLookup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -136,6 +140,17 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
 
       <div className="my-scan-list-head">
         <div><h3>自选资产</h3><p>相同代码在全站只计算一次；删除只影响你自己的列表。</p></div>
+        <label className="my-scan-sort" htmlFor="my-scan-sort">
+          <ArrowUpDown size={14} aria-hidden="true" />
+          <span>排序</span>
+          <select id="my-scan-sort" value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)}>
+            <option value="added">加入顺序</option>
+            <option value="stageAsc">阶段 S1 → S4</option>
+            <option value="stageDesc">阶段 S4 → S1</option>
+            <option value="region">市场顺序</option>
+            <option value="code">代码顺序</option>
+          </select>
+        </label>
         <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
           <div className="distribution-bar">
             {stages.map((stage) => {
