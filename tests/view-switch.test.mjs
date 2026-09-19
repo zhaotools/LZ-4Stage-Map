@@ -126,29 +126,37 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /const openStageIntroduction = \(\) => \{[\s\S]+setIntroductionActive\(true\)/);
   assert.match(pageSource, /className="stage-introduction" aria-labelledby="stage-introduction-title"/);
   const introductionSource = pageSource.slice(pageSource.indexOf('<article className="stage-introduction"'), pageSource.indexOf("</article>", pageSource.indexOf('<article className="stage-introduction"')));
-  const introductionParts = ["stage-introduction-head", "stage-introduction-stages", "stage-introduction-diagram", "stage-introduction-figure", "stage-introduction-reading"];
+  const introductionParts = ["stage-introduction-hero", "stage-introduction-overview", "stage-introduction-stages", "stage-introduction-diagram", "stage-introduction-reading", "stage-introduction-faq"];
   for (const part of introductionParts) assert.ok(introductionSource.includes(part));
   for (let index = 1; index < introductionParts.length; index += 1) {
     assert.ok(introductionSource.indexOf(introductionParts[index - 1]) < introductionSource.indexOf(introductionParts[index]));
   }
-  assert.match(introductionSource, /<p>四阶段分析用[^<]+<\/p>\s*<p>春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换。<\/p>/);
-  assert.match(introductionSource, /<h3 id="stage-introduction-diagram-title">四阶段示意图<\/h3>/);
-  assert.match(introductionSource, /<h3 id="stage-introduction-reading-title">读图提示<\/h3>/);
-  assert.ok(introductionSource.indexOf("lz-4stage-substages.png") < introductionSource.indexOf("stage-introduction-reading-title"));
-  assert.equal((introductionSource.match(/本图展示典型走势中细分阶段的大致位置/g) ?? []).length, 1);
-  assert.doesNotMatch(introductionSource, /查看完整四阶段示意图|stage-introduction-details|lz-4stage-framework\.svg/);
+  assert.match(introductionSource, /先看阶段，再看变化/);
+  assert.match(introductionSource, /资产当前处在什么阶段？/);
+  assert.match(introductionSource, /春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换/);
+  assert.match(introductionSource, /认识四种市场阶段/);
   assert.equal((introductionSource.match(/className="stage-introduction-item /g) ?? []).length, 4);
-  assert.match(introductionSource, /lz-4stage-substages\.png/);
+  for (const [heading, description] of [
+    ["低位整理 S1｜春季", "下跌后转为整理，方向尚未明确。留意价格与30周均线的变化，但这不等于已经见底。"],
+    ["上升趋势 S2｜夏季", "价格呈上升结构，重点看趋势能否延续；短期仍可能回撤。"],
+    ["高位整理 S3｜秋季", "高位反复整理，原有上升结构出现变化；这不等于已经见顶。"],
+    ["下降趋势 S4｜冬季", "价格呈下降结构，重点看下行压力是否减弱；不代表接下来一定继续下跌。"],
+  ]) {
+    assert.ok(introductionSource.includes(`<h3>${heading}</h3><p>${description}</p>`));
+  }
+  assert.match(introductionSource, /<h2 id="stage-introduction-diagram-title">四阶段示意图<\/h2>/);
+  assert.equal((introductionSource.match(/本图展示典型走势中细分阶段的大致位置/g) ?? []).length, 1);
   assert.equal((introductionSource.match(/lz-4stage-substages\.png/g) ?? []).length, 1);
-  assert.doesNotMatch(introductionSource, /<strong>细分阶段示意<\/strong>/);
+  assert.ok(introductionSource.indexOf("lz-4stage-substages.png") < introductionSource.indexOf("stage-introduction-reading-title"));
+  assert.doesNotMatch(introductionSource, /查看完整四阶段示意图|stage-introduction-details|lz-4stage-framework\.svg|<strong>细分阶段示意<\/strong>/);
   assert.match(introductionSource, /不代表阶段必须依次出现；30 周均线也不是唯一判断依据/);
-  assert.match(cssSource, /\.stage-introduction-diagram \{[^}]*margin: 28px auto 0;/);
-  assert.match(pageSource, /认识四种市场阶段/);
-  assert.match(pageSource, /低位整理 S1｜春季/);
-  assert.match(pageSource, /上升趋势 S2｜夏季/);
-  assert.match(introductionSource, /S2A、S2B、S4A 等是阶段细分代码/);
-  assert.match(pageSource, /高位整理 S3｜秋季/);
-  assert.match(pageSource, /下降趋势 S4｜冬季/);
+  assert.match(introductionSource, /资产信息面板示例 · 非实时行情/);
+  for (const field of ["当前阶段", "主阶段持续", "本阶段起始时间", "本周观察", "30周均线："]) {
+    assert.match(introductionSource, new RegExp(`<dt>${field}</dt>`));
+  }
+  assert.match(introductionSource, /DEMO · 示例资产 A/);
+  assert.equal((introductionSource.match(/className="stage-introduction-read-point"/g) ?? []).length, 3);
+  assert.equal((introductionSource.match(/<details className="stage-introduction-disclosure"/g) ?? []).length, 3);
   for (const [stage, title] of Object.entries({
     S1: "低位整理",
     S2: "上升趋势",
@@ -162,23 +170,17 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(introductionSource, /阶段不会按季节固定轮换/);
   assert.match(introductionSource, /不等于已经见底/);
   assert.match(introductionSource, /不等于已经见顶/);
-  assert.match(introductionSource, /不能单独决定阶段/);
-  assert.match(introductionSource, /代码不代表固定转换顺序/);
+  assert.match(introductionSource, /不单独决定阶段/);
+  assert.match(introductionSource, /不代表一定依次发生的未来走势/);
   assert.doesNotMatch(introductionSource, /筑底|向下一阶段过渡|→/);
-  assert.match(pageSource, /先判断阶段，再观察趋势。/);
-  assert.match(pageSource, /用一张地图，查看全球资产的当前阶段与趋势变化。/);
   assert.match(cssSource, /\.stage-intro-link \{[^}]*text-decoration: underline;/);
-  assert.match(cssSource, /\.stage-introduction-head p \+ p \{ margin-top: 8px; \}/);
   assert.match(cssSource, /\.stage-introduction-diagram \{[^}]*text-align: left;/);
-  assert.match(cssSource, /\.stage-introduction-diagram h3 \{[^}]*font-size: 19px;/);
   assert.match(cssSource, /\.stage-introduction-figure \{[^}]*margin: 0;/);
   assert.doesNotMatch(cssSource.match(/\.stage-introduction-image \{[^}]*\}/)?.[0] ?? "", /border|background|border-radius/);
-  assert.doesNotMatch(cssSource.match(/\.stage-introduction-reading \{[^}]*\}/)?.[0] ?? "", /border|background|padding/);
-  assert.doesNotMatch(cssSource, /\.stage-introduction-ma \{/);
-  assert.match(cssSource, /\.stage-introduction-copy \{[^}]*font-size: 15px;/);
-  assert.match(cssSource, /\.stage-introduction-stages \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(cssSource, /\.stage-introduction-stages \{[^}]*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
   assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 17px;/);
-  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*\.stage-introduction-stages \{ grid-template-columns: 1fr;/);
+  assert.match(cssSource, /\.stage-introduction-example-panel dl > div \{[^}]*grid-template-columns: 82px minmax\(0, 1fr\);/);
+  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*\.stage-introduction-stages \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.top-actions \{[^}]*flex-wrap: nowrap;[^}]*gap: 5px;/);
   assert.doesNotMatch(cssSource, /confirmation-label-(?:long|short)/);
   assert.match(cssSource, /footer \{ display: grid; grid-template-columns: 1fr auto 1fr;/);

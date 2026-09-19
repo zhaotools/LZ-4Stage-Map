@@ -1486,35 +1486,66 @@ export default function Home() {
 
           {introductionActive ? (
             <article className="stage-introduction" aria-labelledby="stage-introduction-title">
-              <div className="stage-introduction-copy">
-                <header className="stage-introduction-head">
-                  <h2 id="stage-introduction-title">认识四种市场阶段</h2>
-                  <p>四阶段分析用低位整理、上升趋势、高位整理、下降趋势描述市场当前结构。</p>
+              <header className="stage-introduction-hero stage-introduction-panel">
+                <div>
+                  <p className="stage-introduction-kicker">先看阶段，再看变化</p>
+                  <h2 id="stage-introduction-title">资产当前处在什么阶段？</h2>
+                  <p>四阶段分析把市场走势分为低位整理、上升趋势、高位整理和下降趋势。</p>
                   <p>春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换。</p>
-                </header>
+                </div>
+                <div className="stage-introduction-hero-note">
+                  <strong>用周线看大方向</strong>
+                  <span>确认当前阶段</span><span>跟踪观察变化</span><span>按需查看阶段细分</span>
+                </div>
+              </header>
+              <section className="stage-introduction-overview" aria-labelledby="stage-introduction-stages-title">
+                <div className="stage-introduction-section-heading">
+                  <h2 id="stage-introduction-stages-title">认识四种市场阶段</h2>
+                  <p>春夏秋冬是帮助记忆的比喻。</p>
+                </div>
                 <div className="stage-introduction-stages">
                   <section className="stage-introduction-item stage-introduction-s1"><h3>低位整理 S1｜春季</h3><p>下跌后转为整理，方向尚未明确。留意价格与30周均线的变化，但这不等于已经见底。</p></section>
                   <section className="stage-introduction-item stage-introduction-s2"><h3>上升趋势 S2｜夏季</h3><p>价格呈上升结构，重点看趋势能否延续；短期仍可能回撤。</p></section>
                   <section className="stage-introduction-item stage-introduction-s3"><h3>高位整理 S3｜秋季</h3><p>高位反复整理，原有上升结构出现变化；这不等于已经见顶。</p></section>
                   <section className="stage-introduction-item stage-introduction-s4"><h3>下降趋势 S4｜冬季</h3><p>价格呈下降结构，重点看下行压力是否减弱；不代表接下来一定继续下跌。</p></section>
                 </div>
-                <section className="stage-introduction-diagram" aria-labelledby="stage-introduction-diagram-title">
-                  <h3 id="stage-introduction-diagram-title">四阶段示意图</h3>
-                  <p>本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</p>
-                  <figure className="stage-introduction-figure">
-                    <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-substages.png`} alt="典型走势中的四阶段细分代码示意：包含 S2A、S2B、S4A、S4B 等位置及 30 周移动平均线" width="1536" height="1024" />
-                  </figure>
-                </section>
-                <section className="stage-introduction-reading" aria-labelledby="stage-introduction-reading-title">
-                  <h3 id="stage-introduction-reading-title">读图提示</h3>
-                  <p><strong>30周均线</strong> 是观察周线趋势的参考之一，不能单独决定阶段；阶段判断仍按现有系统规则执行。</p>
-                  <p>先看已确认的当前阶段，再看主阶段持续时间，最后看本周观察。卡片底色表示已确认阶段；外框提示待确认观察，不代表阶段已经改变。</p>
-                  <p>S2A、S2B、S4A 等是阶段细分代码，需要更多细节时再查看资产详情；代码不代表固定转换顺序。</p>
-                  <p>LZ-4Stage 的核心不是预测涨跌，而是回答一个更简单的问题：<strong>当前资产处在趋势周期的什么位置？</strong></p>
-                  <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
-                  <p className="stage-introduction-closing">用一张地图，查看全球资产的当前阶段与趋势变化。</p>
-                </section>
-              </div>
+              </section>
+              <section className="stage-introduction-diagram" aria-labelledby="stage-introduction-diagram-title">
+                <h2 id="stage-introduction-diagram-title">四阶段示意图</h2>
+                <p>本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</p>
+                <figure className="stage-introduction-figure">
+                  <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-substages.png`} alt="典型走势中的四阶段细分代码示意：包含 S2A、S2B、S4A、S4B 等位置及 30 周移动平均线" width="1536" height="1024" />
+                </figure>
+              </section>
+              <section className="stage-introduction-reading stage-introduction-panel" aria-labelledby="stage-introduction-reading-title">
+                <div className="stage-introduction-section-top"><h2 id="stage-introduction-reading-title">怎样读地图？</h2><span>先读当前结果，再看观察变化</span></div>
+                <div className="stage-introduction-read-grid">
+                  <div className="stage-introduction-example-wrap">
+                    <div className="stage-introduction-example-caption">资产信息面板示例 · 非实时行情</div>
+                    <div className="stage-introduction-example-panel">
+                      <div className="stage-introduction-example-title"><span />DEMO · 示例资产 A</div>
+                      <dl>
+                        <div><dt>当前阶段</dt><dd><b className="stage-introduction-example-current">S2</b> · 上升趋势</dd></div>
+                        <div><dt>主阶段持续</dt><dd>6周</dd></div>
+                        <div><dt>本阶段起始时间</dt><dd>2026-08-14</dd></div>
+                        <div><dt>本周观察</dt><dd className="stage-introduction-example-observation">转向下降观察 · 1/2周确认</dd></div>
+                        <div><dt>30周均线：</dt><dd className="stage-introduction-example-ma">上升 · 近5周 +0.80%</dd></div>
+                      </dl>
+                    </div>
+                  </div>
+                  <div className="stage-introduction-read-points">
+                    <div className="stage-introduction-read-point"><span>1</span><div><h3>先看当前阶段</h3><p>示例当前仍为 S2；阶段名称和代码是已确认结果。</p></div></div>
+                    <div className="stage-introduction-read-point"><span>2</span><div><h3>再看本周观察</h3><p>“转向下降观察 · 1/2周确认”是待确认提示，不等于已进入 S4。</p></div></div>
+                    <div className="stage-introduction-read-point"><span>3</span><div><h3>补充看时间与均线</h3><p>持续周数、起始时间和30周均线帮助理解趋势，不单独决定阶段。</p></div></div>
+                  </div>
+                </div>
+                <p className="stage-introduction-note">示例只说明读图顺序，并非真实行情。实际资产的阶段、观察和数据时间，以页面显示为准。</p>
+              </section>
+              <section className="stage-introduction-faq" aria-label="四阶段常见问题">
+                <details className="stage-introduction-disclosure"><summary>30周均线怎样看？</summary><div><p>页面把30周均线的方向与近5周变化放在同一行，帮助观察周线趋势及其变化幅度。它们是参考信息，不是阶段判定的全部条件。</p></div></details>
+                <details className="stage-introduction-disclosure"><summary>S2A、S2B等细分代码怎样看？</summary><div><p>这些代码描述主阶段内部的差异。先看“上升趋势 S2”等主阶段名称，需要更多细节时再查看资产详情。A、B和减号是识别码，不代表一定依次发生的未来走势。</p><div className="stage-introduction-code-row"><span>S2A</span><span>S2</span><span>S2-</span><span>S2B</span><span>S2B-</span></div><div className="stage-introduction-code-row"><span>S4A</span><span>S4</span><span>S4-</span><span>S4B</span><span>S4B-</span></div><p>“上升阶段 ≤4周”是持续时间筛选条件，不等同于S2A；两者独立显示。</p></div></details>
+                <details className="stage-introduction-disclosure"><summary>使用这套方法，需要注意什么？</summary><div><p>四阶段分析描述当前结构，不保证未来涨跌。季节不是现实月份，阶段持续时间并不固定，也可能反复切换。阶段颜色不直接等于买卖动作。</p><p>“低位整理”不代表已找到最低点，“高位整理”也不代表已确认最高点。细分说明与确认条件以系统规则为准。</p></div></details>
+              </section>
             </article>
           ) : myScanActive ? (
             <MyScanPage
