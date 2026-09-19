@@ -1489,7 +1489,8 @@ export default function Home() {
               <div className="stage-introduction-copy">
                 <header className="stage-introduction-head">
                   <h2 id="stage-introduction-title">认识四种市场阶段</h2>
-                  <p>四阶段分析用低位整理、上升趋势、高位整理、下降趋势描述市场当前结构。春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换。</p>
+                  <p>四阶段分析用低位整理、上升趋势、高位整理、下降趋势描述市场当前结构。</p>
+                  <p>春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换。</p>
                 </header>
                 <div className="stage-introduction-stages">
                   <section className="stage-introduction-item stage-introduction-s1"><h3>低位整理 S1｜春季</h3><p>下跌后转为整理，方向尚未明确。留意价格与30周均线的变化，但这不等于已经见底。</p></section>
@@ -1497,8 +1498,16 @@ export default function Home() {
                   <section className="stage-introduction-item stage-introduction-s3"><h3>高位整理 S3｜秋季</h3><p>高位反复整理，原有上升结构出现变化；这不等于已经见顶。</p></section>
                   <section className="stage-introduction-item stage-introduction-s4"><h3>下降趋势 S4｜冬季</h3><p>价格呈下降结构，重点看下行压力是否减弱；不代表接下来一定继续下跌。</p></section>
                 </div>
+                <section className="stage-introduction-diagram" aria-labelledby="stage-introduction-diagram-title">
+                  <h3 id="stage-introduction-diagram-title">四阶段示意图</h3>
+                  <p>本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</p>
+                  <figure className="stage-introduction-figure">
+                    <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-substages.png`} alt="典型走势中的四阶段细分代码示意：包含 S2A、S2B、S4A、S4B 等位置及 30 周移动平均线" width="1536" height="1024" />
+                  </figure>
+                </section>
                 <section className="stage-introduction-reading" aria-labelledby="stage-introduction-reading-title">
                   <h3 id="stage-introduction-reading-title">读图提示</h3>
+                  <p><strong>细分阶段示意</strong>：本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</p>
                   <p className="stage-introduction-ma"><strong>30周均线</strong> 是观察周线趋势的参考之一，不能单独决定阶段；阶段判断仍按现有系统规则执行。</p>
                   <p>先看已确认的当前阶段，再看主阶段持续时间，最后看本周观察。卡片底色表示已确认阶段；外框提示待确认观察，不代表阶段已经改变。</p>
                   <p>S2A、S2B、S4A 等是阶段细分代码，需要更多细节时再查看资产详情；代码不代表固定转换顺序。</p>
@@ -1506,16 +1515,6 @@ export default function Home() {
                   <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
                   <p className="stage-introduction-closing">用一张地图，查看全球资产的当前阶段与趋势变化。</p>
                 </section>
-                <details className="stage-introduction-details">
-                  <summary>查看完整四阶段示意图</summary>
-                  <figure className="stage-introduction-figure">
-                    <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.svg`} alt="四阶段分析示意图：低位整理 S1 春季、上升趋势 S2 夏季、高位整理 S3 秋季、下降趋势 S4 冬季，阶段没有固定顺序" width="1536" height="1024" />
-                  </figure>
-                  <figure className="stage-introduction-figure stage-introduction-substage-figure">
-                    <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-substages.png`} alt="典型走势中的四阶段细分代码示意：包含 S2A、S2B、S4A、S4B 等位置及 30 周移动平均线" width="1536" height="1024" loading="lazy" />
-                    <figcaption className="stage-introduction-substage-caption"><strong>细分阶段示意</strong><span>本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</span></figcaption>
-                  </figure>
-                </details>
               </div>
             </article>
           ) : myScanActive ? (
