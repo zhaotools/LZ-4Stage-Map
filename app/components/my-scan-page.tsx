@@ -237,7 +237,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
                   <>
                     <dl className="my-scan-card-meta">
                       <div><dt>当前阶段</dt><dd><b style={{ color: stageColors[result.stage] }}>{result.subStage}</b> · {result.stageDetail}</dd></div>
-                      <div><dt>确认时间</dt><dd>{result.weeks}周 · {stageConfirmationTimeFor(result)}</dd></div>
+                      <div><dt>阶段持续</dt><dd>{result.weeks}周 · 首次确认 {stageConfirmationTimeFor(result)}</dd></div>
                       <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageColors[observationStage] : undefined }}>{observationLabel}</dd></div>
                       <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {result.momentum.toFixed(2)}%</dd></div>
                     </dl>

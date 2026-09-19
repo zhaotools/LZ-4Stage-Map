@@ -135,7 +135,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /认识四种市场阶段/);
   assert.match(pageSource, /低位整理 S1｜春季/);
   assert.match(pageSource, /上升趋势 S2｜夏季/);
-  assert.match(pageSource, /S2A → S2 → S2- → S2B → S2B-/);
+  assert.match(introductionSource, /S2A、S2B、S4A 等是阶段细分代码/);
   assert.match(pageSource, /高位整理 S3｜秋季/);
   assert.match(pageSource, /下降趋势 S4｜冬季/);
   for (const [stage, title] of Object.entries({
@@ -146,9 +146,14 @@ test("sidebar switches between the six stage-map collections", () => {
   })) {
     assert.ok(pageSource.includes(`${stage}: { title: "${title}"`));
   }
-  assert.match(pageSource, /S4A → S4 → S4- → S4B → S4B-/);
+  assert.match(introductionSource, /阶段不会按季节固定轮换/);
+  assert.match(introductionSource, /不等于已经见底/);
+  assert.match(introductionSource, /不等于已经见顶/);
+  assert.match(introductionSource, /不能单独决定阶段/);
+  assert.match(introductionSource, /代码不代表固定转换顺序/);
+  assert.doesNotMatch(introductionSource, /筑底|向下一阶段过渡|→/);
   assert.match(pageSource, /先判断阶段，再观察趋势。/);
-  assert.match(pageSource, /用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。/);
+  assert.match(pageSource, /用一张地图，查看全球资产的当前阶段与趋势变化。/);
   assert.match(cssSource, /\.stage-intro-link \{[^}]*text-decoration: underline;/);
   assert.match(cssSource, /\.stage-introduction-figure \{[^}]*margin: 0 auto 28px;/);
   assert.match(cssSource, /\.stage-introduction-copy \{[^}]*font-size: 15px;/);

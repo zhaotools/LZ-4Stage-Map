@@ -330,7 +330,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
       <div className="hover-card-title"><span style={{ background: stageMeta[market.stage].color }} />{market.shortCode} · {market.name}{touchMode && <button className="hover-close" type="button" aria-label="关闭资产阶段信息" onClick={onClose}><X size={17} /></button>}</div>
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-        <div><dt>确认时间</dt><dd>{market.weeks}周· {confirmationTime}</dd></div>
+        <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {confirmationTime}</dd></div>
         <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
         {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；确认至 {confirmationTimeForTradingDate(market)}</dd></div>}
@@ -499,7 +499,7 @@ function TrendRadarPage({
                 <div className="radar-match-tags">{market.matchRules.filter((ruleId) => ruleIds.includes(ruleId)).map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
+                  <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
@@ -595,7 +595,7 @@ function StockRadarPage({
                 <div className="radar-match-tags">{market.matchRules.map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>确认时间</dt><dd>{market.weeks}周 · {stageConfirmationTimeFor(market)}</dd></div>
+                  <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
@@ -1490,23 +1490,25 @@ export default function Home() {
               <div className="stage-introduction-copy">
                 <header className="stage-introduction-head">
                   <h2 id="stage-introduction-title">认识四种市场阶段</h2>
-                  <p>LZ-4Stage 将一个完整的市场趋势周期划分为 <strong>4 个阶段</strong>，用“春、夏、秋、冬”帮助理解资产当前所处的位置。</p>
+                  <p>四阶段分析用低位整理、上升趋势、高位整理、下降趋势描述市场当前结构。春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换。</p>
                 </header>
                 <figure className="stage-introduction-figure">
                   <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.svg`} alt="四阶段分析示意图：低位整理 S1 春季、上升趋势 S2 夏季、高位整理 S3 秋季、下降趋势 S4 冬季，阶段没有固定顺序" width="1536" height="1024" />
                 </figure>
                 <div className="stage-introduction-stages">
-                  <section className="stage-introduction-item stage-introduction-s1"><h3>低位整理 S1｜春季</h3><p>下跌趋势逐渐结束，价格开始横盘筑底，30周均线趋于走平。市场处于新一轮趋势形成前的准备阶段。</p></section>
-                  <section className="stage-introduction-item stage-introduction-s2"><h3>上升趋势 S2｜夏季</h3><p>价格突破底部区域并运行在30周均线上方，均线转为向上。通常是趋势最明确、持续时间最长的阶段。</p><p>LZ-4Stage 进一步划分为 <strong>S2A → S2 → S2- → S2B → S2B-</strong>，用于观察趋势从早期启动到后期衰减的过程。</p></section>
-                  <section className="stage-introduction-item stage-introduction-s3"><h3>高位整理 S3｜秋季</h3><p>上涨动能减弱，价格高位反复震荡，30周均线逐渐走平。市场由上涨趋势向下一阶段过渡。</p></section>
-                  <section className="stage-introduction-item stage-introduction-s4"><h3>下降趋势 S4｜冬季</h3><p>价格跌破关键趋势区域，30周均线转为向下，进入持续下降阶段。</p><p>LZ-4Stage 将其进一步划分为 <strong>S4A → S4 → S4- → S4B → S4B-</strong>，用于观察下跌趋势从早期到尾声的变化。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s1"><h3>低位整理 S1｜春季</h3><p>下跌后转为整理，方向尚未明确。留意价格与30周均线的变化，但这不等于已经见底。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s2"><h3>上升趋势 S2｜夏季</h3><p>价格呈上升结构，重点看趋势能否延续；短期仍可能回撤。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s3"><h3>高位整理 S3｜秋季</h3><p>高位反复整理，原有上升结构出现变化；这不等于已经见顶。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s4"><h3>下降趋势 S4｜冬季</h3><p>价格呈下降结构，重点看下行压力是否减弱；不代表接下来一定继续下跌。</p></section>
                 </div>
                 <section className="stage-introduction-reading" aria-labelledby="stage-introduction-reading-title">
                   <h3 id="stage-introduction-reading-title">读图提示</h3>
-                  <p className="stage-introduction-ma"><strong>30周移动平均线</strong> 是整个四阶段框架的重要参考线，用来判断中长期趋势方向：<br /><strong>向上代表趋势偏强，走平代表趋势转换，向下代表趋势偏弱。</strong></p>
+                  <p className="stage-introduction-ma"><strong>30周均线</strong> 是观察周线趋势的参考之一，不能单独决定阶段；阶段判断仍按现有系统规则执行。</p>
+                  <p>先看已确认的当前阶段，再看主阶段持续时间，最后看本周观察。卡片底色表示已确认阶段；外框提示待确认观察，不代表阶段已经改变。</p>
+                  <p>S2A、S2B、S4A 等是阶段细分代码，需要更多细节时再查看资产详情；代码不代表固定转换顺序。</p>
                   <p>LZ-4Stage 的核心不是预测涨跌，而是回答一个更简单的问题：<strong>当前资产处在趋势周期的什么位置？</strong></p>
                   <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
-                  <p className="stage-introduction-closing">用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。</p>
+                  <p className="stage-introduction-closing">用一张地图，查看全球资产的当前阶段与趋势变化。</p>
                 </section>
               </div>
             </article>
@@ -1554,7 +1556,7 @@ export default function Home() {
 
           <section className="map-panel" id="stage-map">
             <div className="map-panel-head">
-              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>颜色代表当前所处阶段，外框代表本周观察变化</p></div>
+              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换</p></div>
             </div>
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketPointerDown={handleMarketPointerDown} onMarketTap={handleMarketTap} />
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>

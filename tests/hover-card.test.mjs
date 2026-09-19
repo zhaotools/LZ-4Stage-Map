@@ -42,14 +42,14 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /touch-card/);
   assert.match(source, /关闭资产阶段信息/);
   assert.match(source, /market-hover-card/);
-  for (const label of ["当前阶段", "确认时间", "本周观察", "MA30趋势"]) {
+  for (const label of ["当前阶段", "阶段持续", "本周观察", "MA30趋势"]) {
     assert.match(source, new RegExp(label));
   }
   assert.doesNotMatch(source, /阶段详细信息/);
   assert.doesNotMatch(source, /<dt>代码名称<\/dt>/);
   assert.match(source, /market\.shortCode} · \{market\.name/);
   assert.doesNotMatch(source, /<dt>持续时间<\/dt>/);
-  assert.match(source, /market\.weeks}周· \{confirmationTime}/);
+  assert.match(source, /market\.weeks}周 · 首次确认 \{confirmationTime}/);
   assert.match(source, /stageConfirmationTimeFor\(market\)/);
   assert.match(source, /market\.stageDetail/);
   assert.match(source, /market\.observationStage/);
@@ -87,7 +87,7 @@ test("market tiles outline observation-stage changes", async () => {
   assert.match(source, /--observation-border.*stageMeta\[observationStage\]\.color/s);
   assert.match(css, /\.map-tile\.tile-observation-change \{ box-shadow: inset 0 0 0 2px var\(--observation-border\); \}/);
   assert.doesNotMatch(css, /tile-observation-change \{[^}]*#ffffff/s);
-  assert.match(source, /颜色代表当前所处阶段，外框代表本周观察变化/);
+  assert.match(source, /底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换/);
   assert.doesNotMatch(source, /方块大小体现资产重要性，颜色代表当前所处阶段/);
 });
 
