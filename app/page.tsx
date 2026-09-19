@@ -329,8 +329,7 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
         <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
         <div><dt>本阶段起始时间</dt><dd>{confirmationTime}</dd></div>
         <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-        <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
-        <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
+        <div><dt>30周均线：</dt><dd style={{ color: maColor }}>{maDirection} · 近5周 {market.momentum.toFixed(2)}%</dd></div>
         {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；阶段数据截至：{confirmationTimeForTradingDate(market)}</dd></div>}
       </dl>
     </div>
@@ -361,7 +360,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
                 gridRow: `span ${tileRows}`,
                 ...(observationChanged && observationStage ? { "--observation-border": stageMeta[observationStage].color } : {}),
               } as CSSProperties}
-              aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，30周均线方向${momentumDirection(item.momentum)}，近5周变化${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
+              aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，30周均线：${momentumDirection(item.momentum)} · 近5周 ${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onPointerDown={(event) => { onMarketPointerDown(event.pointerType); onMarketLeave(); }}
               onPointerCancel={() => onMarketPointerDown("")}
@@ -500,8 +499,7 @@ function TrendRadarPage({
                   <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
                   <div><dt>本阶段起始时间</dt><dd>{stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
-                  <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
+                  <div><dt>30周均线：</dt><dd style={{ color: maColor }}>{maDirection} · 近5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </a>
             );
@@ -598,8 +596,7 @@ function StockRadarPage({
                   <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
                   <div><dt>本阶段起始时间</dt><dd>{stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
-                  <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
+                  <div><dt>30周均线：</dt><dd style={{ color: maColor }}>{maDirection} · 近5周 {market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </a>
             );
@@ -1513,6 +1510,10 @@ export default function Home() {
                   <summary>查看完整四阶段示意图</summary>
                   <figure className="stage-introduction-figure">
                     <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.svg`} alt="四阶段分析示意图：低位整理 S1 春季、上升趋势 S2 夏季、高位整理 S3 秋季、下降趋势 S4 冬季，阶段没有固定顺序" width="1536" height="1024" />
+                  </figure>
+                  <figure className="stage-introduction-figure stage-introduction-substage-figure">
+                    <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-substages.png`} alt="典型走势中的四阶段细分代码示意：包含 S2A、S2B、S4A、S4B 等位置及 30 周移动平均线" width="1536" height="1024" loading="lazy" />
+                    <figcaption className="stage-introduction-substage-caption"><strong>细分阶段示意</strong><span>本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</span></figcaption>
                   </figure>
                 </details>
               </div>

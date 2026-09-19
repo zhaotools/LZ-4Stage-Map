@@ -136,6 +136,11 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.doesNotMatch(introductionSource, /<details className="stage-introduction-details"[^>]*\bopen\b/);
   assert.equal((introductionSource.match(/className="stage-introduction-item /g) ?? []).length, 4);
   assert.match(pageSource, /lz-4stage-framework\.svg/);
+  assert.match(introductionSource, /lz-4stage-substages\.png/);
+  assert.ok(introductionSource.indexOf("lz-4stage-framework.svg") < introductionSource.indexOf("lz-4stage-substages.png"));
+  assert.match(introductionSource, /细分阶段示意/);
+  assert.match(introductionSource, /不代表阶段必须依次出现；30 周均线也不是唯一判断依据/);
+  assert.match(cssSource, /\.stage-introduction-figure\.stage-introduction-substage-figure \{ margin-top: 24px; \}/);
   assert.match(pageSource, /认识四种市场阶段/);
   assert.match(pageSource, /低位整理 S1｜春季/);
   assert.match(pageSource, /上升趋势 S2｜夏季/);

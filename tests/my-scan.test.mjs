@@ -34,7 +34,7 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /window\.open\(tradingViewChartUrlFor\(result\), "_blank", "noopener,noreferrer"\)/);
   assert.match(component, /role=\{result \? "link" : undefined\}/);
   assert.match(component, /className=\{`my-scan-card \$\{result \? `stage-\$\{result\.stage\.toLowerCase\(\)\} clickable` : "pending"\}/);
-  assert.match(component, /<dt>当前阶段<\/dt>[\s\S]*<dt>主阶段持续<\/dt>[\s\S]*<dt>本阶段起始时间<\/dt>[\s\S]*<dt>本周观察<\/dt>[\s\S]*<dt>30周均线方向<\/dt>[\s\S]*<dt>近5周变化<\/dt>/);
+  assert.match(component, /<dt>当前阶段<\/dt>[\s\S]*<dt>主阶段持续<\/dt>[\s\S]*<dt>本阶段起始时间<\/dt>[\s\S]*<dt>本周观察<\/dt>[\s\S]*<dt>30周均线：<\/dt><dd style=\{\{ color: maColor \}\}>\{maDirection\} · 近5周 \{result\.momentum\.toFixed\(2\)\}%<\/dd>/);
   assert.match(component, /<dt>主阶段持续<\/dt><dd>\{result\.weeks\}周<\/dd><\/div>\s*<div><dt>本阶段起始时间<\/dt><dd>\{stageConfirmationTimeFor\(result\)\}<\/dd>/);
   assert.match(component, /stageConfirmationTimeFor\(result\)/);
   assert.match(component, /event\.stopPropagation\(\)/);

@@ -20,7 +20,7 @@ test("member-only stock radar loads the protected 300-stock S2 snapshot", () => 
   assert.doesNotMatch(pageSource, /个机会/);
   assert.match(pageSource, /20日均额/);
   assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*href=\{tradingViewChartUrlFor\(market\)\}[\s\S]*target="_blank"/);
-  assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>主阶段持续<\/dt>[\s\S]*?<dt>本阶段起始时间<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>30周均线方向<\/dt>[\s\S]*?<dt>近5周变化<\/dt>/);
+  assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>主阶段持续<\/dt>[\s\S]*?<dt>本阶段起始时间<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>30周均线：<\/dt><dd style=\{\{ color: maColor \}\}>\{maDirection\} · 近5周 \{market\.momentum\.toFixed\(2\)\}%<\/dd>/);
   assert.match(pageSource, /<dt>主阶段持续<\/dt><dd>\{market\.weeks\}周<\/dd><\/div>\s*<div><dt>本阶段起始时间<\/dt><dd>\{stageConfirmationTimeFor\(market\)\}<\/dd>/);
   assert.match(pageSource, /stockRadarSnapshot\.matches/);
   assert.match(pageSource, /pendingView === "stockRadar"/);

@@ -43,7 +43,7 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /touch-card/);
   assert.match(source, /关闭资产阶段信息/);
   assert.match(source, /market-hover-card/);
-  for (const label of ["当前阶段", "主阶段持续", "本阶段起始时间", "本周观察", "30周均线方向", "近5周变化"]) {
+  for (const label of ["当前阶段", "主阶段持续", "本阶段起始时间", "本周观察", "30周均线："]) {
     assert.match(source, new RegExp(label));
   }
   assert.doesNotMatch(source, /阶段详细信息/);
@@ -51,9 +51,9 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /market\.shortCode} · \{market\.name/);
   assert.doesNotMatch(source, /<dt>持续时间<\/dt>/);
   assert.match(source, /<dt>主阶段持续<\/dt><dd>\{market\.weeks\}周<\/dd><\/div>\s*<div><dt>本阶段起始时间<\/dt><dd>\{confirmationTime\}<\/dd>/);
-  assert.match(source, /<dt>30周均线方向<\/dt><dd style=\{\{ color: maColor \}\}>\{maDirection\}<\/dd>/);
-  assert.match(source, /<dt>近5周变化<\/dt><dd style=\{\{ color: maColor \}\}>\{market\.momentum\.toFixed\(2\)\}%<\/dd>/);
-  assert.match(source, /30周均线方向\$\{momentumDirection\(item\.momentum\)\}，近5周变化\$\{item\.momentum\.toFixed\(2\)\}%/);
+  assert.match(source, /<dt>30周均线：<\/dt><dd style=\{\{ color: maColor \}\}>\{maDirection\} · 近5周 \{market\.momentum\.toFixed\(2\)\}%<\/dd>/);
+  assert.doesNotMatch(source, /<dt>近5周变化<\/dt>/);
+  assert.match(source, /30周均线：\$\{momentumDirection\(item\.momentum\)\} · 近5周 \$\{item\.momentum\.toFixed\(2\)\}%/);
   assert.match(source, /const cardHeight = 330/);
   assert.doesNotMatch(source, /<dt>MA30趋势<\/dt>/);
   assert.match(source, /stageConfirmationTimeFor\(market\)/);
