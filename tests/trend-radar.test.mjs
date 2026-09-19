@@ -11,8 +11,8 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(apiSource, /\.eq\("view_key", "trendRadar"\)/);
   assert.match(pageSource, /type ProtectedPage = MemberView \| "trendRadar" \| "stockRadar"/);
   assert.match(pageSource, /if \(!isMember\) \{[\s\S]*setPendingView\("trendRadar"\)/);
-  assert.match(pageSource, /aria-label="会员工具"/);
-  assert.match(pageSource, /手机端会员工具/);
+  assert.match(pageSource, /<nav className="side-tools" aria-label="阶段扫描">/);
+  assert.match(pageSource, /手机端阶段扫描/);
   assert.match(pageSource, /全球阶段扫描/);
   assert.match(pageSource, /<span className="section-kicker">STAGE SCAN<\/span>/);
   assert.match(pageSource, /转向S2观察/);

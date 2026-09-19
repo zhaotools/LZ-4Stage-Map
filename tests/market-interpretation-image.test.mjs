@@ -29,9 +29,12 @@ const interpretation = {
 test("image export model shares the page V2 structure, positions, changes and confirmation dates", () => {
   const model = buildInterpretationImageModel(interpretation, "全球市场", "传统市场至 2026-09-05｜加密市场至 2026-09-07");
 
-  assert.equal(model.title, "全球市场四季解读");
+  assert.equal(model.title, "全球市场阶段解读");
+  assert.equal(model.kicker, "LZ-4Stage Map · MARKET INTERPRETATION");
   assert.equal(model.headline, interpretation.headline);
-  assert.deepEqual(model.stageCounts.map(({ label, count, percent }) => [label, count, percent]), [["S1 春季", 1, 6], ["S2 夏季", 9, 56], ["S3 秋季", 1, 6], ["S4 冬季", 5, 31]]);
+  assert.deepEqual(model.stageCounts.map(({ label, count, percent }) => [label, count, percent]), [["低位整理 S1｜春季", 1, 6], ["上升趋势 S2｜夏季", 9, 56], ["高位整理 S3｜秋季", 1, 6], ["下降趋势 S4｜冬季", 5, 31]]);
+  assert.deepEqual(model.stageCounts.map(({ color }) => color), ["#3f7fd2", "#329b57", "#d68428", "#d0444e"]);
+  assert.deepEqual(model.stageCounts.map(({ background }) => background), ["#e9f1fb", "#e7f5ec", "#fcf0e1", "#fae9eb"]);
   assert.equal(model.marketStructure[0].summary, "S2为主");
   assert.equal(model.keyPositions[0].assets[0].name, "比特币");
   assert.match(model.changeLines.join("\n"), /阶段净变化：S2 \+1｜S4 -1/);
@@ -82,11 +85,15 @@ test("image export paints a PNG and triggers a browser download", async () => {
     const fileName = await downloadMarketInterpretationImage(interpretation, "全球市场", "传统市场至 2026-09-05｜加密市场至 2026-09-07");
     assert.equal(clicked, true);
     assert.equal(downloadedAs, fileName);
-    assert.match(fileName, /^LZ-4Stage-全球市场-四季解读-2026-09-07\.png$/);
+    assert.match(fileName, /^LZ-4Stage-Map-全球市场-阶段解读-2026-09-07\.png$/);
     assert.equal(revoked, "blob:interpretation-image");
     assert.ok(paintedText.includes("6%"));
     assert.ok(paintedText.includes("56%"));
     assert.ok(!paintedText.includes("1 · 6%"));
+    assert.ok(paintedText.includes("低位整理 S1｜春季"));
+    assert.ok(paintedText.includes("上升趋势 S2｜夏季"));
+    assert.ok(paintedText.includes("高位整理 S3｜秋季"));
+    assert.ok(paintedText.includes("下降趋势 S4｜冬季"));
     assert.ok(paintedText.includes("美股"));
     assert.ok(paintedText.includes("S2为主"));
     assert.ok(!paintedText.includes("观察信号尚未等同于阶段确认。"));

@@ -219,10 +219,10 @@ function hydrateMarkets(items: DashboardMarket[]): Market[] {
 
 
 const stageMeta: Record<Stage, { title: string; season: string; color: string; dark: string }> = {
-  S1: { title: "筑底阶段", season: "春", color: "#3f7fd2", dark: "#3f7fd2" },
-  S2: { title: "上升阶段", season: "夏", color: "#329b57", dark: "#329b57" },
-  S3: { title: "筑顶阶段", season: "秋", color: "#d68428", dark: "#d68428" },
-  S4: { title: "下降阶段", season: "冬", color: "#d0444e", dark: "#d0444e" },
+  S1: { title: "低位整理", season: "春", color: "#3f7fd2", dark: "#3f7fd2" },
+  S2: { title: "上升趋势", season: "夏", color: "#329b57", dark: "#329b57" },
+  S3: { title: "高位整理", season: "秋", color: "#d68428", dark: "#d68428" },
+  S4: { title: "下降趋势", season: "冬", color: "#d0444e", dark: "#d0444e" },
 };
 const radarRuleMeta: Record<TrendRadarRuleId, { label: string; description: string; color: string }> = {
   s4Recovery: { label: "转向S2观察", description: "当前主阶段 S1 / S3 / S4 · 本周观察转向 S2", color: "#18a567" },
@@ -243,9 +243,17 @@ const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Reg
   global: { mapKicker: "GLOBAL MARKET", mapTitle: "全球市场", regions, groups: marketRegions },
   crypto7: { mapKicker: "CRYPTO MARKET", mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
   commodity: { mapKicker: "COMMODITY MARKET", mapTitle: "商品市场", regions: ["全球"], groups: ["大宗·宏观"] },
-  usSelected: { mapKicker: "US INDEX", mapTitle: "美股指数", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
-  chinaIndices: { mapKicker: "CHINA INDEX", mapTitle: "A股指数", regions: ["全球", "A股"], groups: ["A股"] },
-  hkSelected: { mapKicker: "HONG KONG INDEX", mapTitle: "港股指数", regions: ["全球", "港股"], groups: ["港股"] },
+  usSelected: { mapKicker: "US MARKET", mapTitle: "美股市场", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
+  chinaIndices: { mapKicker: "CHINA MARKET", mapTitle: "A股市场", regions: ["全球", "A股"], groups: ["A股"] },
+  hkSelected: { mapKicker: "HONG KONG MARKET", mapTitle: "港股市场", regions: ["全球", "港股"], groups: ["港股"] },
+};
+const mapPageTitles: Record<View, string> = {
+  global: "全球市场趋势地图",
+  usSelected: "美股市场趋势地图",
+  chinaIndices: "A股市场趋势地图",
+  hkSelected: "港股市场趋势地图",
+  commodity: "商品市场趋势地图",
+  crypto7: "加密市场趋势地图",
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
@@ -619,8 +627,8 @@ function MarketInterpretationPanel({ interpretation, marketTitle, confirmationLa
     <section className="market-interpretation" aria-labelledby="market-interpretation-title">
       <div className="market-interpretation-head">
         <div>
-          <span className="section-kicker">LZ-4STAGE INTERPRETATION</span>
-          <h2 id="market-interpretation-title">{marketTitle}四季解读</h2>
+          <span className="section-kicker">MARKET INTERPRETATION</span>
+          <h2 id="market-interpretation-title">{marketTitle}阶段解读</h2>
         </div>
         <div className="market-interpretation-actions">
           <span className="market-interpretation-date">{presentation.confirmationLabel}</span>
@@ -1367,30 +1375,39 @@ export default function Home() {
     }
   };
   const activeViewMeta = viewMeta[view];
+  const activePageTitle = introductionActive ? "四阶段说明"
+    : myScanActive ? "自选阶段扫描"
+      : stockRadarActive ? "个股阶段扫描"
+        : radarActive ? "全球阶段扫描"
+          : mapPageTitles[view];
+
+  useEffect(() => {
+    document.title = `${activePageTitle}｜LZ-4Stage Map`;
+  }, [activePageTitle]);
 
   return (
     <>
       <div className="app-shell">
         <aside className="sidebar">
-          <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="38" height="38" /><div><strong>4STAGE MAP</strong><small>MARKET TOOLKIT</small></div></div>
+          <div className="brand"><img className="brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="38" height="38" /><div><strong>市场地图</strong><small>LZ-4Stage Map</small></div></div>
           <div className="sidebar-navigation">
             <section className="side-nav-section" aria-labelledby="market-map-navigation-title">
               <h2 id="market-map-navigation-title">市场地图</h2>
               <nav className="side-nav" aria-label="市场地图">
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "global" ? "active" : ""}`} onClick={() => requestView("global")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "global"}><Grid2X2 size={18} /><span>全球市场</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股指数</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股指数</span></button>
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股指数</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected" ? "active" : ""}`} onClick={() => requestView("usSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "usSelected"}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}美股市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices" ? "active" : ""}`} onClick={() => requestView("chinaIndices")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "chinaIndices"}><Landmark size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}A股市场</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected" ? "active" : ""}`} onClick={() => requestView("hkSelected")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected"}><Building2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}港股市场</span></button>
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "commodity" ? "active" : ""}`} onClick={() => requestView("commodity")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "commodity"}><Gem size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}商品市场</span></button>
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
               </nav>
             </section>
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
-              <h2 id="member-tools-navigation-title">会员工具</h2>
-              <nav className="side-tools" aria-label="会员工具">
-                <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}全球阶段扫描</span></button>
-                <button className={`nav-item ${stockRadarActive ? "active" : ""}`} type="button" onClick={requestStockRadar} aria-pressed={stockRadarActive}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}个股阶段扫描</span></button>
-                <button className={`nav-item ${myScanActive ? "active" : ""}`} type="button" onClick={requestMyScan} aria-pressed={myScanActive}><MousePointerClick size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}我的扫描</span></button>
+              <h2 id="member-tools-navigation-title">阶段扫描</h2>
+              <nav className="side-tools" aria-label="阶段扫描">
+                <button className={`nav-item ${radarActive ? "active" : ""}`} type="button" onClick={requestTrendRadar} aria-pressed={radarActive}><Radar size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}全球扫描</span></button>
+                <button className={`nav-item ${stockRadarActive ? "active" : ""}`} type="button" onClick={requestStockRadar} aria-pressed={stockRadarActive}><TrendingUp size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}个股扫描</span></button>
+                <button className={`nav-item ${myScanActive ? "active" : ""}`} type="button" onClick={requestMyScan} aria-pressed={myScanActive}><MousePointerClick size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}自选扫描</span></button>
               </nav>
             </section>
           </div>
@@ -1423,18 +1440,18 @@ export default function Home() {
                 type="button"
                 className={`mobile-menu-trigger ${radarActive || stockRadarActive || myScanActive ? "active" : ""} ${mobileMenuOpen === "tools" ? "open" : ""}`}
                 onClick={() => setMobileMenuOpen((current) => current === "tools" ? null : "tools")}
-                aria-label="手机端会员工具"
+                aria-label="手机端阶段扫描"
                 aria-haspopup="menu"
                 aria-expanded={mobileMenuOpen === "tools"}
                 aria-controls="mobile-tools-menu"
               >
-                <Radar size={15} /><span>会员工具</span><ChevronDown size={13} aria-hidden="true" />
+                <Radar size={15} /><span>阶段扫描</span><ChevronDown size={13} aria-hidden="true" />
               </button>
               {mobileMenuOpen === "tools" && (
-                <div className="mobile-dropdown-panel" id="mobile-tools-menu" role="menu" aria-label="会员工具">
-                  <button type="button" role="menuitem" className={radarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestTrendRadar(); }}><Radar size={15} /><span>全球阶段扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={stockRadarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestStockRadar(); }}><TrendingUp size={15} /><span>个股阶段扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
-                  <button type="button" role="menuitem" className={myScanActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestMyScan(); }}><MousePointerClick size={15} /><span>我的扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                <div className="mobile-dropdown-panel" id="mobile-tools-menu" role="menu" aria-label="阶段扫描">
+                  <button type="button" role="menuitem" className={radarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestTrendRadar(); }}><Radar size={15} /><span>全球扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={stockRadarActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestStockRadar(); }}><TrendingUp size={15} /><span>个股扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={myScanActive ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestMyScan(); }}><MousePointerClick size={15} /><span>自选扫描</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                 </div>
               )}
             </div>
@@ -1444,9 +1461,9 @@ export default function Home() {
 
         <main className="main-content">
           <header className="topbar">
-            <div><div className="eyebrow"><Globe2 size={14} /> LZ-4STAGE MAP｜全球趋势导航</div><h1>全球市场四季图</h1></div>
+            <div><div className="eyebrow"><Globe2 size={14} /> LZ-4Stage Map｜四阶段分析</div><h1>{activePageTitle}</h1></div>
             <div className="top-actions">
-              <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />LZ-4Stage介绍</button>
+              <button className={`stage-intro-link ${introductionActive ? "active" : ""}`} type="button" onClick={openStageIntroduction} aria-pressed={introductionActive}><BookOpenText size={16} />四阶段说明</button>
               {!isMember && <button className="member-auth-button register-member-button" type="button" onClick={() => { setHoveredMarket(null); setShowFullVersion(true); }}><UserPlus size={14} />注册会员</button>}
               {isMember ? (
                 <div className="member-account-menu" ref={accountMenuRef}>
@@ -1470,18 +1487,27 @@ export default function Home() {
 
           {introductionActive ? (
             <article className="stage-introduction" aria-labelledby="stage-introduction-title">
-              <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.png`} alt="LZ-4Stage 春夏秋冬四阶段趋势框架图" width="1536" height="1024" />
               <div className="stage-introduction-copy">
-                <h2 id="stage-introduction-title">LZ-4Stage 四阶段趋势框架</h2>
-                <p>LZ-4Stage 将一个完整的市场趋势周期划分为 <strong>4 个阶段</strong>，用“春、夏、秋、冬”帮助理解资产当前所处的位置。</p>
-                <section className="stage-introduction-item stage-introduction-s1"><h3>Stage 1｜春季：底部整理期</h3><p>下跌趋势逐渐结束，价格开始横盘筑底，30周均线趋于走平。市场处于新一轮趋势形成前的准备阶段。</p></section>
-                <section className="stage-introduction-item stage-introduction-s2"><h3>Stage 2｜夏季：上升趋势期</h3><p>价格突破底部区域并运行在30周均线上方，均线转为向上。通常是趋势最明确、持续时间最长的阶段。</p><p>LZ-4Stage 进一步划分为 <strong>S2A → S2 → S2- → S2B → S2B-</strong>，用于观察趋势从早期启动到后期衰减的过程。</p></section>
-                <section className="stage-introduction-item stage-introduction-s3"><h3>Stage 3｜秋季：顶部整理期</h3><p>上涨动能减弱，价格高位反复震荡，30周均线逐渐走平。市场由上涨趋势向下一阶段过渡。</p></section>
-                <section className="stage-introduction-item stage-introduction-s4"><h3>Stage 4｜冬季：下降趋势期</h3><p>价格跌破关键趋势区域，30周均线转为向下，进入持续下降阶段。</p><p>LZ-4Stage 将其进一步划分为 <strong>S4A → S4 → S4- → S4B → S4B-</strong>，用于观察下跌趋势从早期到尾声的变化。</p></section>
-                <p className="stage-introduction-ma"><strong>30周移动平均线</strong> 是整个四阶段框架的重要参考线，用来判断中长期趋势方向：<br /><strong>向上代表趋势偏强，走平代表趋势转换，向下代表趋势偏弱。</strong></p>
-                <p>LZ-4Stage 的核心不是预测涨跌，而是回答一个更简单的问题：<strong>当前资产处在趋势周期的什么位置？</strong></p>
-                <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
-                <p className="stage-introduction-closing">用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。</p>
+                <header className="stage-introduction-head">
+                  <h2 id="stage-introduction-title">认识四种市场阶段</h2>
+                  <p>LZ-4Stage 将一个完整的市场趋势周期划分为 <strong>4 个阶段</strong>，用“春、夏、秋、冬”帮助理解资产当前所处的位置。</p>
+                </header>
+                <figure className="stage-introduction-figure">
+                  <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.svg`} alt="四阶段分析示意图：低位整理 S1 春季、上升趋势 S2 夏季、高位整理 S3 秋季、下降趋势 S4 冬季，阶段没有固定顺序" width="1536" height="1024" />
+                </figure>
+                <div className="stage-introduction-stages">
+                  <section className="stage-introduction-item stage-introduction-s1"><h3>低位整理 S1｜春季</h3><p>下跌趋势逐渐结束，价格开始横盘筑底，30周均线趋于走平。市场处于新一轮趋势形成前的准备阶段。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s2"><h3>上升趋势 S2｜夏季</h3><p>价格突破底部区域并运行在30周均线上方，均线转为向上。通常是趋势最明确、持续时间最长的阶段。</p><p>LZ-4Stage 进一步划分为 <strong>S2A → S2 → S2- → S2B → S2B-</strong>，用于观察趋势从早期启动到后期衰减的过程。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s3"><h3>高位整理 S3｜秋季</h3><p>上涨动能减弱，价格高位反复震荡，30周均线逐渐走平。市场由上涨趋势向下一阶段过渡。</p></section>
+                  <section className="stage-introduction-item stage-introduction-s4"><h3>下降趋势 S4｜冬季</h3><p>价格跌破关键趋势区域，30周均线转为向下，进入持续下降阶段。</p><p>LZ-4Stage 将其进一步划分为 <strong>S4A → S4 → S4- → S4B → S4B-</strong>，用于观察下跌趋势从早期到尾声的变化。</p></section>
+                </div>
+                <section className="stage-introduction-reading" aria-labelledby="stage-introduction-reading-title">
+                  <h3 id="stage-introduction-reading-title">读图提示</h3>
+                  <p className="stage-introduction-ma"><strong>30周移动平均线</strong> 是整个四阶段框架的重要参考线，用来判断中长期趋势方向：<br /><strong>向上代表趋势偏强，走平代表趋势转换，向下代表趋势偏弱。</strong></p>
+                  <p>LZ-4Stage 的核心不是预测涨跌，而是回答一个更简单的问题：<strong>当前资产处在趋势周期的什么位置？</strong></p>
+                  <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
+                  <p className="stage-introduction-closing">用一张地图，看懂全球资产当前处在春夏秋冬的哪一季。</p>
+                </section>
               </div>
             </article>
           ) : myScanActive ? (
@@ -1537,7 +1563,7 @@ export default function Home() {
           </>}
 
           <footer>
-            <span>{introductionActive ? "LZ-4Stage 四阶段趋势框架" : myScanActive ? `LZ-4Stage 我的扫描 · ${myScanAssets.length}/20 个资产` : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4stage 真实完整周线分析 · ${activeUniverse.length} 个资产`}</span>
+            <span>{introductionActive ? "LZ-4Stage Map · 四阶段说明" : myScanActive ? `LZ-4Stage Map · 自选阶段扫描 · ${myScanAssets.length}/20 个资产` : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage Map · 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage Map · 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4Stage Map · 四阶段分析 · ${activeUniverse.length} 个资产`}</span>
             <div className="footer-data-times">
               <span>{myScanActive
                 ? <>传统资产周六更新｜加密资产周一更新</>

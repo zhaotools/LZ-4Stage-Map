@@ -11,7 +11,7 @@ test("member-only stock radar loads the protected 300-stock S2 snapshot", () => 
   assert.match(apiSource, /\.eq\("view_key", "stockRadar"\)/);
   assert.match(pageSource, /type ProtectedPage = MemberView \| "trendRadar" \| "stockRadar"/);
   assert.match(pageSource, /onClick=\{requestStockRadar\}/);
-  assert.match(pageSource, />个股阶段扫描<\/span>/);
+  assert.match(pageSource, />个股扫描<\/span>/);
   assert.match(pageSource, /A股·港股·美股高流动性股票四阶段状态/);
   assert.match(pageSource, /\{stat\.matches\} 个观察/);
   assert.match(pageSource, /\{markets\.length\} 个观察/);

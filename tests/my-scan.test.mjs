@@ -10,8 +10,8 @@ const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8
 test("My Scan is a member-only desktop and mobile page", () => {
   assert.match(page, /type ProtectedPage = MemberView \| "trendRadar" \| "stockRadar" \| "myScan"/);
   assert.match(page, /const requestMyScan = async \(\) => \{[\s\S]*setPendingView\("myScan"\)[\s\S]*loadMyScan\(true\)/);
-  assert.match(page, /onClick=\{requestMyScan\}.*我的扫描/);
-  assert.match(page, /requestMyScan\(\); \}\}><MousePointerClick.*<span>我的扫描<\/span>/);
+  assert.match(page, /onClick=\{requestMyScan\}.*自选扫描/);
+  assert.match(page, /requestMyScan\(\); \}\}><MousePointerClick.*<span>自选扫描<\/span>/);
   assert.match(page, /const switchToMyScan = \(\) => \{[\s\S]*setMyScanActive\(true\);[\s\S]*scrollPageToTop\(\)/);
   assert.match(page, /<MyScanPage/);
   assert.match(page, /myScanOrderStorageKey/);
@@ -24,7 +24,8 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.doesNotMatch(component, /跟踪自己关心的资产阶段/);
   assert.doesNotMatch(component, /只查询精确代码/);
   assert.doesNotMatch(component, /<label[^>]*>资产代码<\/label>/);
-  assert.match(component, /<div className="my-scan-toolbar">[\s\S]*<h2 id="my-scan-title">我的扫描<\/h2>[\s\S]*className="my-scan-region-tabs"[\s\S]*<form className="my-scan-search"[\s\S]*className="my-scan-count"/);
+  assert.match(component, /<div className="my-scan-toolbar">[\s\S]*<h2 id="my-scan-title">我的自选资产<\/h2>[\s\S]*className="my-scan-region-tabs"[\s\S]*<form className="my-scan-search"[\s\S]*className="my-scan-count"/);
+  assert.match(component, /<h3>资产列表<\/h3>/);
   assert.match(component, /\{assets\.length\}<\/strong><span>\/ 20/);
   assert.match(component, /已达20个上限/);
   assert.match(component, /等待周度首次计算/);

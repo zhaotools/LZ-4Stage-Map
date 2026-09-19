@@ -1,8 +1,15 @@
 const STAGE_COLORS = {
-  S1: { season: "春季", color: "#397ff6", background: "#eef4ff" },
-  S2: { season: "夏季", color: "#18a567", background: "#eefaf4" },
-  S3: { season: "秋季", color: "#f09a18", background: "#fff7e8" },
-  S4: { season: "冬季", color: "#ed4859", background: "#fff1f3" },
+  S1: { season: "春季", color: "#3f7fd2", background: "#e9f1fb" },
+  S2: { season: "夏季", color: "#329b57", background: "#e7f5ec" },
+  S3: { season: "秋季", color: "#d68428", background: "#fcf0e1" },
+  S4: { season: "冬季", color: "#d0444e", background: "#fae9eb" },
+};
+
+const STAGE_NAMES = {
+  S1: "低位整理",
+  S2: "上升趋势",
+  S3: "高位整理",
+  S4: "下降趋势",
 };
 
 const FONT_FAMILY = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif';
@@ -84,7 +91,7 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
     const count = supplied?.count ?? interpretation.stageCounts[stage] ?? 0;
     return {
       stage,
-      label: `${stage} ${supplied?.season || STAGE_COLORS[stage].season}`,
+      label: `${STAGE_NAMES[stage]} ${stage}｜${supplied?.season || STAGE_COLORS[stage].season}`,
       count,
       percent: supplied?.percent ?? percentage(count, total),
       delta: supplied?.delta ?? 0,
@@ -98,8 +105,8 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
     ? { headline: interpretation.headline, summary: interpretation.summary }
     : fallbackOverview(marketTitle, stageCounts, total);
   return {
-    kicker: "LZ-4STAGE · MARKET INTERPRETATION",
-    title: `${marketTitle}四季解读`,
+    kicker: "LZ-4Stage Map · MARKET INTERPRETATION",
+    title: `${marketTitle}阶段解读`,
     confirmationLabel,
     reportDateLabel: reportDateLabel(confirmationLabel),
     headline: overview.headline,
@@ -211,7 +218,7 @@ function sectionLines(model, measure, widths) {
 
 function drawSection(context, { x, y, width, height, title, lines }) {
   paintCard(context, x, y, width, height, 16, "#fbfcfe", "#e1e8f2");
-  context.fillStyle = "#397ff6";
+  context.fillStyle = STAGE_COLORS.S1.color;
   context.beginPath();
   context.arc(x + 30, y + 35, 6, 0, Math.PI * 2);
   context.fill();
@@ -227,7 +234,7 @@ function drawSection(context, { x, y, width, height, title, lines }) {
 
 function drawMarketStructureSection(context, { x, y, width, height, rows, fallbackLines }) {
   paintCard(context, x, y, width, height, 16, "#fbfcfe", "#e1e8f2");
-  context.fillStyle = "#397ff6";
+  context.fillStyle = STAGE_COLORS.S1.color;
   context.beginPath();
   context.arc(x + 30, y + 35, 6, 0, Math.PI * 2);
   context.fill();
@@ -299,7 +306,7 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.shadowColor = "transparent";
 
   let y = 66;
-  context.fillStyle = "#397ff6";
+  context.fillStyle = STAGE_COLORS.S1.color;
   context.font = `700 18px ${FONT_FAMILY}`;
   context.fillText(model.kicker, contentX, y);
   y += 54;
@@ -373,10 +380,10 @@ export async function downloadMarketInterpretationImage(interpretation, marketTi
   context.font = `17px ${FONT_FAMILY}`;
   context.fillText(model.disclaimer, contentX, y);
   y += 36;
-  context.fillStyle = "#397ff6";
+  context.fillStyle = STAGE_COLORS.S1.color;
   context.font = `17px ${FONT_FAMILY}`;
   context.fillText(model.detailUrl, contentX, y);
 
-  const fileName = safeFileName(`LZ-4Stage-${marketTitle}-四季解读-${model.fileDate}.png`);
+  const fileName = safeFileName(`LZ-4Stage-Map-${marketTitle}-阶段解读-${model.fileDate}.png`);
   return downloadCanvas(canvas, fileName);
 }

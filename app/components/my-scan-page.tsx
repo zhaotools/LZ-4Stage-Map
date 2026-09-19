@@ -135,9 +135,9 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
   return (
     <section className="my-scan-page" aria-labelledby="my-scan-title">
       <div className="my-scan-head">
-        <span className="section-kicker">MEMBER · MY SCAN</span>
+        <span className="section-kicker">STAGE SCAN · WATCHLIST</span>
         <div className="my-scan-toolbar">
-          <h2 id="my-scan-title">我的扫描</h2>
+          <h2 id="my-scan-title">我的自选资产</h2>
           <div className="my-scan-region-tabs" role="group" aria-label="选择资产市场">
             {regions.map((item) => (
               <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => { setRegion(item); setCandidate(null); setMessage(null); }} aria-pressed={region === item}>{item}</button>
@@ -159,7 +159,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
       </div>
 
       <div className="my-scan-list-head">
-        <div><h3>自选资产</h3><p>使用卡片右上角的箭头调整显示顺序；相同代码在全站只计算一次。</p></div>
+        <div><h3>资产列表</h3><p>使用卡片右上角的箭头调整显示顺序；相同代码在全站只计算一次。</p></div>
         <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
           <div className="distribution-bar">
             {stages.map((stage) => {
