@@ -14,6 +14,7 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /<nav className="side-tools" aria-label="阶段扫描">/);
   assert.match(pageSource, /手机端阶段扫描/);
   assert.match(pageSource, /全球阶段扫描/);
+  assert.match(pageSource, /<span>本周匹配<\/span><strong>\{familyMarkets\.length\}<\/strong><small>个不重复资产<\/small>/);
   assert.match(pageSource, /<span className="section-kicker">STAGE SCAN<\/span>/);
   assert.match(pageSource, /转向S2观察/);
   assert.match(pageSource, /当前主阶段 S1 \/ S3 \/ S4 · 本周观察转向 S2/);
@@ -26,8 +27,8 @@ test("trend radar switches between three S2 and three S4 scan conditions", () =>
   assert.match(pageSource, /扫描\{mode\.toUpperCase\(\)\}/);
   assert.match(pageSource, /const \[radarScanMode, setRadarScanMode\] = useState<RadarScanMode>\("s2"\)/);
   assert.match(pageSource, /market\.matchRules\.filter[\s\S]*\.map/);
-  assert.match(pageSource, /<dt>阶段持续<\/dt><dd>\{market\.weeks\}周 · 首次确认 \{stageConfirmationTimeFor\(market\)\}<\/dd>/);
-  assert.match(pageSource, /className="radar-result-card"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>阶段持续<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>30周均线方向<\/dt>[\s\S]*?<dt>近5周变化<\/dt>/);
+  assert.match(pageSource, /<dt>主阶段持续<\/dt><dd>\{market\.weeks\}周<\/dd><\/div>\s*<div><dt>本阶段起始时间<\/dt><dd>\{stageConfirmationTimeFor\(market\)\}<\/dd>/);
+  assert.match(pageSource, /className="radar-result-card"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>主阶段持续<\/dt>[\s\S]*?<dt>本阶段起始时间<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>30周均线方向<\/dt>[\s\S]*?<dt>近5周变化<\/dt>/);
   assert.match(pageSource, /className="radar-result-card"[\s\S]*href=\{tradingViewChartUrlFor\(market\)\}[\s\S]*target="_blank"/);
   assert.doesNotMatch(pageSource, /radar-detail-button|查看阶段详情/);
   assert.match(pageSource, /\{snapshot\.universeSize\}个全球核心资产四阶段状态/);

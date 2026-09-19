@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { STAGE_PRESENTATION } from "../app/lib/stage-presentation.mjs";
 
 const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 const component = await readFile(new URL("../app/components/my-scan-page.tsx", import.meta.url), "utf8");
@@ -33,8 +34,8 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /window\.open\(tradingViewChartUrlFor\(result\), "_blank", "noopener,noreferrer"\)/);
   assert.match(component, /role=\{result \? "link" : undefined\}/);
   assert.match(component, /className=\{`my-scan-card \$\{result \? `stage-\$\{result\.stage\.toLowerCase\(\)\} clickable` : "pending"\}/);
-  assert.match(component, /<dt>当前阶段<\/dt>[\s\S]*<dt>阶段持续<\/dt>[\s\S]*<dt>本周观察<\/dt>[\s\S]*<dt>30周均线方向<\/dt>[\s\S]*<dt>近5周变化<\/dt>/);
-  assert.match(component, /<dt>阶段持续<\/dt><dd>\{result\.weeks\}周 · 首次确认 \{stageConfirmationTimeFor\(result\)\}<\/dd>/);
+  assert.match(component, /<dt>当前阶段<\/dt>[\s\S]*<dt>主阶段持续<\/dt>[\s\S]*<dt>本阶段起始时间<\/dt>[\s\S]*<dt>本周观察<\/dt>[\s\S]*<dt>30周均线方向<\/dt>[\s\S]*<dt>近5周变化<\/dt>/);
+  assert.match(component, /<dt>主阶段持续<\/dt><dd>\{result\.weeks\}周<\/dd><\/div>\s*<div><dt>本阶段起始时间<\/dt><dd>\{stageConfirmationTimeFor\(result\)\}<\/dd>/);
   assert.match(component, /stageConfirmationTimeFor\(result\)/);
   assert.match(component, /event\.stopPropagation\(\)/);
   assert.doesNotMatch(component, /my-scan-stage-result|my-scan-stage-code|行情确认至/);
@@ -71,4 +72,14 @@ test("My Scan API never exposes direct table writes or provider requests in the 
   assert.match(api, /rpc\("reorder_my_scan_assets"/);
   assert.doesNotMatch(component, /yahoo|eastmoney|binance|okx|bybit/i);
   assert.doesNotMatch(api, /service_role|SUPABASE_SECRET/);
+});
+
+test("My Scan stage colors match the main map", () => {
+  for (const [stage, color] of Object.entries({ S1: "#3f7fd2", S2: "#329b57", S3: "#d68428", S4: "#d0444e" })) {
+    assert.equal(STAGE_PRESENTATION[stage].color, color);
+    assert.ok(page.includes("= STAGE_PRESENTATION;"));
+    assert.ok(component.includes(`${stage}: STAGE_PRESENTATION.${stage}.color`));
+    assert.ok(component.includes(`${stage}: STAGE_PRESENTATION.${stage}.season`));
+    assert.ok(css.includes(`.my-scan-card.stage-${stage.toLowerCase()} { --my-stage: ${color}; }`));
+  }
 });

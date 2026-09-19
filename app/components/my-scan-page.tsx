@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 import { ChevronLeft, ChevronRight, Clock3, Plus, Search, Trash2 } from "lucide-react";
 
 import { stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
+import { STAGE_PRESENTATION } from "@/app/lib/stage-presentation.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
 import type { MyScanAsset, MyScanLookupAsset, MyScanRegion } from "@/app/lib/member-api";
 
@@ -27,13 +28,13 @@ type Props = {
 };
 
 const stageColors = {
-  S1: "#397ff6",
-  S2: "#18a567",
-  S3: "#f09a18",
-  S4: "#ed4859",
+  S1: STAGE_PRESENTATION.S1.color,
+  S2: STAGE_PRESENTATION.S2.color,
+  S3: STAGE_PRESENTATION.S3.color,
+  S4: STAGE_PRESENTATION.S4.color,
 } as const;
 const stages = ["S1", "S2", "S3", "S4"] as const;
-const stageSeasons = { S1: "春季", S2: "夏季", S3: "秋季", S4: "冬季" } as const;
+const stageSeasons = { S1: STAGE_PRESENTATION.S1.season, S2: STAGE_PRESENTATION.S2.season, S3: STAGE_PRESENTATION.S3.season, S4: STAGE_PRESENTATION.S4.season } as const;
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
 }
@@ -237,7 +238,8 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
                   <>
                     <dl className="my-scan-card-meta">
                       <div><dt>当前阶段</dt><dd><b style={{ color: stageColors[result.stage] }}>{result.subStage}</b> · {result.stageDetail}</dd></div>
-                      <div><dt>阶段持续</dt><dd>{result.weeks}周 · 首次确认 {stageConfirmationTimeFor(result)}</dd></div>
+                      <div><dt>主阶段持续</dt><dd>{result.weeks}周</dd></div>
+                      <div><dt>本阶段起始时间</dt><dd>{stageConfirmationTimeFor(result)}</dd></div>
                       <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageColors[observationStage] : undefined }}>{observationLabel}</dd></div>
                       <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
                       <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{result.momentum.toFixed(2)}%</dd></div>

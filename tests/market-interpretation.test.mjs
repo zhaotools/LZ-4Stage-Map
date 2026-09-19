@@ -53,3 +53,9 @@ test("interpretation panel exports the same content and explicit confirmation da
   assert.match(pageSource, /加密市场 \$\{cryptoInterpretationDate/);
   assert.match(pageSource, /阶段数据截至：\$\{commonConfirmationDate\}/);
 });
+
+test("mobile interpretation date can wrap without changing desktop", () => {
+  const mobileStyles = styles.slice(styles.indexOf("@media (max-width: 480px)"));
+  assert.match(styles, /\.market-interpretation-date \{ color: #7b899e; font-size: 10px; white-space: nowrap; \}/);
+  assert.match(mobileStyles, /\.market-interpretation-date \{ width: 100%; text-align: right; font-size: 10px; white-space: normal; overflow-wrap: anywhere; \}/);
+});

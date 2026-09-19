@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { STAGE_PRESENTATION } from "../app/lib/stage-presentation.mjs";
 
 const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 const cssSource = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
@@ -111,13 +112,15 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.ok(footerSource.indexOf("阶段数据截至：传统市场") < footerSource.indexOf("数据生成于"));
   assert.doesNotMatch(pageSource.slice(pageSource.indexOf('<header className="topbar">'), pageSource.indexOf("</header>")), /确认至|confirmation-date/);
   assert.match(cssSource, /\.footer-data-times \{[^}]*display: flex;[^}]*font-size: 10px;[^}]*white-space: nowrap;/);
+  assert.match(cssSource, /@media \(max-width: 780px\) \{\s*\.footer-data-times \{[^}]*display: block;[^}]*overflow-x: visible;[^}]*white-space: normal;[^}]*\}\s*\.footer-data-times span \{[^}]*display: block;[^}]*overflow-wrap: anywhere;/);
+  assert.match(pageSource, /counts\[stage\]\} 个资产/);
   assert.doesNotMatch(pageSource, /title=\{chartLinkTitleFor/);
   assert.doesNotMatch(pageSource, /RefreshCw|刷新页面|window\.location\.reload/);
   assert.doesNotMatch(pageSource, />完整周线<\/span>/);
   assert.doesNotMatch(pageSource, /点击获取完整LZ-4Stage/);
   assert.doesNotMatch(pageSource, /点击获取完整版/);
   assert.match(pageSource, /注册成为LZ会员/);
-  assert.match(pageSource, /LZ-4Stage全球市场阶段地图，可公开访问。/);
+  assert.match(pageSource, /LZ-4Stage全球市场趋势地图，可公开访问。/);
   assert.match(pageSource, /其他市场查询，以及市场扫描工具，需注册会员。/);
   assert.match(pageSource, /const \[introductionActive, setIntroductionActive\] = useState\(false\)/);
   assert.match(pageSource, /const openStageIntroduction = \(\) => \{[\s\S]+setIntroductionActive\(true\)/);
@@ -145,7 +148,9 @@ test("sidebar switches between the six stage-map collections", () => {
     S3: "高位整理",
     S4: "下降趋势",
   })) {
-    assert.ok(pageSource.includes(`${stage}: { title: "${title}"`));
+    assert.equal(STAGE_PRESENTATION[stage].title, title);
+    assert.match(pageSource, /const stageMeta:[^\n]+ = STAGE_PRESENTATION;/);
+    assert.match(pageSource, /\{stage\} \{stageMeta\[stage\]\.season\}/);
   }
   assert.match(introductionSource, /阶段不会按季节固定轮换/);
   assert.match(introductionSource, /不等于已经见底/);
@@ -175,6 +180,8 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.brand strong \{[^}]*font-size: 14px;[^}]*white-space: nowrap;/);
   assert.match(indexSource, /<title>全球市场趋势地图｜LZ-4Stage Map<\/title>/);
   assert.match(indexSource, /<meta property="og:title" content="全球市场趋势地图｜LZ-4Stage Map" \/>/);
+  assert.match(indexSource, /<meta name="description" content="基于 LZ-4Stage 真实完整周线数据的全球市场趋势地图。" \/>/);
+  assert.match(indexSource, /<meta property="og:description" content="基于 LZ-4Stage 真实完整周线数据的全球市场趋势地图。" \/>/);
   assert.match(indexSource, /href="\.\/favicon-v2\.png"/);
   assert.match(pageSource, /global: \{ mapKicker: "GLOBAL MARKET", mapTitle: "全球市场"/);
   assert.match(pageSource, /crypto7: \{ mapKicker: "CRYPTO MARKET", mapTitle: "加密市场"/);
@@ -288,4 +295,9 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.map-加密 \{ grid-area: 5 \/ 5 \/ 9 \/ 8; \}/);
   assert.match(cssSource, /\.map-日股 \{ grid-area: 5 \/ 8 \/ 9 \/ 10; \}/);
   assert.match(cssSource, /\.map-欧股 \{ grid-area: 5 \/ 10 \/ 9 \/ 13; \}/);
+});
+
+test("map empty state names stage observations without implying a confirmed change", () => {
+  assert.match(pageSource, /<span>本周暂无新的阶段观察变化<\/span>/);
+  assert.doesNotMatch(pageSource, /本周暂无新的观察变化/);
 });

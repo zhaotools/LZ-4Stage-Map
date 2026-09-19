@@ -32,6 +32,7 @@ import { globalConfirmationDates, latestConfirmationDate, stageConfirmationTimeF
 import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview-link.mjs";
 import { buildInterpretationImageModel, downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
 import { scrollPageToTop } from "@/app/lib/page-scroll.mjs";
+import { STAGE_PRESENTATION } from "@/app/lib/stage-presentation.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -218,12 +219,7 @@ function hydrateMarkets(items: DashboardMarket[]): Market[] {
 }
 
 
-const stageMeta: Record<Stage, { title: string; season: string; color: string; dark: string }> = {
-  S1: { title: "低位整理", season: "春", color: "#3f7fd2", dark: "#3f7fd2" },
-  S2: { title: "上升趋势", season: "夏", color: "#329b57", dark: "#329b57" },
-  S3: { title: "高位整理", season: "秋", color: "#d68428", dark: "#d68428" },
-  S4: { title: "下降趋势", season: "冬", color: "#d0444e", dark: "#d0444e" },
-};
+const stageMeta: Record<Stage, { title: string; season: string; color: string; dark: string }> = STAGE_PRESENTATION;
 const radarRuleMeta: Record<TrendRadarRuleId, { label: string; description: string; color: string }> = {
   s4Recovery: { label: "转向S2观察", description: "当前主阶段 S1 / S3 / S4 · 本周观察转向 S2", color: "#18a567" },
   s2aEntry: { label: "进入S2A", description: "当前进入S2A阶段", color: "#18a567" },
@@ -330,7 +326,8 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
       <div className="hover-card-title"><span style={{ background: stageMeta[market.stage].color }} />{market.shortCode} · {market.name}{touchMode && <button className="hover-close" type="button" aria-label="关闭资产阶段信息" onClick={onClose}><X size={17} /></button>}</div>
       <dl>
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-        <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {confirmationTime}</dd></div>
+        <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
+        <div><dt>本阶段起始时间</dt><dd>{confirmationTime}</dd></div>
         <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
         <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
@@ -459,7 +456,7 @@ function TrendRadarPage({
 
       <div className="radar-summary" role="group" aria-label="全球阶段扫描条件筛选">
         <button type="button" className={`radar-rule-card radar-rule-all ${filter === "all" ? "selected" : ""}`} onClick={() => onFilterChange("all")} aria-pressed={filter === "all"}>
-          <span>本周发现</span><strong>{familyMarkets.length}</strong><small>个不重复资产</small>
+          <span>本周匹配</span><strong>{familyMarkets.length}</strong><small>个不重复资产</small>
         </button>
         {ruleIds.map((ruleId) => {
           const meta = radarRuleMeta[ruleId];
@@ -500,7 +497,8 @@ function TrendRadarPage({
                 <div className="radar-match-tags">{market.matchRules.filter((ruleId) => ruleIds.includes(ruleId)).map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {stageConfirmationTimeFor(market)}</dd></div>
+                  <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
+                  <div><dt>本阶段起始时间</dt><dd>{stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
                   <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
@@ -551,7 +549,7 @@ function StockRadarPage({
 
       <div className="radar-summary" role="group" aria-label="个股阶段扫描条件筛选">
         <button type="button" className={`radar-rule-card radar-rule-all ${filter === "all" ? "selected" : ""}`} onClick={() => onFilterChange("all")} aria-pressed={filter === "all"}>
-          <span>本周发现</span><strong>{markets.length}</strong><small>个不重复股票</small>
+          <span>本周匹配</span><strong>{markets.length}</strong><small>只不重复股票</small>
         </button>
         {ruleIds.map((ruleId) => {
           const meta = radarRuleMeta[ruleId];
@@ -564,14 +562,14 @@ function StockRadarPage({
       </div>
 
       <div className="stock-market-health" aria-label="三个市场扫描状态">
-        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 个观察</em></div>)}
+        {snapshot.marketStats.map((stat) => <div key={stat.region}><strong>{stat.region}</strong><span>{stat.analyzed}/{stat.universe} 只</span><em>{stat.matches} 只匹配股票</em></div>)}
       </div>
 
       <div className="radar-toolbar">
         <div className="radar-region-tabs" role="group" aria-label="个股阶段扫描市场筛选">
           {(["全部", "美股", "A股", "港股"] as const).map((item) => <button key={item} type="button" className={region === item ? "active" : ""} onClick={() => onRegionChange(item)}>{item}</button>)}
         </div>
-        <span>显示 {filtered.length} / {markets.length} 个观察</span>
+        <span>显示 {filtered.length} / {markets.length} 只匹配股票</span>
       </div>
 
       {filtered.length ? (
@@ -597,7 +595,8 @@ function StockRadarPage({
                 <div className="radar-match-tags">{market.matchRules.map((ruleId) => <span key={ruleId} style={{ "--radar-tag-color": radarRuleMeta[ruleId].color } as CSSProperties}>{radarRuleMeta[ruleId].label}</span>)}</div>
                 <dl>
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {stageConfirmationTimeFor(market)}</dd></div>
+                  <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
+                  <div><dt>本阶段起始时间</dt><dd>{stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
                   <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
                   <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
@@ -1110,7 +1109,7 @@ export default function Home() {
   const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
     const cardWidth = 350;
-    const cardHeight = 290;
+    const cardHeight = 330;
     const gap = 16;
     setHoverPoint({
       x: clientX + gap + cardWidth > window.innerWidth ? Math.max(8, clientX - cardWidth - gap) : clientX + gap,
@@ -1549,10 +1548,10 @@ export default function Home() {
                   style={{ background: `color-mix(in srgb, ${stageMeta[stage].color} 14%, var(--canvas))` }}
                   onClick={() => setStageFilter(selected ? "全部" : stage)}
                   aria-pressed={selected}
-                  aria-label={`${stage} ${stageMeta[stage].title}，占比 ${percent}%，${counts[stage]} 个指数`}
+                  aria-label={`${stage} ${stageMeta[stage].title}，占比 ${percent}%，${counts[stage]} 个资产`}
                 >
                   <span className="distribution-fill" aria-hidden="true" style={{ width: `${percent}%`, background: `linear-gradient(135deg, ${stageMeta[stage].color}, ${stageMeta[stage].dark})` }} />
-                  <span className="distribution-label"><b style={{ color: stageMeta[stage].color }}>{stage} {stageMeta[stage].season}季</b></span>
+                  <span className="distribution-label"><b style={{ color: stageMeta[stage].color }}>{stage} {stageMeta[stage].season}</b></span>
                   <span className="distribution-value"><strong>{percent}%</strong></span>
                 </button>;
               })}
@@ -1565,7 +1564,7 @@ export default function Home() {
               <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换</p></div>
             </div>
             <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketPointerDown={handleMarketPointerDown} onMarketTap={handleMarketTap} />
-            <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的观察变化</span>}</div>
+            <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的阶段观察变化</span>}</div>
           </section>
           {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} />}
           </>}
@@ -1590,7 +1589,7 @@ export default function Home() {
               <button className="modal-close" type="button" aria-label="关闭完整版介绍" onClick={() => setShowFullVersion(false)}><X size={19} /></button>
               <div className="modal-icon"><MousePointerClick size={21} /></div>
               <h2 id="full-version-title">注册成为LZ会员</h2>
-              <p>LZ-4Stage全球市场阶段地图，可公开访问。</p>
+              <p>LZ-4Stage全球市场趋势地图，可公开访问。</p>
               <p>其他市场查询，以及市场扫描工具，需注册会员。</p>
               <div className="wechat-contact"><strong>请添加以下微信</strong><span>咨询更多信息</span></div>
               {/* Keep the original QR pixels intact instead of routing through image optimization. */}

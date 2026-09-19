@@ -1,16 +1,6 @@
-const STAGE_COLORS = {
-  S1: { season: "春季", color: "#3f7fd2", background: "#e9f1fb" },
-  S2: { season: "夏季", color: "#329b57", background: "#e7f5ec" },
-  S3: { season: "秋季", color: "#d68428", background: "#fcf0e1" },
-  S4: { season: "冬季", color: "#d0444e", background: "#fae9eb" },
-};
+import { STAGE_PRESENTATION } from "./stage-presentation.mjs";
 
-const STAGE_NAMES = {
-  S1: "低位整理",
-  S2: "上升趋势",
-  S3: "高位整理",
-  S4: "下降趋势",
-};
+const STAGE_COLORS = STAGE_PRESENTATION;
 
 const FONT_FAMILY = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif';
 
@@ -91,11 +81,13 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
     const count = supplied?.count ?? interpretation.stageCounts[stage] ?? 0;
     return {
       stage,
-      label: `${STAGE_NAMES[stage]} ${stage}｜${supplied?.season || STAGE_COLORS[stage].season}`,
+      label: `${STAGE_COLORS[stage].title} ${stage}｜${supplied?.season || STAGE_COLORS[stage].season}`,
       count,
       percent: supplied?.percent ?? percentage(count, total),
       delta: supplied?.delta ?? 0,
-      ...STAGE_COLORS[stage],
+      season: STAGE_COLORS[stage].season,
+      color: STAGE_COLORS[stage].color,
+      background: STAGE_COLORS[stage].background,
     };
   });
   const marketStructure = interpretation.marketStructure || [];
@@ -122,7 +114,7 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
       : "",
     source: "数据来自公开市场，由 LZ-4Stage 框架系统分析。",
     disclaimer: interpretation.note,
-    detailUrl: "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/",
+    detailUrl: "查看全球市场趋势地图：https://zhaotools.github.io/LZ-4Stage-Map/",
     fileDate: dateMatches?.at(-1) || interpretation.commonStageAsOf,
   };
 }

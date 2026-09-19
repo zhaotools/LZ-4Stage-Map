@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { createHoverResumeGuard } from "../app/lib/hover-resume.mjs";
+import { STAGE_PRESENTATION } from "../app/lib/stage-presentation.mjs";
 
 const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
@@ -42,18 +43,18 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /touch-card/);
   assert.match(source, /关闭资产阶段信息/);
   assert.match(source, /market-hover-card/);
-  for (const label of ["当前阶段", "阶段持续", "本周观察", "30周均线方向", "近5周变化"]) {
+  for (const label of ["当前阶段", "主阶段持续", "本阶段起始时间", "本周观察", "30周均线方向", "近5周变化"]) {
     assert.match(source, new RegExp(label));
   }
   assert.doesNotMatch(source, /阶段详细信息/);
   assert.doesNotMatch(source, /<dt>代码名称<\/dt>/);
   assert.match(source, /market\.shortCode} · \{market\.name/);
   assert.doesNotMatch(source, /<dt>持续时间<\/dt>/);
-  assert.match(source, /market\.weeks}周 · 首次确认 \{confirmationTime}/);
+  assert.match(source, /<dt>主阶段持续<\/dt><dd>\{market\.weeks\}周<\/dd><\/div>\s*<div><dt>本阶段起始时间<\/dt><dd>\{confirmationTime\}<\/dd>/);
   assert.match(source, /<dt>30周均线方向<\/dt><dd style=\{\{ color: maColor \}\}>\{maDirection\}<\/dd>/);
   assert.match(source, /<dt>近5周变化<\/dt><dd style=\{\{ color: maColor \}\}>\{market\.momentum\.toFixed\(2\)\}%<\/dd>/);
   assert.match(source, /30周均线方向\$\{momentumDirection\(item\.momentum\)\}，近5周变化\$\{item\.momentum\.toFixed\(2\)\}%/);
-  assert.match(source, /const cardHeight = 290/);
+  assert.match(source, /const cardHeight = 330/);
   assert.doesNotMatch(source, /<dt>MA30趋势<\/dt>/);
   assert.match(source, /stageConfirmationTimeFor\(market\)/);
   assert.match(source, /market\.stageDetail/);
@@ -98,10 +99,11 @@ test("market tiles outline observation-stage changes", async () => {
 
 test("market map uses the flat four-stage palette, light framing and white tile gaps", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(source, /S1: \{[^}]*color: "#3f7fd2"/);
-  assert.match(source, /S2: \{[^}]*color: "#329b57"/);
-  assert.match(source, /S3: \{[^}]*color: "#d68428"/);
-  assert.match(source, /S4: \{[^}]*color: "#d0444e"/);
+  assert.match(source, /const stageMeta:[^\n]+ = STAGE_PRESENTATION;/);
+  for (const [stage, color] of Object.entries({ S1: "#3f7fd2", S2: "#329b57", S3: "#d68428", S4: "#d0444e" })) {
+    assert.equal(STAGE_PRESENTATION[stage].color, color);
+    assert.equal(STAGE_PRESENTATION[stage].dark, color);
+  }
   assert.match(css, /\.market-map \{[^}]*border: 1px solid #e1e5ea;[^}]*background: #f0f2f5;/);
   assert.match(css, /\.map-group \{[^}]*border: 1px solid #e2e6eb;[^}]*background: #fff;/);
   assert.match(css, /\.map-tiles \{[^}]*gap: 1px;[^}]*padding: 0;[^}]*background: #fff;/);

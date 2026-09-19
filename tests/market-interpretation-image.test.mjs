@@ -45,7 +45,7 @@ test("image export model shares the page V2 structure, positions, changes and co
   assert.equal(model.confirmationLabel, "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
   assert.equal(model.reportDateLabel, "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
   assert.equal(model.fileDate, "2026-09-07");
-  assert.equal(model.detailUrl, "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/");
+  assert.equal(model.detailUrl, "查看全球市场趋势地图：https://zhaotools.github.io/LZ-4Stage-Map/");
 });
 
 test("image export paints a PNG and triggers a browser download", async () => {
@@ -98,6 +98,7 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.ok(paintedText.includes("S2为主"));
     assert.ok(!paintedText.includes("观察信号尚未等同于阶段确认。"));
     assert.ok(paintedText.includes("阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07"));
+    assert.ok(paintedText.includes("查看全球市场趋势地图：https://zhaotools.github.io/LZ-4Stage-Map/"));
     assert.equal(canvas.width, 1600);
     assert.equal(canvas.height, 1000);
     assert.equal(canvas.width / canvas.height, 16 / 10);
