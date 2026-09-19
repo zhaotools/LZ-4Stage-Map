@@ -123,20 +123,19 @@ button, input { font: inherit; } button { color: inherit; }
 .stage-introduction-head h2 { margin: 0 0 10px; color: var(--ink); font-size: 29px; letter-spacing: -.4px; }
 .stage-introduction-head p { margin: 0; }
 .stage-introduction-head p + p { margin-top: 8px; }
-.stage-introduction-diagram { width: min(800px, 100%); margin: 28px auto 0; }
+.stage-introduction-diagram { width: min(800px, 100%); margin: 28px auto 0; text-align: left; }
 .stage-introduction-diagram h3 { margin: 0 0 6px; color: var(--ink); font-size: 19px; }
 .stage-introduction-diagram p { margin: 0 0 14px; }
 .stage-introduction-figure { width: 100%; margin: 0; }
-.stage-introduction-image { display: block; width: 100%; height: auto; border: 1px solid #e4eaf3; border-radius: 13px; background: #f5f7fb; }
+.stage-introduction-image { display: block; width: 100%; height: auto; }
 .stage-introduction-stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .stage-introduction-item { min-width: 0; padding: 18px 20px; border: 1px solid color-mix(in srgb, var(--stage-intro-color) 22%, #e4e9f2); border-top: 4px solid var(--stage-intro-color); border-radius: 13px; background: color-mix(in srgb, var(--stage-intro-color) 6%, #fff); }
 .stage-introduction-item h3 { margin: 0 0 8px; color: var(--stage-intro-color); font-size: 17px; }
 .stage-introduction-item p { margin: 0; }.stage-introduction-item p + p { margin-top: 9px; }
 .stage-introduction-s1 { --stage-intro-color: #3f7fd2; }.stage-introduction-s2 { --stage-intro-color: #329b57; }.stage-introduction-s3 { --stage-intro-color: #d68428; }.stage-introduction-s4 { --stage-intro-color: #d0444e; }
-.stage-introduction-reading { margin-top: 30px; padding: 24px 26px; border: 1px solid #e2e9f2; border-radius: 13px; background: #f8fafd; }
+.stage-introduction-reading { margin-top: 30px; }
 .stage-introduction-reading h3 { margin: 0 0 12px; color: var(--ink); font-size: 19px; }
 .stage-introduction-reading > p { margin: 0 0 14px; }
-.stage-introduction-ma { padding: 14px 16px; border-left: 3px solid #3f7fd2; border-radius: 0 9px 9px 0; background: #fff; }
 .stage-introduction-principle { margin: 23px 0 5px !important; color: var(--ink); font-size: 20px; font-weight: 850; text-align: center; }
 .stage-introduction-closing { margin: 0 !important; color: #6f7d93; text-align: center; }
 .market-hover-card { position: fixed; z-index: 100; width: min(350px, calc(100vw - 16px)); pointer-events: none; overflow: hidden; border: 1px solid #e0e4e9; border-radius: 12px; color: #344054; background: rgba(247, 248, 250, .95); box-shadow: 0 16px 38px #35445b24; animation: hover-card-in .12s ease-out; }
@@ -197,7 +196,7 @@ footer span:last-child { text-align: right; }
   .side-tools { display: none; }
   .radar-panel { min-height: 0; padding: 15px; }.radar-head { align-items: flex-start; }.radar-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }.radar-rule-card { min-height: 88px; }.radar-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }.stock-market-health { grid-template-columns: 1fr; }.stock-market-health div { padding-block: 7px; }
   .my-scan-page { min-height: 0; padding: 15px; }.my-scan-toolbar { flex-wrap: wrap; }.my-scan-search { flex: 1 1 280px; }.my-scan-list-head { flex-wrap: wrap; padding-block: 12px; }.my-scan-stage-distribution { flex: 1 1 410px; }.my-scan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stage-introduction { padding: 15px 14px 24px; }.stage-introduction-diagram { margin-top: 22px; }.stage-introduction-figure { margin: 0; }.stage-introduction-image { margin-bottom: 0; border-radius: 9px; }.stage-introduction-copy { font-size: 14px; line-height: 1.75; }.stage-introduction-head { margin-bottom: 18px; }.stage-introduction-head h2 { font-size: 23px; }.stage-introduction-item { padding: 12px 13px; }.stage-introduction-item h3 { font-size: 15px; }.stage-introduction-principle { font-size: 18px; }.stage-introduction-stages { grid-template-columns: 1fr; gap: 10px; }.stage-introduction-reading { margin-top: 22px; padding: 18px 16px; }
+  .stage-introduction { padding: 15px 14px 24px; }.stage-introduction-diagram { margin-top: 22px; }.stage-introduction-figure { margin: 0; }.stage-introduction-copy { font-size: 14px; line-height: 1.75; }.stage-introduction-head { margin-bottom: 18px; }.stage-introduction-head h2 { font-size: 23px; }.stage-introduction-item { padding: 12px 13px; }.stage-introduction-item h3 { font-size: 15px; }.stage-introduction-principle { font-size: 18px; }.stage-introduction-stages { grid-template-columns: 1fr; gap: 10px; }.stage-introduction-reading { margin-top: 22px; }
 }
 @media (max-width: 480px) {
   .mobile-navigation-menus { margin-left: 8px; }

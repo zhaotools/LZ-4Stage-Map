@@ -1507,8 +1507,7 @@ export default function Home() {
                 </section>
                 <section className="stage-introduction-reading" aria-labelledby="stage-introduction-reading-title">
                   <h3 id="stage-introduction-reading-title">读图提示</h3>
-                  <p><strong>细分阶段示意</strong>：本图展示典型走势中细分阶段的大致位置，不代表阶段必须依次出现；30 周均线也不是唯一判断依据。</p>
-                  <p className="stage-introduction-ma"><strong>30周均线</strong> 是观察周线趋势的参考之一，不能单独决定阶段；阶段判断仍按现有系统规则执行。</p>
+                  <p><strong>30周均线</strong> 是观察周线趋势的参考之一，不能单独决定阶段；阶段判断仍按现有系统规则执行。</p>
                   <p>先看已确认的当前阶段，再看主阶段持续时间，最后看本周观察。卡片底色表示已确认阶段；外框提示待确认观察，不代表阶段已经改变。</p>
                   <p>S2A、S2B、S4A 等是阶段细分代码，需要更多细节时再查看资产详情；代码不代表固定转换顺序。</p>
                   <p>LZ-4Stage 的核心不是预测涨跌，而是回答一个更简单的问题：<strong>当前资产处在趋势周期的什么位置？</strong></p>

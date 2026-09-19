@@ -135,12 +135,12 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(introductionSource, /<h3 id="stage-introduction-diagram-title">四阶段示意图<\/h3>/);
   assert.match(introductionSource, /<h3 id="stage-introduction-reading-title">读图提示<\/h3>/);
   assert.ok(introductionSource.indexOf("lz-4stage-substages.png") < introductionSource.indexOf("stage-introduction-reading-title"));
-  assert.equal((introductionSource.match(/本图展示典型走势中细分阶段的大致位置/g) ?? []).length, 2);
+  assert.equal((introductionSource.match(/本图展示典型走势中细分阶段的大致位置/g) ?? []).length, 1);
   assert.doesNotMatch(introductionSource, /查看完整四阶段示意图|stage-introduction-details|lz-4stage-framework\.svg/);
   assert.equal((introductionSource.match(/className="stage-introduction-item /g) ?? []).length, 4);
   assert.match(introductionSource, /lz-4stage-substages\.png/);
   assert.equal((introductionSource.match(/lz-4stage-substages\.png/g) ?? []).length, 1);
-  assert.match(introductionSource, /细分阶段示意/);
+  assert.doesNotMatch(introductionSource, /<strong>细分阶段示意<\/strong>/);
   assert.match(introductionSource, /不代表阶段必须依次出现；30 周均线也不是唯一判断依据/);
   assert.match(cssSource, /\.stage-introduction-diagram \{[^}]*margin: 28px auto 0;/);
   assert.match(pageSource, /认识四种市场阶段/);
@@ -169,8 +169,12 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /用一张地图，查看全球资产的当前阶段与趋势变化。/);
   assert.match(cssSource, /\.stage-intro-link \{[^}]*text-decoration: underline;/);
   assert.match(cssSource, /\.stage-introduction-head p \+ p \{ margin-top: 8px; \}/);
+  assert.match(cssSource, /\.stage-introduction-diagram \{[^}]*text-align: left;/);
   assert.match(cssSource, /\.stage-introduction-diagram h3 \{[^}]*font-size: 19px;/);
   assert.match(cssSource, /\.stage-introduction-figure \{[^}]*margin: 0;/);
+  assert.doesNotMatch(cssSource.match(/\.stage-introduction-image \{[^}]*\}/)?.[0] ?? "", /border|background|border-radius/);
+  assert.doesNotMatch(cssSource.match(/\.stage-introduction-reading \{[^}]*\}/)?.[0] ?? "", /border|background|padding/);
+  assert.doesNotMatch(cssSource, /\.stage-introduction-ma \{/);
   assert.match(cssSource, /\.stage-introduction-copy \{[^}]*font-size: 15px;/);
   assert.match(cssSource, /\.stage-introduction-stages \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 17px;/);
