@@ -174,11 +174,11 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(introductionSource, /不代表一定依次发生的未来走势/);
   assert.doesNotMatch(introductionSource, /筑底|向下一阶段过渡|→/);
   assert.match(cssSource, /\.stage-intro-link \{[^}]*text-decoration: underline;/);
-  assert.match(cssSource, /\.stage-introduction \{ width: min\(1000px, 100%\); margin: 0 auto;[^}]*text-align: center;/);
+  assert.match(cssSource, /\.stage-introduction \{ width: min\(820px, 100%\); margin: 0 auto;[^}]*text-align: center;/);
   assert.match(cssSource, /\.stage-introduction-diagram \{ width: 100%; margin: 16px auto;/);
-  assert.match(cssSource, /\.stage-introduction-figure \{ width: min\(900px, 100%\); margin: 0 auto;/);
+  assert.match(cssSource, /\.stage-introduction-figure \{ width: 100%; margin: 0;/);
   assert.doesNotMatch(cssSource.match(/\.stage-introduction-image \{[^}]*\}/)?.[0] ?? "", /border|background|border-radius/);
-  assert.match(cssSource, /\.stage-introduction-stages \{ width: min\(820px, 100%\); margin: 0 auto;[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(cssSource, /\.stage-introduction-stages \{ width: 100%; margin: 0;[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 17px;/);
   assert.match(cssSource, /\.stage-introduction-example-panel dl > div \{[^}]*grid-template-columns: 82px minmax\(0, 1fr\);/);
   assert.match(cssSource, /\.stage-introduction-read-points \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
