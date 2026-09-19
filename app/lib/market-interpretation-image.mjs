@@ -52,10 +52,10 @@ function withoutObservationDisclaimer(text) {
 
 function reportDateLabel(confirmationLabel) {
   const normalized = confirmationLabel
-    .replace(/^数据确认至\s*/u, "")
+    .replace(/^(?:阶段)?数据(?:确认至|截至)[:：]?\s*/u, "")
     .replace(/^确认至\s*/u, "")
     .replace(/市场至\s*/gu, "市场 ");
-  return `数据截至：${normalized}`;
+  return `阶段数据截至：${normalized}`;
 }
 
 function changeLines(interpretation) {
@@ -83,7 +83,7 @@ function changeLines(interpretation) {
   return lines;
 }
 
-export function buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel = `数据确认至 ${interpretation.commonStageAsOf}`) {
+export function buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel = `阶段数据截至：${interpretation.commonStageAsOf}`) {
   const total = interpretation.analyzedSize || Object.values(interpretation.stageCounts).reduce((sum, count) => sum + count, 0);
   const providedDistribution = new Map((interpretation.stageDistribution || []).map((item) => [item.stage, item]));
   const stageCounts = ["S1", "S2", "S3", "S4"].map((stage) => {

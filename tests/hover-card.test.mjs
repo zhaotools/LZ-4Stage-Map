@@ -42,7 +42,7 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /touch-card/);
   assert.match(source, /关闭资产阶段信息/);
   assert.match(source, /market-hover-card/);
-  for (const label of ["当前阶段", "阶段持续", "本周观察", "MA30趋势"]) {
+  for (const label of ["当前阶段", "阶段持续", "本周观察", "30周均线方向", "近5周变化"]) {
     assert.match(source, new RegExp(label));
   }
   assert.doesNotMatch(source, /阶段详细信息/);
@@ -50,6 +50,11 @@ test("market tiles provide a pointer-following stage detail card", () => {
   assert.match(source, /market\.shortCode} · \{market\.name/);
   assert.doesNotMatch(source, /<dt>持续时间<\/dt>/);
   assert.match(source, /market\.weeks}周 · 首次确认 \{confirmationTime}/);
+  assert.match(source, /<dt>30周均线方向<\/dt><dd style=\{\{ color: maColor \}\}>\{maDirection\}<\/dd>/);
+  assert.match(source, /<dt>近5周变化<\/dt><dd style=\{\{ color: maColor \}\}>\{market\.momentum\.toFixed\(2\)\}%<\/dd>/);
+  assert.match(source, /30周均线方向\$\{momentumDirection\(item\.momentum\)\}，近5周变化\$\{item\.momentum\.toFixed\(2\)\}%/);
+  assert.match(source, /const cardHeight = 290/);
+  assert.doesNotMatch(source, /<dt>MA30趋势<\/dt>/);
   assert.match(source, /stageConfirmationTimeFor\(market\)/);
   assert.match(source, /market\.stageDetail/);
   assert.match(source, /market\.observationStage/);
@@ -116,6 +121,7 @@ test("crypto pending and unavailable analysis is clearly labelled without changi
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /cryptoFreshness === "pending"/);
   assert.match(source, /数据待更新 · 保留历史结果/);
+  assert.match(source, /阶段数据截至：\{confirmationTimeForTradingDate\(market\)\}/);
   assert.match(source, /cryptoFreshness === "unavailable"/);
   assert.match(source, /tile-unavailable/);
   assert.doesNotMatch(source, /行情来源|crypto-source-note/);

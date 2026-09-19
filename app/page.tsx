@@ -332,8 +332,9 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
         <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
         <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {confirmationTime}</dd></div>
         <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-        <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
-        {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；确认至 {confirmationTimeForTradingDate(market)}</dd></div>}
+        <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
+        <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
+        {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；阶段数据截至：{confirmationTimeForTradingDate(market)}</dd></div>}
       </dl>
     </div>
   );
@@ -363,7 +364,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
                 gridRow: `span ${tileRows}`,
                 ...(observationChanged && observationStage ? { "--observation-border": stageMeta[observationStage].color } : {}),
               } as CSSProperties}
-              aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，MA30${momentumDirection(item.momentum)}${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
+              aria-label={item.code === "HYPE-USD" ? `${chartLinkTitleFor(item)}，新标签页打开${item.cryptoFreshness === "unavailable" ? "，数据暂不可用" : item.cryptoFreshness === "pending" ? "，数据待更新" : ""}` : item.cryptoFreshness === "unavailable" ? `${item.shortCode}，数据暂不可用，点击在TradingView新标签页打开K线` : `${item.shortCode}，${item.name}，${item.cryptoFreshness === "pending" ? "数据待更新，以下为历史结果，" : ""}${item.subStage}，${item.stageDetail}，已持续${item.weeks}周，30周均线方向${momentumDirection(item.momentum)}，近5周变化${item.momentum.toFixed(2)}%，点击在TradingView新标签页打开K线`}
               onPointerMove={(event) => { if (event.pointerType !== "touch") onMarketMove(item, event); }}
               onPointerDown={(event) => { onMarketPointerDown(event.pointerType); onMarketLeave(); }}
               onPointerCancel={() => onMarketPointerDown("")}
@@ -501,7 +502,8 @@ function TrendRadarPage({
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
                   <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
+                  <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
+                  <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </a>
             );
@@ -542,8 +544,8 @@ function StockRadarPage({
       <div className="radar-head stock-radar-head">
         <div><span className="section-kicker">STAGE SCAN</span><h2 id="stock-radar-title">个股阶段扫描</h2><p>A股·港股·美股高流动性股票四阶段状态</p></div>
         <div className="stock-radar-status" aria-label="个股阶段扫描数据质量">
-          <strong>{snapshot.quality.completionRate}% 完整</strong>
-          <span>{snapshot.quality.live} 实时 · {snapshot.quality.cache} 缓存</span>
+          <strong>扫描完成率 {snapshot.quality.completionRate}%</strong>
+          <span>本次获取 {snapshot.quality.live} 只 · 使用缓存 {snapshot.quality.cache} 只</span>
         </div>
       </div>
 
@@ -597,7 +599,8 @@ function StockRadarPage({
                   <div><dt>当前阶段</dt><dd><b style={{ color: stageMeta[market.stage].color }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
                   <div><dt>阶段持续</dt><dd>{market.weeks}周 · 首次确认 {stageConfirmationTimeFor(market)}</dd></div>
                   <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageMeta[observationStage].color : undefined }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
-                  <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {market.momentum.toFixed(2)}%</dd></div>
+                  <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
+                  <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{market.momentum.toFixed(2)}%</dd></div>
                 </dl>
               </a>
             );
@@ -1086,8 +1089,8 @@ export default function Home() {
   const traditionalInterpretationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: true });
   const cryptoInterpretationDate = latestConfirmationDate(activeUniverse.filter(item => item.region === "加密" && item.cryptoFreshness !== "unavailable"));
   const interpretationConfirmationLabel = view === "global"
-    ? `传统市场至 ${traditionalInterpretationDate ?? "—"}｜加密市场至 ${cryptoInterpretationDate ?? "—"}`
-    : `数据确认至 ${commonConfirmationDate}`;
+    ? `阶段数据截至：传统市场 ${traditionalInterpretationDate ?? "—"}｜加密市场 ${cryptoInterpretationDate ?? "—"}`
+    : `阶段数据截至：${commonConfirmationDate}`;
   const myScanLatestGeneratedAt = [...myScanAssets]
     .map((asset) => asset.result?.generatedAt)
     .filter((value): value is string => Boolean(value))
@@ -1107,7 +1110,7 @@ export default function Home() {
   const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
     const cardWidth = 350;
-    const cardHeight = 250;
+    const cardHeight = 290;
     const gap = 16;
     setHoverPoint({
       x: clientX + gap + cardWidth > window.innerWidth ? Math.max(8, clientX - cardWidth - gap) : clientX + gap,
@@ -1492,9 +1495,6 @@ export default function Home() {
                   <h2 id="stage-introduction-title">认识四种市场阶段</h2>
                   <p>四阶段分析用低位整理、上升趋势、高位整理、下降趋势描述市场当前结构。春夏秋冬只是帮助记忆的比喻，阶段不会按季节固定轮换。</p>
                 </header>
-                <figure className="stage-introduction-figure">
-                  <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.svg`} alt="四阶段分析示意图：低位整理 S1 春季、上升趋势 S2 夏季、高位整理 S3 秋季、下降趋势 S4 冬季，阶段没有固定顺序" width="1536" height="1024" />
-                </figure>
                 <div className="stage-introduction-stages">
                   <section className="stage-introduction-item stage-introduction-s1"><h3>低位整理 S1｜春季</h3><p>下跌后转为整理，方向尚未明确。留意价格与30周均线的变化，但这不等于已经见底。</p></section>
                   <section className="stage-introduction-item stage-introduction-s2"><h3>上升趋势 S2｜夏季</h3><p>价格呈上升结构，重点看趋势能否延续；短期仍可能回撤。</p></section>
@@ -1510,6 +1510,12 @@ export default function Home() {
                   <p className="stage-introduction-principle">先判断阶段，再观察趋势。</p>
                   <p className="stage-introduction-closing">用一张地图，查看全球资产的当前阶段与趋势变化。</p>
                 </section>
+                <details className="stage-introduction-details">
+                  <summary>查看完整四阶段示意图</summary>
+                  <figure className="stage-introduction-figure">
+                    <img className="stage-introduction-image" src={`${import.meta.env.BASE_URL}lz-4stage-framework.svg`} alt="四阶段分析示意图：低位整理 S1 春季、上升趋势 S2 夏季、高位整理 S3 秋季、下降趋势 S4 冬季，阶段没有固定顺序" width="1536" height="1024" />
+                  </figure>
+                </details>
               </div>
             </article>
           ) : myScanActive ? (
@@ -1570,8 +1576,8 @@ export default function Home() {
               <span>{myScanActive
                 ? <>传统资产周六更新｜加密资产周一更新</>
                 : view === "global"
-                ? <>传统市场确认至 {globalDates.traditional}｜加密确认至 {globalDates.crypto}</>
-                : <>确认至 {commonConfirmationDate}</>}</span>
+                ? <>阶段数据截至：传统市场 {globalDates.traditional}｜加密市场 {globalDates.crypto}</>
+                : <>阶段数据截至：{commonConfirmationDate}</>}</span>
               <span>数据生成于 {formatDateTime(activeGeneratedAt)}</span>
             </div>
             <span>阶段分析仅供市场观察，不构成任何投资建议</span>

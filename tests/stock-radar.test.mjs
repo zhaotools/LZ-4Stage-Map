@@ -19,13 +19,17 @@ test("member-only stock radar loads the protected 300-stock S2 snapshot", () => 
   assert.doesNotMatch(pageSource, /个机会/);
   assert.match(pageSource, /20日均额/);
   assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*href=\{tradingViewChartUrlFor\(market\)\}[\s\S]*target="_blank"/);
-  assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>阶段持续<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>MA30趋势<\/dt>/);
+  assert.match(pageSource, /className="radar-result-card stock-radar-result"[\s\S]*?<dt>当前阶段<\/dt>[\s\S]*?<dt>阶段持续<\/dt>[\s\S]*?<dt>本周观察<\/dt>[\s\S]*?<dt>30周均线方向<\/dt>[\s\S]*?<dt>近5周变化<\/dt>/);
   assert.match(pageSource, /<dt>阶段持续<\/dt><dd>\{market\.weeks\}周 · 首次确认 \{stageConfirmationTimeFor\(market\)\}<\/dd>/);
   assert.match(pageSource, /stockRadarSnapshot\.matches/);
   assert.match(pageSource, /pendingView === "stockRadar"/);
   assert.match(pageSource, /登录会员账号后查看300只高流动性股票扫描结果/);
   assert.match(cssSource, /\.stock-market-health/);
   assert.match(cssSource, /\.stock-radar-status/);
+  assert.match(pageSource, /本次获取 \{snapshot\.quality\.live\} 只 · 使用缓存 \{snapshot\.quality\.cache\} 只/);
+  assert.match(pageSource, /扫描完成率 \{snapshot\.quality\.completionRate\}%/);
+  assert.doesNotMatch(pageSource, /\{snapshot\.quality\.completionRate\}% 完整/);
+  assert.doesNotMatch(pageSource, /\{snapshot\.quality\.live\} 实时/);
   assert.match(cssSource, /background: color-mix\(in srgb, var\(--radar-stage-color\) 4%, #fff\)/);
   assert.match(cssSource, /\.radar-result-card:hover, \.radar-result-card:focus-visible/);
 });

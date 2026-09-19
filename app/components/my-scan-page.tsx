@@ -239,7 +239,8 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
                       <div><dt>当前阶段</dt><dd><b style={{ color: stageColors[result.stage] }}>{result.subStage}</b> · {result.stageDetail}</dd></div>
                       <div><dt>阶段持续</dt><dd>{result.weeks}周 · 首次确认 {stageConfirmationTimeFor(result)}</dd></div>
                       <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageColors[observationStage] : undefined }}>{observationLabel}</dd></div>
-                      <div><dt>MA30趋势</dt><dd style={{ color: maColor }}>{maDirection} · 5周 {result.momentum.toFixed(2)}%</dd></div>
+                      <div><dt>30周均线方向</dt><dd style={{ color: maColor }}>{maDirection}</dd></div>
+                      <div><dt>近5周变化</dt><dd style={{ color: maColor }}>{result.momentum.toFixed(2)}%</dd></div>
                     </dl>
                     {staleAfterFailure && <p className="my-scan-status warning">本次更新失败，保留上期结果</p>}
                   </>

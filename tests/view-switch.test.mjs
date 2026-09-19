@@ -101,15 +101,14 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+四阶段说明<\/button>/);
   assert.match(pageSource, /\{!isMember && <button className="member-auth-button register-member-button"[^\n]+注册会员<\/button>\}/);
   assert.ok(pageSource.indexOf("注册会员</button>") < pageSource.indexOf('className="member-auth-button login-button"'));
-  assert.match(pageSource, /传统市场确认至 \{globalDates.traditional\}/);
-  assert.match(pageSource, /加密确认至 \{globalDates.crypto\}/);
-  assert.match(pageSource, /确认至 \{commonConfirmationDate\}/);
+  assert.match(pageSource, /阶段数据截至：传统市场 \{globalDates.traditional\}｜加密市场 \{globalDates.crypto\}/);
+  assert.match(pageSource, /阶段数据截至：\{commonConfirmationDate\}/);
   assert.match(pageSource, /数据生成于 \{formatDateTime\(activeGeneratedAt\)\}/);
   const footerSource = pageSource.slice(pageSource.indexOf("<footer>"), pageSource.indexOf("</footer>"));
   assert.match(footerSource, /footer-data-times/);
   assert.match(footerSource, /LZ-4Stage Map · 四阶段说明/);
   assert.match(footerSource, /LZ-4Stage Map · 自选阶段扫描/);
-  assert.ok(footerSource.indexOf("传统市场确认至") < footerSource.indexOf("数据生成于"));
+  assert.ok(footerSource.indexOf("阶段数据截至：传统市场") < footerSource.indexOf("数据生成于"));
   assert.doesNotMatch(pageSource.slice(pageSource.indexOf('<header className="topbar">'), pageSource.indexOf("</header>")), /确认至|confirmation-date/);
   assert.match(cssSource, /\.footer-data-times \{[^}]*display: flex;[^}]*font-size: 10px;[^}]*white-space: nowrap;/);
   assert.doesNotMatch(pageSource, /title=\{chartLinkTitleFor/);
@@ -124,12 +123,14 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /const openStageIntroduction = \(\) => \{[\s\S]+setIntroductionActive\(true\)/);
   assert.match(pageSource, /className="stage-introduction" aria-labelledby="stage-introduction-title"/);
   const introductionSource = pageSource.slice(pageSource.indexOf('<article className="stage-introduction"'), pageSource.indexOf("</article>", pageSource.indexOf('<article className="stage-introduction"')));
-  const introductionParts = ["stage-introduction-head", "stage-introduction-figure", "stage-introduction-stages", "stage-introduction-reading"];
+  const introductionParts = ["stage-introduction-head", "stage-introduction-stages", "stage-introduction-reading", "stage-introduction-details", "stage-introduction-figure"];
   for (const part of introductionParts) assert.ok(introductionSource.includes(part));
   for (let index = 1; index < introductionParts.length; index += 1) {
     assert.ok(introductionSource.indexOf(introductionParts[index - 1]) < introductionSource.indexOf(introductionParts[index]));
   }
   assert.match(introductionSource, /<h3 id="stage-introduction-reading-title">读图提示<\/h3>/);
+  assert.match(introductionSource, /className="stage-introduction-reading"[\s\S]*?<\/section>\s*<details className="stage-introduction-details">\s*<summary>查看完整四阶段示意图<\/summary>\s*<figure className="stage-introduction-figure"/);
+  assert.doesNotMatch(introductionSource, /<details className="stage-introduction-details"[^>]*\bopen\b/);
   assert.equal((introductionSource.match(/className="stage-introduction-item /g) ?? []).length, 4);
   assert.match(pageSource, /lz-4stage-framework\.svg/);
   assert.match(pageSource, /认识四种市场阶段/);
@@ -155,7 +156,9 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /先判断阶段，再观察趋势。/);
   assert.match(pageSource, /用一张地图，查看全球资产的当前阶段与趋势变化。/);
   assert.match(cssSource, /\.stage-intro-link \{[^}]*text-decoration: underline;/);
-  assert.match(cssSource, /\.stage-introduction-figure \{[^}]*margin: 0 auto 28px;/);
+  assert.match(cssSource, /\.stage-introduction-details \{[^}]*margin-top: 28px;/);
+  assert.match(cssSource, /\.stage-introduction-details summary \{[^}]*cursor: pointer;/);
+  assert.match(cssSource, /\.stage-introduction-figure \{[^}]*margin: 16px auto 0;/);
   assert.match(cssSource, /\.stage-introduction-copy \{[^}]*font-size: 15px;/);
   assert.match(cssSource, /\.stage-introduction-stages \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 17px;/);

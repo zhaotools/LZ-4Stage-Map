@@ -49,6 +49,7 @@ test("interpretation panel exports the same content and explicit confirmation da
   assert.match(pageSource, /"生成图片"/);
   assert.match(pageSource, /marketTitle=\{activeViewMeta\.mapTitle\}/);
   assert.match(pageSource, /confirmationLabel=\{interpretationConfirmationLabel\}/);
-  assert.match(pageSource, /传统市场至 \$\{traditionalInterpretationDate/);
-  assert.match(pageSource, /加密市场至 \$\{cryptoInterpretationDate/);
+  assert.match(pageSource, /阶段数据截至：传统市场 \$\{traditionalInterpretationDate/);
+  assert.match(pageSource, /加密市场 \$\{cryptoInterpretationDate/);
+  assert.match(pageSource, /阶段数据截至：\$\{commonConfirmationDate\}/);
 });

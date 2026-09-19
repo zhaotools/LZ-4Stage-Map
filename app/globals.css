@@ -122,7 +122,10 @@ button, input { font: inherit; } button { color: inherit; }
 .stage-introduction-head { max-width: 760px; margin: 0 0 24px; }
 .stage-introduction-head h2 { margin: 0 0 10px; color: var(--ink); font-size: 29px; letter-spacing: -.4px; }
 .stage-introduction-head p { margin: 0; }
-.stage-introduction-figure { width: min(800px, 100%); margin: 0 auto 28px; }
+.stage-introduction-details { margin-top: 28px; }
+.stage-introduction-details summary { width: min(800px, 100%); margin: 0 auto; padding: 12px 16px; border: 1px solid #d7e3f2; border-radius: 10px; background: #f5f8fd; color: #2c5f9c; font-size: 14px; font-weight: 700; cursor: pointer; }
+.stage-introduction-details summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.stage-introduction-figure { width: min(800px, 100%); margin: 16px auto 0; }
 .stage-introduction-image { display: block; width: 100%; height: auto; border: 1px solid #e4eaf3; border-radius: 13px; background: #f5f7fb; }
 .stage-introduction-stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .stage-introduction-item { min-width: 0; padding: 18px 20px; border: 1px solid color-mix(in srgb, var(--stage-intro-color) 22%, #e4e9f2); border-top: 4px solid var(--stage-intro-color); border-radius: 13px; background: color-mix(in srgb, var(--stage-intro-color) 6%, #fff); }
@@ -190,7 +193,7 @@ footer span:last-child { text-align: right; }
   .side-tools { display: none; }
   .radar-panel { min-height: 0; padding: 15px; }.radar-head { align-items: flex-start; }.radar-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }.radar-rule-card { min-height: 88px; }.radar-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }.stock-market-health { grid-template-columns: 1fr; }.stock-market-health div { padding-block: 7px; }
   .my-scan-page { min-height: 0; padding: 15px; }.my-scan-toolbar { flex-wrap: wrap; }.my-scan-search { flex: 1 1 280px; }.my-scan-list-head { flex-wrap: wrap; padding-block: 12px; }.my-scan-stage-distribution { flex: 1 1 410px; }.my-scan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stage-introduction { padding: 15px 14px 24px; }.stage-introduction-figure { margin-bottom: 20px; }.stage-introduction-image { margin-bottom: 0; border-radius: 9px; }.stage-introduction-copy { font-size: 14px; line-height: 1.75; }.stage-introduction-head { margin-bottom: 18px; }.stage-introduction-head h2 { font-size: 23px; }.stage-introduction-item { padding: 12px 13px; }.stage-introduction-item h3 { font-size: 15px; }.stage-introduction-principle { font-size: 18px; }.stage-introduction-stages { grid-template-columns: 1fr; gap: 10px; }.stage-introduction-reading { margin-top: 22px; padding: 18px 16px; }
+  .stage-introduction { padding: 15px 14px 24px; }.stage-introduction-details { margin-top: 20px; }.stage-introduction-figure { margin-top: 16px; margin-bottom: 0; }.stage-introduction-image { margin-bottom: 0; border-radius: 9px; }.stage-introduction-copy { font-size: 14px; line-height: 1.75; }.stage-introduction-head { margin-bottom: 18px; }.stage-introduction-head h2 { font-size: 23px; }.stage-introduction-item { padding: 12px 13px; }.stage-introduction-item h3 { font-size: 15px; }.stage-introduction-principle { font-size: 18px; }.stage-introduction-stages { grid-template-columns: 1fr; gap: 10px; }.stage-introduction-reading { margin-top: 22px; padding: 18px 16px; }
 }
 @media (max-width: 480px) {
   .mobile-navigation-menus { margin-left: 8px; }

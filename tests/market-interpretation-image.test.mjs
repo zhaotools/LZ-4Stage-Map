@@ -27,7 +27,7 @@ const interpretation = {
 };
 
 test("image export model shares the page V2 structure, positions, changes and confirmation dates", () => {
-  const model = buildInterpretationImageModel(interpretation, "全球市场", "传统市场至 2026-09-05｜加密市场至 2026-09-07");
+  const model = buildInterpretationImageModel(interpretation, "全球市场", "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
 
   assert.equal(model.title, "全球市场阶段解读");
   assert.equal(model.kicker, "LZ-4Stage Map · MARKET INTERPRETATION");
@@ -42,8 +42,8 @@ test("image export model shares the page V2 structure, positions, changes and co
   assert.match(model.changeLines.join("\n"), /恒生指数 S4 → S1观察（延续）/);
   assert.doesNotMatch(model.changeLines.join("\n"), /观察信号尚未等同于阶段确认/);
   assert.equal(model.source, "数据来自公开市场，由 LZ-4Stage 框架系统分析。");
-  assert.equal(model.confirmationLabel, "传统市场至 2026-09-05｜加密市场至 2026-09-07");
-  assert.equal(model.reportDateLabel, "数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
+  assert.equal(model.confirmationLabel, "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
+  assert.equal(model.reportDateLabel, "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
   assert.equal(model.fileDate, "2026-09-07");
   assert.equal(model.detailUrl, "阶段地图详情：https://zhaotools.github.io/LZ-4Stage-Map/");
 });
@@ -82,7 +82,7 @@ test("image export paints a PNG and triggers a browser download", async () => {
   URL.revokeObjectURL = (url) => { revoked = url; };
 
   try {
-    const fileName = await downloadMarketInterpretationImage(interpretation, "全球市场", "传统市场至 2026-09-05｜加密市场至 2026-09-07");
+    const fileName = await downloadMarketInterpretationImage(interpretation, "全球市场", "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
     assert.equal(clicked, true);
     assert.equal(downloadedAs, fileName);
     assert.match(fileName, /^LZ-4Stage-Map-全球市场-阶段解读-2026-09-07\.png$/);
@@ -97,7 +97,7 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.ok(paintedText.includes("美股"));
     assert.ok(paintedText.includes("S2为主"));
     assert.ok(!paintedText.includes("观察信号尚未等同于阶段确认。"));
-    assert.ok(paintedText.includes("数据截至：传统市场 2026-09-05｜加密市场 2026-09-07"));
+    assert.ok(paintedText.includes("阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07"));
     assert.equal(canvas.width, 1600);
     assert.equal(canvas.height, 1000);
     assert.equal(canvas.width / canvas.height, 16 / 10);
