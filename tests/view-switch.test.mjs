@@ -179,6 +179,10 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.stage-introduction-figure \{ width: 100%; margin: 0;/);
   assert.doesNotMatch(cssSource.match(/\.stage-introduction-image \{[^}]*\}/)?.[0] ?? "", /border|background|border-radius/);
   assert.match(cssSource, /\.stage-introduction-stages \{ width: 100%; margin: 0;[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(cssSource, /\.stage-introduction-stages \{ width: 100%; margin: 0;[^}]*gap: 22px 12px;/);
+  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*\.stage-introduction-stages \{[^}]*gap: 18px 10px;/);
+  assert.match(cssSource, /@media \(max-width: 480px\)[\s\S]*\.stage-introduction-stages \{ gap: 16px 8px;/);
+  assert.match(pageSource, /const week = isoWeek\(traditionalInterpretationDate \?\? commonStageAsOf\);/);
   assert.match(cssSource, /\.stage-introduction-item h3 \{[^}]*font-size: 17px;/);
   assert.match(cssSource, /\.stage-introduction-example-panel dl > div \{[^}]*grid-template-columns: 82px minmax\(0, 1fr\);/);
   assert.match(cssSource, /\.stage-introduction-read-points \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);

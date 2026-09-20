@@ -1102,7 +1102,7 @@ export default function Home() {
   const activeInterpretation = view === "global"
     ? (publicSnapshot as typeof dashboardData & { interpretation?: MarketInterpretation }).interpretation
     : memberSnapshots[view]?.interpretation;
-  const week = isoWeek(commonStageAsOf);
+  const week = isoWeek(traditionalInterpretationDate ?? commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
   const placeHoverCard = (clientX: number, clientY: number) => {
     const cardWidth = 350;
