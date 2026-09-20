@@ -627,7 +627,7 @@ function MarketInterpretationPanel({ interpretation, marketTitle, confirmationLa
       <div className="market-interpretation-head">
         <div>
           <span className="section-kicker">MARKET INTERPRETATION</span>
-          <h2 id="market-interpretation-title">{marketTitle}阶段解读</h2>
+          <h2 id="market-interpretation-title">{presentation.title}</h2>
         </div>
         <div className="market-interpretation-actions">
           <span className="market-interpretation-date">{presentation.confirmationLabel}</span>

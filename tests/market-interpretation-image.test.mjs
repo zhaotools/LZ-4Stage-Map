@@ -29,7 +29,10 @@ const interpretation = {
 test("image export model shares the page V2 structure, positions, changes and confirmation dates", () => {
   const model = buildInterpretationImageModel(interpretation, "全球市场", "阶段数据截至：传统市场 2026-09-05｜加密市场 2026-09-07");
 
-  assert.equal(model.title, "全球市场阶段解读");
+  assert.equal(model.title, "全球市场趋势解读");
+  for (const marketTitle of ["美股市场", "A股市场", "港股市场", "商品市场", "加密市场"]) {
+    assert.equal(buildInterpretationImageModel(interpretation, marketTitle).title, `${marketTitle}趋势解读`);
+  }
   assert.equal(model.kicker, "LZ-4Stage Map · MARKET INTERPRETATION");
   assert.equal(model.headline, interpretation.headline);
   assert.deepEqual(model.stageCounts.map(({ label, count, percent }) => [label, count, percent]), [["低位整理 S1｜春季", 1, 6], ["上升趋势 S2｜夏季", 9, 56], ["高位整理 S3｜秋季", 1, 6], ["下降趋势 S4｜冬季", 5, 31]]);
@@ -87,6 +90,7 @@ test("image export paints a PNG and triggers a browser download", async () => {
     assert.equal(downloadedAs, fileName);
     assert.match(fileName, /^LZ-4Stage-Map-全球市场-阶段解读-2026-09-07\.png$/);
     assert.equal(revoked, "blob:interpretation-image");
+    assert.ok(paintedText.includes("全球市场趋势解读"));
     assert.ok(paintedText.includes("6%"));
     assert.ok(paintedText.includes("56%"));
     assert.ok(!paintedText.includes("1 · 6%"));

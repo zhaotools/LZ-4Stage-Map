@@ -98,7 +98,7 @@ export function buildInterpretationImageModel(interpretation, marketTitle, confi
     : fallbackOverview(marketTitle, stageCounts, total);
   return {
     kicker: "LZ-4Stage Map · MARKET INTERPRETATION",
-    title: `${marketTitle}阶段解读`,
+    title: `${marketTitle}趋势解读`,
     confirmationLabel,
     reportDateLabel: reportDateLabel(confirmationLabel),
     headline: overview.headline,

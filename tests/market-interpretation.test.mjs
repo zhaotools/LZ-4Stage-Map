@@ -14,7 +14,7 @@ test("market pages render the synchronized V2 interpretation below the stage map
   assert.ok(mapPosition >= 0);
   assert.ok(interpretationPosition > mapPosition);
   assert.ok(footerPosition > interpretationPosition);
-  assert.match(pageSource, /\{marketTitle\}阶段解读/);
+  assert.match(pageSource, /<h2 id="market-interpretation-title">\{presentation\.title\}<\/h2>/);
   assert.match(pageSource, /buildInterpretationImageModel\(interpretation, marketTitle, confirmationLabel\)/);
   assert.doesNotMatch(pageSource, /系统解读/);
   assert.doesNotMatch(pageSource, /AI解读/);
