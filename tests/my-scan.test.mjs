@@ -54,6 +54,7 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /\{stage\} \{stageSeasons\[stage\]\}/);
   assert.match(component, /Math\.round\(\(stageCounts\[stage\] \/ analyzedTotal\) \* 100\)/);
   assert.match(component, /onClick=\{\(\) => setStageFilter\(selected \? "全部" : stage\)\}/);
+  assert.match(component, /color: percent === 100 \? "#fff" : stageColors\[stage\], textShadow: percent === 100 \? "none" : undefined/);
   assert.match(component, /aria-pressed=\{selected\}/);
   assert.match(component, /\{filteredAssets\.map\(\(asset\) =>/);
   assert.match(component, /当前没有\{stageFilter\}资产/);

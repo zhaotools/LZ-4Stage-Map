@@ -307,6 +307,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.view-hkSelected \.map-hk-mega \.map-tiles \{ grid-template-columns: repeat\(3,/);
   assert.match(cssSource, /\.view-hkSelected \.map-hk-sector \.map-tiles \{ grid-template-columns: repeat\(4,/);
   assert.match(pageSource, /className="distribution-fill"/);
+  assert.match(pageSource, /color: percent === 100 \? "#fff" : stageMeta\[stage\]\.color, textShadow: percent === 100 \? "none" : undefined/);
   assert.match(pageSource, /color-mix\(in srgb, \$\{stageMeta\[stage\]\.color\} 14%, var\(--canvas\)\)/);
   assert.match(pageSource, /style=\{\{ width: `\$\{percent\}%`/);
   assert.match(cssSource, /\.distribution-segment \{[^}]*flex: 1 1 0;/);

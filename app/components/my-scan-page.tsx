@@ -178,7 +178,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
                   aria-label={`${stage} ${stageSeasons[stage]}，占比 ${percent}%，${stageCounts[stage]} 个资产`}
                 >
                   <span className="distribution-fill" aria-hidden="true" style={{ width: `${percent}%`, background: stageColors[stage] }} />
-                  <span className="distribution-label"><b style={{ color: stageColors[stage] }}>{stage} {stageSeasons[stage]}</b></span>
+                  <span className="distribution-label"><b style={{ color: percent === 100 ? "#fff" : stageColors[stage], textShadow: percent === 100 ? "none" : undefined }}>{stage} {stageSeasons[stage]}</b></span>
                   <span className="distribution-value"><strong>{percent}%</strong></span>
                 </button>
               );
