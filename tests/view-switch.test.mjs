@@ -99,12 +99,13 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
   assert.match(pageSource, /if \(!authReady \|\| !isMember \|\| !globalSnapshot\) \{[\s\S]*className="member-site-gate"/);
-  assert.ok(pageSource.indexOf("if (!authReady || !isMember) {") < pageSource.indexOf('<div className="app-shell">'));
-  assert.match(pageSource, /className="access-gate member-site-login"[^\n]+aria-busy=\{!authReady\}/);
+  assert.ok(pageSource.indexOf("if (!authReady || !isMember || !globalSnapshot) {") < pageSource.indexOf('<div className="app-shell">'));
+  assert.match(pageSource, /className="access-gate member-site-login"[^\n]+aria-label="会员登录"[^\n]+aria-busy=\{!authReady\}/);
   assert.match(pageSource, /id="member-site-email"/);
   assert.match(pageSource, /id="member-site-password"/);
   assert.match(pageSource, /正在验证会员状态…/);
-  assert.match(pageSource, /登录有效会员账号后，查看全球市场趋势地图与阶段扫描工具/);
+  const memberSiteGate = pageSource.slice(pageSource.indexOf('<main className="member-site-gate">'), pageSource.indexOf("{showFullVersion && <MemberRegistrationModal"));
+  assert.doesNotMatch(memberSiteGate, /access-gate-icon|access-gate-kicker|member-site-login-title|登录有效会员账号后/);
   assert.match(pageSource, /useEffect\(\(\) => \{\s+if \(!authReady \|\| !isMember\) return;[\s\S]+startWeeklyRefresh\(refresh\)/);
   assert.match(pageSource, /LZ-4Stage Map｜四阶段分析/);
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+四阶段说明<\/button>/);

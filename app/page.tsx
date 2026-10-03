@@ -1419,19 +1419,15 @@ export default function Home() {
   if (!authReady || !isMember || !globalSnapshot) {
     return (
       <main className="member-site-gate">
-        <section className="access-gate member-site-login" aria-labelledby="member-site-login-title" aria-busy={!authReady}>
+        <section className="access-gate member-site-login" aria-label="会员登录" aria-busy={!authReady}>
           <div className="member-site-brand">
             <img className="member-site-brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="48" height="48" />
             <div><strong>市场地图</strong><small>LZ-4Stage Map</small></div>
           </div>
-          <div className="access-gate-icon"><LockKeyhole size={23} /></div>
-          <span className="access-gate-kicker">LZ MEMBER</span>
-          <h1 id="member-site-login-title">会员登录</h1>
           {!authReady ? (
             <p className="member-site-status" role="status">正在验证会员状态…</p>
           ) : (
             <>
-              <p>登录有效会员账号后，查看全球市场趋势地图与阶段扫描工具。</p>
               {memberDialog === "passwordChanged" && <p className="member-site-notice" role="status">密码修改成功，请使用新密码重新登录。</p>}
               <form onSubmit={handleMemberLogin}>
                 <label htmlFor="member-site-email">会员邮箱</label>
