@@ -98,6 +98,14 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /await signOutMember\(\)/);
   assert.match(pageSource, /handleMemberLogout[\s\S]+switchView\("global"\)/);
   assert.match(pageSource, /className="member-auth-button logout"[^\n]+handleMemberLogout[^\n]+退出<\/button>/);
+  assert.match(pageSource, /if \(!authReady \|\| !isMember \|\| !globalSnapshot\) \{[\s\S]*className="member-site-gate"/);
+  assert.ok(pageSource.indexOf("if (!authReady || !isMember) {") < pageSource.indexOf('<div className="app-shell">'));
+  assert.match(pageSource, /className="access-gate member-site-login"[^\n]+aria-busy=\{!authReady\}/);
+  assert.match(pageSource, /id="member-site-email"/);
+  assert.match(pageSource, /id="member-site-password"/);
+  assert.match(pageSource, /正在验证会员状态…/);
+  assert.match(pageSource, /登录有效会员账号后，查看全球市场趋势地图与阶段扫描工具/);
+  assert.match(pageSource, /useEffect\(\(\) => \{\s+if \(!authReady \|\| !isMember\) return;[\s\S]+startWeeklyRefresh\(refresh\)/);
   assert.match(pageSource, /LZ-4Stage Map｜四阶段分析/);
   assert.match(pageSource, /className=\{`stage-intro-link \$\{introductionActive \? "active" : ""\}`\}[^\n]+四阶段说明<\/button>/);
   assert.match(pageSource, /\{!isMember && <button className="member-auth-button register-member-button"[^\n]+注册会员<\/button>\}/);
@@ -120,8 +128,9 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.doesNotMatch(pageSource, /点击获取完整LZ-4Stage/);
   assert.doesNotMatch(pageSource, /点击获取完整版/);
   assert.match(pageSource, /注册成为LZ会员/);
-  assert.match(pageSource, /LZ-4Stage全球市场趋势地图，可公开访问。/);
-  assert.match(pageSource, /其他市场查询，以及市场扫描工具，需注册会员。/);
+  assert.doesNotMatch(pageSource, /LZ-4Stage全球市场趋势地图，可公开访问。/);
+  assert.match(pageSource, /LZ-4Stage全球市场趋势地图为会员专享服务。/);
+  assert.match(pageSource, /完成注册并开通会员后，可登录查看全部市场和扫描工具。/);
   assert.match(pageSource, /const \[introductionActive, setIntroductionActive\] = useState\(false\)/);
   assert.match(pageSource, /const openStageIntroduction = \(\) => \{[\s\S]+setIntroductionActive\(true\)/);
   assert.match(pageSource, /className="stage-introduction" aria-labelledby="stage-introduction-title"/);
@@ -223,7 +232,7 @@ test("sidebar switches between the six stage-map collections", () => {
     assert.match(pageSource, new RegExp(`${view}: "${title}"`));
   }
   assert.match(pageSource, /const activePageTitle = introductionActive \? "四阶段说明"[\s\S]*?myScanActive \? "自选阶段扫描"[\s\S]*?stockRadarActive \? "个股阶段扫描"[\s\S]*?radarActive \? "全球阶段扫描"[\s\S]*?: mapPageTitles\[view\]/);
-  assert.match(pageSource, /document\.title = `\$\{activePageTitle\}｜LZ-4Stage Map`;/);
+  assert.match(pageSource, /document\.title = `\$\{authReady && isMember \? activePageTitle : "会员登录"\}｜LZ-4Stage Map`;/);
   assert.match(pageSource, /<h1>\{activePageTitle\}<\/h1>/);
   assert.doesNotMatch(pageSource, /<h1>全球市场四季图<\/h1>/);
   assert.doesNotMatch(pageSource, /LZ-Map · 全球资产四阶段观察|site-subtitle/);

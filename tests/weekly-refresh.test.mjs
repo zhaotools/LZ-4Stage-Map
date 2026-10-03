@@ -94,11 +94,10 @@ test("failed or partial requests retry only on a later event; in-flight calls ar
   h.controller.stop();
 });
 
-test("page refreshes public and loaded protected snapshots without reload or interval polling", async () => {
+test("page refreshes the protected global and opened member snapshots without polling", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-  assert.match(source, /BASE_URL\}data\/dashboard\.json/);
-  assert.match(source, /cache: "no-store"/);
-  assert.match(source, /if \(isMember\)/);
+  assert.match(source, /getMemberSnapshot<DashboardMarket>\("global", request\.signal\)/);
+  assert.doesNotMatch(source, /dashboard\.json/);
   assert.match(source, /Promise\.allSettled\(jobs\)/);
   for (const event of ["visibilitychange", "pageshow", "online"]) {
     assert.ok(source.includes(`addEventListener("${event}"`));

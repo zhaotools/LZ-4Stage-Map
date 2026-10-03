@@ -24,7 +24,6 @@ import {
   X,
 } from "lucide-react";
 
-import dashboardData from "@/data/dashboard.json";
 import { newerSnapshot, startWeeklyRefresh, validateSnapshot } from "@/app/lib/weekly-refresh.mjs";
 import { TurnstileWidget } from "@/app/components/turnstile-widget";
 import { MyScanPage } from "@/app/components/my-scan-page";
@@ -198,7 +197,15 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   MSTR: { shortCode: "MSTR", cols: 3, rows: 2 },
 };
 
-type DashboardMarket = (typeof dashboardData.markets)[number];
+type DashboardMarket = Omit<Market, "shortCode" | "cols" | "rows" | "stage" | "previousStage" | "region" | "signal" | "collections" | "dataStatus" | "cryptoFreshness"> & {
+  stage: string;
+  previousStage?: string;
+  region: string;
+  signal: string;
+  collections: string[];
+  dataStatus: string;
+  cryptoFreshness?: string;
+};
 
 function hydrateMarkets(items: DashboardMarket[]): Market[] {
   return items.map((item) => {
@@ -674,9 +681,27 @@ function MarketInterpretationPanel({ interpretation, marketTitle, confirmationLa
   );
 }
 
+function MemberRegistrationModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="full-version-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <section className="full-version-modal" role="dialog" aria-modal="true" aria-labelledby="full-version-title">
+        <button className="modal-close" type="button" aria-label="关闭会员注册说明" onClick={onClose}><X size={19} /></button>
+        <div className="modal-icon"><MousePointerClick size={21} /></div>
+        <h2 id="full-version-title">注册成为LZ会员</h2>
+        <p>LZ-4Stage全球市场趋势地图为会员专享服务。</p>
+        <p>完成注册并开通会员后，可登录查看全部市场和扫描工具。</p>
+        <div className="wechat-contact"><strong>请添加以下微信</strong><span>咨询注册与会员开通</span></div>
+        {/* Keep the original QR pixels intact instead of routing through image optimization. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="wechat-qr" src={`${import.meta.env.BASE_URL}wechat-qr.jpg`} alt="LZ-4Stage 微信二维码" width="280" height="282" />
+      </section>
+    </div>
+  );
+}
+
 export default function Home() {
   const [authReady, setAuthReady] = useState(false);
-  const [publicSnapshot, setPublicSnapshot] = useState(dashboardData);
+  const [globalSnapshot, setGlobalSnapshot] = useState<MemberSnapshot<DashboardMarket> | null>(null);
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [memberSnapshots, setMemberSnapshots] = useState<Partial<Record<MemberView, MemberSnapshot<DashboardMarket>>>>({});
   const [radarSnapshot, setRadarSnapshot] = useState<TrendRadarSnapshot<DashboardMarket> | null>(null);
@@ -762,6 +787,7 @@ export default function Home() {
   }, [memberSnapshots, radarSnapshot, stockRadarSnapshot, myScanLoaded]);
 
   useEffect(() => {
+    if (!authReady || !isMember) return;
     let cancelled = false;
     let abort: AbortController | null = null;
     const refresh = async () => {
@@ -769,35 +795,31 @@ export default function Home() {
       abort = request;
       const timeout = setTimeout(() => request.abort(), 30000);
       try {
-        const jobs: Promise<unknown>[] = [(async () => {
-          const response = await fetch(`${import.meta.env.BASE_URL}data/dashboard.json`, { cache: "no-store", signal: request.signal });
-          if (!response.ok) throw new Error("Public data unavailable");
-          const snapshot = validateSnapshot(await response.json(), "markets") as typeof dashboardData;
-          if (!cancelled) setPublicSnapshot((current) => newerSnapshot(current, snapshot));
-        })()];
-        if (isMember) {
-          // Refresh previously opened protected pages; unopened pages fetch normally on entry.
-          for (const key of Object.keys(snapshotsRef.current.memberSnapshots) as MemberView[]) {
-            jobs.push(getMemberSnapshot<DashboardMarket>(key, request.signal).then((snapshot) => {
-              validateSnapshot(snapshot, "markets");
-              if (!cancelled) setMemberSnapshots((current) => ({ ...current, [key]: newerSnapshot(current[key], snapshot) }));
-            }));
-          }
-          if (snapshotsRef.current.radarSnapshot) jobs.push(getTrendRadarSnapshot<DashboardMarket>(request.signal).then((snapshot) => {
-            validateSnapshot(snapshot, "matches");
-            if (!cancelled) setRadarSnapshot((current) => newerSnapshot(current, snapshot));
-          }));
-          if (snapshotsRef.current.stockRadarSnapshot) jobs.push(getStockRadarSnapshot<StockRadarMarket>(request.signal).then((snapshot) => {
-            validateSnapshot(snapshot, "matches");
-            if (!cancelled) setStockRadarSnapshot((current) => newerSnapshot(current, snapshot));
-          }));
-          if (snapshotsRef.current.myScanLoaded) jobs.push(getMyScanAssets().then((assets) => {
-            if (!cancelled) {
-              setMyScanAssets(assets);
-              setMyScanLoadError(null);
-            }
+        const jobs: Promise<unknown>[] = [getMemberSnapshot<DashboardMarket>("global", request.signal).then((snapshot) => {
+          validateSnapshot(snapshot, "markets");
+          if (!cancelled) setGlobalSnapshot((current) => newerSnapshot(current, snapshot));
+        })];
+        // Refresh previously opened protected pages; unopened pages fetch normally on entry.
+        for (const key of Object.keys(snapshotsRef.current.memberSnapshots) as MemberView[]) {
+          jobs.push(getMemberSnapshot<DashboardMarket>(key, request.signal).then((snapshot) => {
+            validateSnapshot(snapshot, "markets");
+            if (!cancelled) setMemberSnapshots((current) => ({ ...current, [key]: newerSnapshot(current[key], snapshot) }));
           }));
         }
+        if (snapshotsRef.current.radarSnapshot) jobs.push(getTrendRadarSnapshot<DashboardMarket>(request.signal).then((snapshot) => {
+          validateSnapshot(snapshot, "matches");
+          if (!cancelled) setRadarSnapshot((current) => newerSnapshot(current, snapshot));
+        }));
+        if (snapshotsRef.current.stockRadarSnapshot) jobs.push(getStockRadarSnapshot<StockRadarMarket>(request.signal).then((snapshot) => {
+          validateSnapshot(snapshot, "matches");
+          if (!cancelled) setStockRadarSnapshot((current) => newerSnapshot(current, snapshot));
+        }));
+        if (snapshotsRef.current.myScanLoaded) jobs.push(getMyScanAssets().then((assets) => {
+          if (!cancelled) {
+            setMyScanAssets(assets);
+            setMyScanLoadError(null);
+          }
+        }));
         const results = await Promise.allSettled(jobs);
         return results.every((result) => result.status === "fulfilled");
       } finally {
@@ -817,7 +839,7 @@ export default function Home() {
       window.removeEventListener("pageshow", check);
       window.removeEventListener("online", check);
     };
-  }, [isMember, memberProfile?.user_id]);
+  }, [authReady, isMember, memberProfile?.user_id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -834,7 +856,12 @@ export default function Home() {
           await signOutMember();
           return;
         }
-        if (!cancelled) setMemberProfile(profile);
+        const snapshot = await getMemberSnapshot<DashboardMarket>("global");
+        validateSnapshot(snapshot, "markets");
+        if (!cancelled) {
+          setGlobalSnapshot(snapshot);
+          setMemberProfile(profile);
+        }
       } catch {
         if (!cancelled) setMemberProfile(null);
       } finally {
@@ -1017,6 +1044,9 @@ export default function Home() {
         setCheckingCredentials(false);
         return;
       }
+      const snapshot = await getMemberSnapshot<DashboardMarket>("global");
+      validateSnapshot(snapshot, "markets");
+      setGlobalSnapshot(snapshot);
     } catch {
       await signOutMember().catch(() => undefined);
       setLoginError("邮箱、密码或安全验证错误，请重新输入");
@@ -1062,13 +1092,13 @@ export default function Home() {
 
   const activeUniverse = useMemo(() => {
     const selected = view === "global"
-      ? hydrateMarkets(publicSnapshot.markets.filter((item) => item.collections.includes("global")))
+      ? hydrateMarkets(globalSnapshot?.markets.filter((item) => item.collections.includes("global")) ?? [])
       : hydrateMarkets(memberSnapshots[view]?.markets ?? []);
     const order = collectionOrder[view];
     if (!order) return selected;
     const positions = new Map(order.map((code, index) => [code, index]));
     return [...selected].sort((a, b) => (positions.get(a.code) ?? Number.MAX_SAFE_INTEGER) - (positions.get(b.code) ?? Number.MAX_SAFE_INTEGER));
-  }, [memberSnapshots, publicSnapshot, view]);
+  }, [globalSnapshot, memberSnapshots, view]);
   const radarMarkets = useMemo<RadarMarket[]>(() => (radarSnapshot?.matches ?? []).map((item) => ({
     ...hydrateMarkets([item as DashboardMarket])[0],
     matchRules: item.matchRules,
@@ -1079,7 +1109,7 @@ export default function Home() {
     regionData.filter(item => item.cryptoFreshness !== "unavailable").forEach((item) => result[item.stage]++);
     return result;
   }, [regionData]);
-  const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? publicSnapshot.commonStageAsOf;
+  const commonStageAsOf = [...activeUniverse].sort((a, b) => a.stageAsOf.localeCompare(b.stageAsOf))[0]?.stageAsOf ?? globalSnapshot?.commonStageAsOf ?? "";
   const commonConfirmationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: view === "global" }) ?? commonStageAsOf;
   const globalDates = globalConfirmationDates(activeUniverse);
   const traditionalInterpretationDate = latestConfirmationDate(activeUniverse.filter(item => item.cryptoFreshness !== "unavailable"), { excludeCrypto: true });
@@ -1091,16 +1121,16 @@ export default function Home() {
     .map((asset) => asset.result?.generatedAt)
     .filter((value): value is string => Boolean(value))
     .sort()
-    .at(-1) ?? publicSnapshot.generatedAt;
+    .at(-1) ?? globalSnapshot?.generatedAt ?? "";
   const activeGeneratedAt = myScanActive
     ? myScanLatestGeneratedAt
     : stockRadarActive && stockRadarSnapshot
     ? stockRadarSnapshot.generatedAt
     : radarActive && radarSnapshot
       ? radarSnapshot.generatedAt
-      : view === "global" ? publicSnapshot.generatedAt : memberSnapshots[view]?.generatedAt ?? publicSnapshot.generatedAt;
+      : view === "global" ? globalSnapshot?.generatedAt ?? "" : memberSnapshots[view]?.generatedAt ?? globalSnapshot?.generatedAt ?? "";
   const activeInterpretation = view === "global"
-    ? (publicSnapshot as typeof dashboardData & { interpretation?: MarketInterpretation }).interpretation
+    ? globalSnapshot?.interpretation
     : memberSnapshots[view]?.interpretation;
   const week = isoWeek(traditionalInterpretationDate ?? commonStageAsOf);
   const watches = regionData.filter((item) => item.signal !== "稳定" && (!item.cryptoFreshness || item.cryptoFreshness === "fresh")).slice(0, 3);
@@ -1293,6 +1323,7 @@ export default function Home() {
     setAccountMenuOpen(false);
     await signOutMember().catch(() => undefined);
     setMemberProfile(null);
+    setGlobalSnapshot(null);
     setMemberSnapshots({});
     setRadarSnapshot(null);
     setStockRadarSnapshot(null);
@@ -1338,6 +1369,7 @@ export default function Home() {
     }
     await signOutMember().catch(() => undefined);
     setMemberProfile(null);
+    setGlobalSnapshot(null);
     setMemberSnapshots({});
     setRadarSnapshot(null);
     setStockRadarSnapshot(null);
@@ -1381,8 +1413,62 @@ export default function Home() {
           : mapPageTitles[view];
 
   useEffect(() => {
-    document.title = `${activePageTitle}｜LZ-4Stage Map`;
-  }, [activePageTitle]);
+    document.title = `${authReady && isMember ? activePageTitle : "会员登录"}｜LZ-4Stage Map`;
+  }, [activePageTitle, authReady, isMember]);
+
+  if (!authReady || !isMember || !globalSnapshot) {
+    return (
+      <main className="member-site-gate">
+        <section className="access-gate member-site-login" aria-labelledby="member-site-login-title" aria-busy={!authReady}>
+          <div className="member-site-brand">
+            <img className="member-site-brand-mark" src={`${import.meta.env.BASE_URL}lz-logo-v2.png`} alt="LZ" width="48" height="48" />
+            <div><strong>市场地图</strong><small>LZ-4Stage Map</small></div>
+          </div>
+          <div className="access-gate-icon"><LockKeyhole size={23} /></div>
+          <span className="access-gate-kicker">LZ MEMBER</span>
+          <h1 id="member-site-login-title">会员登录</h1>
+          {!authReady ? (
+            <p className="member-site-status" role="status">正在验证会员状态…</p>
+          ) : (
+            <>
+              <p>登录有效会员账号后，查看全球市场趋势地图与阶段扫描工具。</p>
+              {memberDialog === "passwordChanged" && <p className="member-site-notice" role="status">密码修改成功，请使用新密码重新登录。</p>}
+              <form onSubmit={handleMemberLogin}>
+                <label htmlFor="member-site-email">会员邮箱</label>
+                <input
+                  id="member-site-email"
+                  type="email"
+                  value={memberEmail}
+                  onChange={(event) => { setMemberEmail(event.target.value); setLoginError(null); }}
+                  placeholder="请输入会员邮箱"
+                  autoComplete="username"
+                  autoFocus
+                  aria-invalid={Boolean(loginError)}
+                />
+                <label htmlFor="member-site-password">密码</label>
+                <input
+                  id="member-site-password"
+                  type="password"
+                  value={memberPassword}
+                  onChange={(event) => { setMemberPassword(event.target.value); setLoginError(null); }}
+                  placeholder="请输入密码"
+                  autoComplete="current-password"
+                  aria-invalid={Boolean(loginError)}
+                  aria-describedby={loginError ? "member-site-error" : "member-site-note"}
+                />
+                {loginError && <span className="access-error" id="member-site-error" role="alert">{loginError}</span>}
+                {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} resetKey={captchaResetKey} onToken={handleCaptchaToken} />}
+                <button type="submit" disabled={!memberEmail.trim() || !memberPassword || (Boolean(turnstileSiteKey) && !captchaToken) || checkingCredentials}>{checkingCredentials ? "正在登录…" : "登录并进入"}</button>
+              </form>
+              <small id="member-site-note">登录成功后，此浏览器将保持会员状态。</small>
+              <div className="member-site-register"><span>还没有会员账号？</span><button type="button" onClick={() => setShowFullVersion(true)}>注册会员</button></div>
+            </>
+          )}
+        </section>
+        {showFullVersion && <MemberRegistrationModal onClose={() => setShowFullVersion(false)} />}
+      </main>
+    );
+  }
 
   return (
     <>
@@ -1613,21 +1699,7 @@ export default function Home() {
           </footer>
         </main>
         <HoverMarketCard market={hoveredMarket} point={hoverPoint} touchMode={touchCardOpen} onClose={closeMarketCard} />
-        {showFullVersion && (
-          <div className="full-version-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowFullVersion(false); }}>
-            <section className="full-version-modal" role="dialog" aria-modal="true" aria-labelledby="full-version-title">
-              <button className="modal-close" type="button" aria-label="关闭完整版介绍" onClick={() => setShowFullVersion(false)}><X size={19} /></button>
-              <div className="modal-icon"><MousePointerClick size={21} /></div>
-              <h2 id="full-version-title">注册成为LZ会员</h2>
-              <p>LZ-4Stage全球市场趋势地图，可公开访问。</p>
-              <p>其他市场查询，以及市场扫描工具，需注册会员。</p>
-              <div className="wechat-contact"><strong>请添加以下微信</strong><span>咨询更多信息</span></div>
-              {/* Keep the original QR pixels intact instead of routing through image optimization. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="wechat-qr" src={`${import.meta.env.BASE_URL}wechat-qr.jpg`} alt="LZ-4Stage 微信二维码" width="280" height="282" />
-            </section>
-          </div>
-        )}
+        {showFullVersion && <MemberRegistrationModal onClose={() => setShowFullVersion(false)} />}
       </div>
       {memberDialog && (
         <div className="access-gate-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeMemberDialog(); }}>

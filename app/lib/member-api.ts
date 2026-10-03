@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 
 export type MemberView = "crypto7" | "commodity" | "usSelected" | "chinaIndices" | "hkSelected";
+export type MarketView = "global" | MemberView;
 export type TrendRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early" | "s2Breakdown" | "s4aEntry" | "s4Early";
 export type StockRadarRuleId = "s4Recovery" | "s2aEntry" | "s2Early";
 export type MyScanRegion = "美股" | "A股" | "港股" | "加密";
@@ -103,7 +104,7 @@ export type MemberSnapshot<TMarket = unknown> = {
   lastUpdatedAt: { traditional: string; crypto: string };
   analysisPeriod: string;
   commonStageAsOf: string;
-  viewKey: MemberView;
+  viewKey: MarketView;
   markets: TMarket[];
   interpretation?: MarketInterpretation;
 };
@@ -191,7 +192,7 @@ export function isProfileActive(profile: MemberProfile, now = new Date()) {
   return Boolean(profile.expires_at && new Date(profile.expires_at).getTime() > now.getTime());
 }
 
-export async function getMemberSnapshot<TMarket>(viewKey: MemberView, signal?: AbortSignal): Promise<MemberSnapshot<TMarket>> {
+export async function getMemberSnapshot<TMarket>(viewKey: MarketView, signal?: AbortSignal): Promise<MemberSnapshot<TMarket>> {
   const query = requireClient()
     .from("market_snapshots")
     .select("payload")

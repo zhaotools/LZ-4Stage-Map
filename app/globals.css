@@ -70,6 +70,19 @@ button, input { font: inherit; } button { color: inherit; }
 .turnstile-widget { min-height: 65px; display: flex; justify-content: center; align-items: center; }
 .access-gate > small { display: block; margin-top: 16px; color: #98a4b6; font-size: 9px; }
 
+.member-site-gate { min-height: 100vh; display: grid; place-items: center; padding: 32px 20px; background: radial-gradient(circle at 50% 4%, #285ca5 0%, #142f5f 31%, #091a39 72%, #06142d 100%); }
+.member-site-login { width: min(430px, 100%); padding: 34px 38px 30px; box-shadow: 0 30px 90px #020b1d8c; }
+.member-site-brand { display: flex; align-items: center; justify-content: center; gap: 11px; margin-bottom: 24px; color: var(--ink); text-align: left; }
+.member-site-brand-mark { width: 48px; height: 48px; display: block; object-fit: cover; border-radius: 13px; box-shadow: 0 9px 22px #112b5c38; }
+.member-site-brand strong { display: block; font-size: 16px; line-height: 1.2; }.member-site-brand small { display: block; margin-top: 4px; color: #7d8ba2; font-size: 9px; letter-spacing: 1.35px; }
+.member-site-login h1 { margin: 7px 0 8px; color: var(--ink); font-size: 25px; letter-spacing: -.45px; }
+.member-site-login > p { margin: 0 auto 22px; max-width: 330px; color: #6f7e95; font-size: 12px; line-height: 1.75; }
+.member-site-login .member-site-status { margin-bottom: 0; padding: 18px 0 7px; color: #7d8ba2; }
+.member-site-login .member-site-notice { margin: -8px 0 13px; padding: 9px 11px; border: 1px solid #bfe4cf; border-radius: 9px; color: #24784a; background: #f0faf4; font-size: 11px; }
+.member-site-register { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 18px; color: #8794a8; font-size: 10px; }
+.member-site-login .member-site-register button { width: auto; height: auto; margin: 0; padding: 2px; border: 0; border-radius: 3px; color: #2867e7; background: transparent; font-size: 10px; box-shadow: none; text-decoration: underline; text-underline-offset: 3px; }
+.member-site-login .member-site-register button:hover { color: #174fc3; background: transparent; filter: none; }
+
 .full-version-backdrop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; background: #07142c99; backdrop-filter: blur(4px); animation: modal-fade-in .16s ease-out; }
 .full-version-modal { position: relative; width: min(440px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 28px 34px 30px; border: 1px solid #dbe3ef; border-radius: 18px; background: #fff; color: var(--ink); text-align: center; box-shadow: 0 24px 70px #06132e55; animation: modal-rise-in .18s ease-out; }
 .modal-close { position: absolute; top: 13px; right: 13px; width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 9px; background: #f1f4f9; color: #72809a; cursor: pointer; }.modal-close:hover { color: var(--ink); background: #e8edf5; }
@@ -263,6 +276,12 @@ footer span:last-child { text-align: right; }
 }
 @media (max-width: 360px) {
   .top-actions .stage-intro-link svg, .top-actions .confirmation-date svg, .top-actions > .member-auth-button svg { display: none; }.stage-intro-link, .confirmation-date, .top-actions > .member-auth-button { padding-inline: 6px; }
+}
+
+@media (max-width: 480px) {
+  .member-site-gate { padding: 18px 12px; }
+  .member-site-login { padding: 27px 20px 24px; border-radius: 17px; }
+  .member-site-brand { margin-bottom: 19px; }
 }
 /* Crypto publication health: no layout or stage-color changes for normal assets. */
 .crypto-status-badge { display: block; margin-top: 8px; padding: 3px 7px; border-radius: 6px; background: rgba(10, 22, 44, .7); color: #fff; font-size: 14px; line-height: 1.4; }
