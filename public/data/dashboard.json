@@ -1,9 +1,9 @@
 {
   "schemaVersion": "lz-4stage-map-v2",
-  "generatedAt": "2026-10-03T00:08:56.923Z",
+  "generatedAt": "2026-10-03T00:39:25.365Z",
   "updateScope": "traditional",
   "lastUpdatedAt": {
-    "traditional": "2026-10-03T00:08:56.923Z",
+    "traditional": "2026-10-03T00:39:25.365Z",
     "crypto": "2026-09-28T00:09:10.518Z"
   },
   "analysisPeriod": "weekly-completed-bars",
@@ -120,7 +120,7 @@
         "chinaIndices"
       ],
       "radarEligible": true,
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -530,7 +530,7 @@
         "chinaIndices"
       ],
       "radarEligible": true,
-      "source": "东方财富 · 前复权",
+      "source": "腾讯行情 · 前复权",
       "dataStatus": "live",
       "dataWarning": null,
       "stage": "S4",
@@ -556,9 +556,9 @@
     "schemaVersion": "lz-market-interpretation-v2",
     "viewKey": "global",
     "mode": "system",
-    "generatedAt": "2026-10-03T00:08:56.923Z",
+    "generatedAt": "2026-10-03T00:39:25.365Z",
     "commonStageAsOf": "2026-09-21",
-    "sourceSnapshotSha256": "1008f86f6e66cb17f72d9cf2d4aee07bc9675e2acf0a3c4f9e3a4988899a1fbd",
+    "sourceSnapshotSha256": "8c0935054fb9c7f30253fe175fc87760558fc3b41606fd6eed60ddedcd74dc11",
     "universeSize": 16,
     "analyzedSize": 16,
     "excludedSize": 0,
