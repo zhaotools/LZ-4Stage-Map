@@ -16,7 +16,8 @@ test("converts each market weekly close to Beijing time", () => {
   assert.equal(confirmationTimeForTradingDate(market("美股", "NYSE", { stageAsOf: "2026-12-18" })), "2026-12-19 05:00 UTC+8");
   assert.equal(confirmationTimeForTradingDate(market("A股", "SSE")), "2026-08-28 15:00 UTC+8");
   assert.equal(confirmationTimeForTradingDate(market("港股", "HKEX")), "2026-08-28 16:00 UTC+8");
-  assert.equal(confirmationTimeForTradingDate(market("日股", "OSE")), "2026-08-28 14:30 UTC+8");
+  assert.equal(confirmationTimeForTradingDate(market("日韩股市", "OSE")), "2026-08-28 14:30 UTC+8");
+  assert.equal(confirmationTimeForTradingDate(market("日韩股市", "KRX")), "2026-08-28 14:30 UTC+8");
   assert.equal(confirmationTimeForTradingDate(market("欧股", "STOXX")), "2026-08-28 23:30 UTC+8");
   assert.equal(confirmationTimeForTradingDate(market("欧股", "STOXX", { stageAsOf: "2026-12-18" })), "2026-12-19 00:30 UTC+8");
   assert.equal(confirmationTimeForTradingDate(market("大宗·宏观", "COMEX")), "2026-08-29 05:00 UTC+8");

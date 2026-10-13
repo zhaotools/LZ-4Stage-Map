@@ -220,7 +220,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /chinaIndices: \{ mapKicker: "CHINA MARKET", mapTitle: "A股市场"/);
   assert.match(pageSource, /hkSelected: \{ mapKicker: "HONG KONG MARKET", mapTitle: "港股市场"/);
   assert.match(pageSource, /\{activeViewMeta\.mapKicker\}<\/span><h2>\{activeViewMeta\.mapTitle\}<\/h2>/);
-  assert.match(pageSource, /"日股" \| "欧股"/);
+  assert.match(pageSource, /"日韩股市" \| "欧股"/);
   assert.match(pageSource, /LZ-4Stage Map｜四阶段分析/);
   for (const [view, title] of Object.entries({
     global: "全球市场趋势地图",
@@ -241,7 +241,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.topbar \{[^}]*margin-bottom: 12px;/);
   assert.doesNotMatch(pageSource, /activeViewMeta\.(?:eyebrow|subtitle)/);
   assert.match(pageSource, /return region === "大宗·宏观" \? "宏观" : region/);
-  assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
+  assert.match(pageSource, /global: \["GSPC\.INDEX", "NDQ", "SOXX", "VIX", "000300\.SH", "SZ399006", "HSI", "HSTECH", "N225", "KOSPI", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"\]/);
   assert.match(pageSource, /crypto7: \["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"\]/);
   assert.match(pageSource, /commodity: \["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"\]/);
   assert.match(pageSource, /"SOL-USD": \{ shortCode: "SOL", cols: 3, rows: 2 \}/);
@@ -324,8 +324,10 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.distribution-fill \{[^}]*inset: 0 0 0 auto;/);
   assert.match(cssSource, /\.map-大宗-宏观 \{ grid-area: 5 \/ 1 \/ 9 \/ 5; \}/);
   assert.match(cssSource, /\.map-加密 \{ grid-area: 5 \/ 5 \/ 9 \/ 8; \}/);
-  assert.match(cssSource, /\.map-日股 \{ grid-area: 5 \/ 8 \/ 9 \/ 10; \}/);
-  assert.match(cssSource, /\.map-欧股 \{ grid-area: 5 \/ 10 \/ 9 \/ 13; \}/);
+  assert.match(pageSource, /KOSPI: \{ shortCode: "KOSPI", cols: 3, rows: 4 \}/);
+  assert.match(cssSource, /\.map-日韩股市 \{ grid-area: 5 \/ 8 \/ 9 \/ 11; \}/);
+  assert.match(cssSource, /\.map-欧股 \{ grid-area: 5 \/ 11 \/ 9 \/ 13; \}/);
+  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.map-日韩股市 \.map-tiles \{ grid-template-columns: 1fr; grid-template-rows: repeat\(2,/);
 });
 
 test("map empty state names stage observations without implying a confirmed change", () => {

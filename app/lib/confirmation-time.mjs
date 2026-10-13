@@ -57,7 +57,7 @@ function formatBeijingDateTime(date) {
 function marketCloseSpec(market) {
   if (market.region === "A股") return { timeZone: "Asia/Shanghai", time: "15:00" };
   if (market.region === "港股") return { timeZone: "Asia/Hong_Kong", time: "16:00" };
-  if (market.region === "日股") return { timeZone: "Asia/Tokyo", time: "15:30" };
+  if (market.region === "日韩股市") return { timeZone: market.exchange === "KRX" ? "Asia/Seoul" : "Asia/Tokyo", time: "15:30" };
   if (market.region === "欧股") return { timeZone: "Europe/Berlin", time: "17:30" };
   if (market.region === "大宗·宏观" && ["ICE", "NYMEX", "COMEX"].includes(market.exchange)) {
     return { timeZone: "America/New_York", time: "17:00" };

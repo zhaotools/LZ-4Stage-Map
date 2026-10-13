@@ -80,7 +80,7 @@ function applyLocalMyScanOrder(assets: MyScanAsset[], userId?: string) {
   }
 }
 type RadarScanMode = "s2" | "s4";
-type Region = "全球" | "美股" | "A股" | "港股" | "日股" | "欧股" | "大宗·宏观" | "加密";
+type Region = "全球" | "美股" | "A股" | "港股" | "日韩股市" | "欧股" | "大宗·宏观" | "加密";
 type MarketRegion = Exclude<Region, "全球">;
 
 type Market = {
@@ -173,7 +173,8 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   "16.HK": { shortCode: "0016", cols: 2, rows: 1 },
   "2.HK": { shortCode: "0002", cols: 2, rows: 1 },
   "1093.HK": { shortCode: "1093", cols: 2, rows: 1 },
-  N225: { shortCode: "N225", cols: 6, rows: 4 },
+  N225: { shortCode: "N225", cols: 3, rows: 4 },
+  KOSPI: { shortCode: "KOSPI", cols: 3, rows: 4 },
   STOXX50E: { shortCode: "STOXX50", cols: 6, rows: 4 },
   DXY: { shortCode: "DXY", cols: 3, rows: 2 },
   US10Y: { shortCode: "US10Y", cols: 3, rows: 2 },
@@ -240,8 +241,8 @@ const radarRuleIds: Record<RadarScanMode, TrendRadarRuleId[]> = {
   s4: ["s2Breakdown", "s4aEntry", "s4Early"],
 };
 
-const regions: Region[] = ["全球", "美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
-const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日股", "欧股", "大宗·宏观", "加密"];
+const regions: Region[] = ["全球", "美股", "A股", "港股", "日韩股市", "欧股", "大宗·宏观", "加密"];
+const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日韩股市", "欧股", "大宗·宏观", "加密"];
 const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { mapKicker: "GLOBAL MARKET", mapTitle: "全球市场", regions, groups: marketRegions },
   crypto7: { mapKicker: "CRYPTO MARKET", mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
@@ -259,7 +260,7 @@ const mapPageTitles: Record<View, string> = {
   crypto7: "加密市场趋势地图",
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
-  global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
+  global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "KOSPI", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
   crypto7: ["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"],
   commodity: ["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"],
   usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
