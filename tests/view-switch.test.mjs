@@ -253,14 +253,14 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /group="宏观" className="map-us-macro"/);
   assert.doesNotMatch(pageSource, /label: "(?:MARKET｜市场|SECTOR｜行业|LEADERS｜核心资产|INDEX|MEGA CAP|SECTOR)"/);
   assert.match(pageSource, /"BRK\.B": \{ shortCode: "BRK"/);
-  assert.match(pageSource, /chinaIndices: \["000510\.SH", "000300\.SH", "000905\.SH", "000852\.SH", "000016\.SH", "SZ399006", "000688\.SH", "000985\.SH", "931865\.CSI", "930651\.CSI", "399975\.SZ", "399986\.SZ", "930708\.CSI", "399933\.SZ", "399997\.SZ", "930997\.CSI"\]/);
-  assert.match(pageSource, /label: "市场", className: "map-china-market", codes: \["000510\.SH", "000300\.SH", "000905\.SH", "000852\.SH", "000016\.SH", "SZ399006", "000688\.SH", "000985\.SH"\]/);
+  assert.match(pageSource, /chinaIndices: \["000510\.SH", "000300\.SH", "000905\.SH", "000852\.SH", "000984\.SH", "SZ399006", "000688\.SH", "000985\.SH", "931865\.CSI", "930651\.CSI", "399975\.SZ", "399986\.SZ", "930708\.CSI", "399933\.SZ", "399997\.SZ", "930997\.CSI"\]/);
+  assert.match(pageSource, /label: "市场", className: "map-china-market", codes: \["000510\.SH", "000300\.SH", "000905\.SH", "000852\.SH", "000984\.SH", "SZ399006", "000688\.SH", "000985\.SH"\]/);
   assert.match(pageSource, /label: "行业", className: "map-china-sector", codes: \["931865\.CSI", "930651\.CSI", "399975\.SZ", "399986\.SZ", "930708\.CSI", "399933\.SZ", "399997\.SZ", "930997\.CSI"\]/);
   assert.match(pageSource, /"931865\.CSI": \{ shortCode: "半导体"/);
   assert.match(pageSource, /"930651\.CSI": \{ shortCode: "计算机"/);
   assert.match(pageSource, /"930997\.CSI": \{ shortCode: "新能源车"/);
-  assert.match(pageSource, /hkSelected: \["HSI", "HSTECH", "700\.HK", "9988\.HK", "5\.HK", "1299\.HK", "388\.HK", "939\.HK", "1810\.HK", "3690\.HK", "941\.HK", "883\.HK", "1211\.HK", "16\.HK", "2\.HK", "1093\.HK"\]/);
-  assert.match(pageSource, /label: "指数", className: "map-hk-index", codes: \["HSI", "HSTECH"\]/);
+  assert.match(pageSource, /hkSelected: \["HSI", "HSTECH", "HSEWI", "700\.HK", "9988\.HK", "5\.HK", "1299\.HK", "388\.HK", "939\.HK", "1810\.HK", "3690\.HK", "941\.HK", "883\.HK", "1211\.HK", "16\.HK", "2\.HK", "1093\.HK"\]/);
+  assert.match(pageSource, /label: "指数", className: "map-hk-index", codes: \["HSI", "HSTECH", "HSEWI"\]/);
   assert.match(pageSource, /label: "核心蓝筹", className: "map-hk-mega", codes: \["700\.HK", "9988\.HK", "5\.HK", "1299\.HK", "388\.HK", "939\.HK"\]/);
   assert.match(pageSource, /label: "行业代表", className: "map-hk-sector", codes: \["1810\.HK", "3690\.HK", "941\.HK", "883\.HK", "1211\.HK", "16\.HK", "2\.HK", "1093\.HK"\]/);
   assert.match(pageSource, /"5\.HK": \{ shortCode: "0005"/);
@@ -313,7 +313,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.view-hkSelected \.map-hk-index \{ grid-area: 1 \/ 1 \/ 3 \/ 13; \}/);
   assert.match(cssSource, /\.view-hkSelected \.map-hk-mega \{ grid-area: 3 \/ 1 \/ 6 \/ 13; \}/);
   assert.match(cssSource, /\.view-hkSelected \.map-hk-sector \{ grid-area: 6 \/ 1 \/ 9 \/ 13; \}/);
-  assert.match(cssSource, /\.view-hkSelected \.map-hk-index \.map-tiles \{ grid-template-columns: repeat\(2,/);
+  assert.match(cssSource, /\.view-hkSelected \.map-hk-index \.map-tiles \{ grid-template-columns: repeat\(3,/);
   assert.match(cssSource, /\.view-hkSelected \.map-hk-mega \.map-tiles \{ grid-template-columns: repeat\(3,/);
   assert.match(cssSource, /\.view-hkSelected \.map-hk-sector \.map-tiles \{ grid-template-columns: repeat\(4,/);
   assert.match(pageSource, /className="distribution-fill"/);

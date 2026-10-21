@@ -16,6 +16,7 @@ test("maps every market family to its TradingView symbol", () => {
   assert.equal(tradingViewSymbolFor(market("931865.CSI", "A股", "CSI")), "SSE:931865");
   assert.equal(tradingViewSymbolFor(market("700.HK", "港股", "HKEX")), "HKEX:700");
   assert.equal(tradingViewSymbolFor(market("HSTECH", "港股", "HKEX")), "HSI:HSTECH");
+  assert.equal(tradingViewSymbolFor(market("HSEWI", "港股", "HKEX")), "HSI:HSEWI");
   assert.equal(tradingViewSymbolFor(market("N225", "日韩股市", "OSE")), "TVC:NI225");
   assert.equal(tradingViewSymbolFor(market("KOSPI", "日韩股市", "KRX")), "KRX:KOSPI");
   assert.equal(tradingViewSymbolFor(market("US10Y", "大宗·宏观", "CBOE")), "TVC:US10Y");

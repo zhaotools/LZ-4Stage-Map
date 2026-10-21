@@ -145,7 +145,7 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   "000300.SH": { shortCode: "000300", cols: 6, rows: 2 },
   "000905.SH": { shortCode: "000905", cols: 2, rows: 1 },
   "000852.SH": { shortCode: "000852", cols: 2, rows: 1 },
-  "000016.SH": { shortCode: "000016", cols: 2, rows: 1 },
+  "000984.SH": { shortCode: "000984", cols: 2, rows: 1 },
   SZ399006: { shortCode: "399006", cols: 6, rows: 2 },
   "000688.SH": { shortCode: "000688", cols: 2, rows: 1 },
   "000985.SH": { shortCode: "000985", cols: 2, rows: 1 },
@@ -159,6 +159,7 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   "930997.CSI": { shortCode: "新能源车", cols: 2, rows: 1 },
   HSI: { shortCode: "HSI", cols: 6, rows: 2 },
   HSTECH: { shortCode: "HSTECH", cols: 6, rows: 2 },
+  HSEWI: { shortCode: "HSEWI", cols: 6, rows: 2 },
   "700.HK": { shortCode: "0700", cols: 2, rows: 1 },
   "9988.HK": { shortCode: "9988", cols: 2, rows: 1 },
   "1810.HK": { shortCode: "1810", cols: 2, rows: 1 },
@@ -264,8 +265,8 @@ const collectionOrder: Partial<Record<View, string[]>> = {
   crypto7: ["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"],
   commodity: ["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"],
   usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
-  chinaIndices: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000016.SH", "SZ399006", "000688.SH", "000985.SH", "931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"],
-  hkSelected: ["HSI", "HSTECH", "700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK", "1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"],
+  chinaIndices: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000984.SH", "SZ399006", "000688.SH", "000985.SH", "931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"],
+  hkSelected: ["HSI", "HSTECH", "HSEWI", "700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK", "1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"],
 };
 const usMapGroups = [
   { label: "市场", className: "map-us-market", codes: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX"] },
@@ -274,11 +275,11 @@ const usMapGroups = [
 ] as const;
 const usMacroCodes = ["DXY", "US10Y"];
 const chinaMapGroups = [
-  { label: "市场", className: "map-china-market", codes: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000016.SH", "SZ399006", "000688.SH", "000985.SH"] },
+  { label: "市场", className: "map-china-market", codes: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000984.SH", "SZ399006", "000688.SH", "000985.SH"] },
   { label: "行业", className: "map-china-sector", codes: ["931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"] },
 ] as const;
 const hkMapGroups = [
-  { label: "指数", className: "map-hk-index", codes: ["HSI", "HSTECH"] },
+  { label: "指数", className: "map-hk-index", codes: ["HSI", "HSTECH", "HSEWI"] },
   { label: "核心蓝筹", className: "map-hk-mega", codes: ["700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK"] },
   { label: "行业代表", className: "map-hk-sector", codes: ["1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"] },
 ] as const;

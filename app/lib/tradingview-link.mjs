@@ -4,6 +4,7 @@ const specialSymbols = {
   VIX: "CBOE:VIX",
   HSI: "TVC:HSI",
   HSTECH: "HSI:HSTECH",
+  HSEWI: "HSI:HSEWI",
   N225: "TVC:NI225",
   KOSPI: "KRX:KOSPI",
   STOXX50E: "TVC:SX5E",
