@@ -43,6 +43,12 @@ const GROUPS = {
     ["crypto", "加密资产", "#2e9d58"],
     ["stocks", "美股", "#e14655"],
   ],
+  crossMarket: [
+    ["加密与科技", "加密与科技", "#2e9d58"],
+    ["美股领导力", "美股领导力", "#2878df"],
+    ["中国与美国", "中国与美国", "#8b5ac8"],
+    ["宏观资产轮动", "宏观资产轮动", "#df7a24"],
+  ],
 };
 
 const US_MARKET = new Set(["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX"]);
@@ -145,7 +151,7 @@ export function buildMarketQuadrantModel(markets, viewKey, marketTitle, confirma
   const xAxis = niceAxis(Math.max(0, ...points.map((point) => point.weeks)));
   const fileDate = reportDate(confirmationLabel, validMarkets.map((market) => market.stageAsOf).sort().at(-1) || "");
   return {
-    title: `${marketTitle}${points.length}个资产阶段象限图`,
+    title: `${marketTitle}${points.length}个${viewKey === "crossMarket" ? "相对比率" : "资产"}阶段象限图`,
     subtitle: "X轴：主阶段持续时间（周）｜Y轴：当前阶段（S1–S4）",
     confirmationLabel,
     fileDate,

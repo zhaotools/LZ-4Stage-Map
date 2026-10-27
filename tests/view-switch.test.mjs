@@ -22,7 +22,7 @@ test("introduction diagram uses the agreed four-stage names without a fixed rout
   assert.doesNotMatch(frameworkSource, /marker-end|→|↗|↘/);
 });
 
-test("sidebar switches between the six stage-map collections", () => {
+test("sidebar switches between market maps and cross-market strength", () => {
   assert.match(pageSource, /id="market-map-navigation-title">市场地图<\/h2>/);
   assert.match(pageSource, /id="member-tools-navigation-title">阶段扫描<\/h2>/);
   assert.match(pageSource, /<nav className="side-tools" aria-label="阶段扫描">/);
@@ -35,6 +35,8 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /requestView\("usSelected"\)/);
   assert.match(pageSource, /requestView\("chinaIndices"\)/);
   assert.match(pageSource, /requestView\("hkSelected"\)/);
+  assert.match(pageSource, /id="cross-market-navigation-title">跨市场地图<\/h2>/);
+  assert.match(pageSource, /requestView\("crossMarket"\)[^\n]+跨市场强弱<\/span>/);
   const desktopMarketMenu = pageSource.slice(pageSource.indexOf('<nav className="side-nav" aria-label="市场地图">'), pageSource.indexOf('</nav>', pageSource.indexOf('<nav className="side-nav" aria-label="市场地图">')));
   const mobileMarketMenu = pageSource.slice(pageSource.indexOf('id="mobile-market-menu"'), pageSource.indexOf('</div>', pageSource.indexOf('id="mobile-market-menu"')));
   const expectedMarketOrder = ["global", "usSelected", "chinaIndices", "hkSelected", "commodity", "crypto7"];
@@ -64,12 +66,13 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(pageSource, /requestView\("chinaIndices"\); \}\}><Landmark[^\n]+<span>A股<\/span>/);
   assert.match(pageSource, /requestView\("hkSelected"\); \}\}><Building2[^\n]+<span>港股<\/span>/);
   assert.match(pageSource, /aria-label="手机端阶段扫描"[\s\S]*aria-expanded=\{mobileMenuOpen === "tools"\}/);
+  assert.match(pageSource, /aria-label="手机端跨市场地图"[\s\S]*aria-expanded=\{mobileMenuOpen === "crossMarket"\}/);
   assert.match(pageSource, /<Radar size=\{15\} \/><span>阶段扫描<\/span><ChevronDown size=\{13\}/);
   assert.match(pageSource, /id="mobile-tools-menu" role="menu" aria-label="阶段扫描"/);
   assert.match(pageSource, /requestTrendRadar\(\); \}\}><Radar[^\n]+<span>全球扫描<\/span>/);
   assert.match(pageSource, /requestStockRadar\(\); \}\}><TrendingUp[^\n]+<span>个股扫描<\/span>/);
   assert.doesNotMatch(pageSource, /<select/);
-  assert.match(pageSource, /const memberOnlyViews = new Set<MemberView>\(\["crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected"\]\)/);
+  assert.match(pageSource, /const memberOnlyViews = new Set<MemberView>\(\["crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected", "crossMarket"\]\)/);
   assert.match(pageSource, /if \(!isMember && isMemberView\(nextView\)\)/);
   assert.match(pageSource, /LZ会员专享/);
   assert.match(pageSource, /登录会员账号后查看完整市场趋势地图/);
@@ -278,7 +281,7 @@ test("sidebar switches between the six stage-map collections", () => {
   assert.match(cssSource, /\.view-commodity \.map-commodity-agriculture \{ grid-area: 5 \/ 6 \/ 9 \/ 13; \}/);
   assert.match(cssSource, /\.view-crypto7 \{ height: clamp\(380px, 41\.333vh, 480px\); \}/);
   assert.match(cssSource, /@media \(max-width: 1180px\)[\s\S]*?\.view-crypto7 \{ height: 413px; \}/);
-  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.view-crypto7 \.map-group \{ height: 180px; \}/);
+  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.view-crypto7 \.map-group, \.view-crossMarket \.map-group \{ height: 180px; \}/);
   assert.match(cssSource, /\.map-tile > strong \{ font-size: clamp\(15px, calc\(1\.25vw \+ 2px\), 23px\);/);
   assert.match(cssSource, /\.map-tile > span \{[^}]*font-size: clamp\(10px, calc\(\.67vw \+ 2px\), 12px\); \}/);
   assert.match(cssSource, /\.map-tile b \{[^}]*font-size: 12px; \}\.map-tile em \{[^}]*font-size: 12px;/);

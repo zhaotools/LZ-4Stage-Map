@@ -52,6 +52,7 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
   stageFilter: Stage | "全部";
 }) {
   const model = buildMarketQuadrantModel(markets, view, marketTitle, confirmationLabel);
+  const noun = view === "crossMarket" ? "比率" : "资产";
   if (!model.points.length) return <div className="market-quadrant-empty">当前没有可用于象限图的阶段数据</div>;
 
   const pointsWithPixels = model.points.map((point: Omit<QuadrantPoint, "pixelX" | "pixelY" | "labelBox">) => ({
@@ -67,7 +68,7 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
       <div className="market-quadrant-scroll">
         <svg className="market-quadrant-svg" viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-labelledby="market-quadrant-title market-quadrant-description">
           <title id="market-quadrant-title">{model.title}</title>
-          <desc id="market-quadrant-description">横轴为主阶段持续时间，纵轴为当前阶段；每个资产用带标签的圆点表示。</desc>
+          <desc id="market-quadrant-description">横轴为主阶段持续时间，纵轴为当前阶段；每个{noun}用带标签的圆点表示。</desc>
           {model.stages.map((stage: { stage: Stage; axisLabel: string; color: string; background: string }, index: number) => {
             const bandY = plot.y + index * plot.bandHeight;
             return <g key={stage.stage}>
@@ -109,7 +110,7 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
           })}
         </svg>
       </div>
-      <div className="market-quadrant-legend" aria-label="资产分类图例">
+      <div className="market-quadrant-legend" aria-label={`${noun}分类图例`}>
         {model.groups.map((group: { id: string; label: string; color: string; count: number }) => <span key={group.id}><i style={{ background: group.color }} />{group.label}（{group.count}个）</span>)}
       </div>
       <div className="market-quadrant-meta"><span>{confirmationLabel}</span><span>阶段分析仅供市场观察，不构成任何投资建议</span></div>

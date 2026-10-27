@@ -83,7 +83,7 @@ function applyLocalMyScanOrder(assets: MyScanAsset[], userId?: string) {
   }
 }
 type RadarScanMode = "s2" | "s4";
-type Region = "全球" | "美股" | "A股" | "港股" | "日韩股市" | "欧股" | "大宗·宏观" | "加密";
+type Region = "全球" | "美股" | "A股" | "港股" | "日韩股市" | "欧股" | "大宗·宏观" | "加密" | "加密与科技" | "美股领导力" | "中国与美国" | "宏观资产轮动";
 type MarketRegion = Exclude<Region, "全球">;
 
 type Market = {
@@ -115,6 +115,15 @@ type Market = {
   stageAsOf: string;
   cols: number;
   rows: number;
+  tradingviewSymbol?: string;
+  numeratorCode?: string;
+  numeratorName?: string;
+  numeratorStage?: string;
+  denominatorCode?: string;
+  denominatorName?: string;
+  denominatorStage?: string;
+  relativeReturn13w?: number | null;
+  basis?: string;
 };
 type RadarMarket = Market & { matchRules: TrendRadarRuleId[] };
 type StockRadarMarket = Market & {
@@ -124,7 +133,7 @@ type StockRadarMarket = Market & {
   matchRules: StockRadarRuleId[];
 };
 
-const memberOnlyViews = new Set<MemberView>(["crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected"]);
+const memberOnlyViews = new Set<MemberView>(["crypto7", "commodity", "usSelected", "chinaIndices", "hkSelected", "crossMarket"]);
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? "";
 
 function isMemberView(view: View): view is MemberView {
@@ -200,6 +209,14 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   CRCL: { shortCode: "CRCL", cols: 3, rows: 2 },
   COIN: { shortCode: "COIN", cols: 3, rows: 2 },
   MSTR: { shortCode: "MSTR", cols: 3, rows: 2 },
+  "BTC-SOXX": { shortCode: "BTC/SOXX", cols: 3, rows: 4 },
+  "BTC-QQQ": { shortCode: "BTC/QQQ", cols: 3, rows: 4 },
+  "SOXX-SPY": { shortCode: "SOXX/SPY", cols: 3, rows: 4 },
+  "RSP-SPY": { shortCode: "RSP/SPY", cols: 3, rows: 4 },
+  "ASHR-SPY": { shortCode: "ASHR/SPY", cols: 3, rows: 4 },
+  "KTEC-QQQ": { shortCode: "KTEC/QQQ", cols: 3, rows: 4 },
+  "BTC-GLD": { shortCode: "BTC/GLD", cols: 3, rows: 4 },
+  "GLD-SPY": { shortCode: "GLD/SPY", cols: 3, rows: 4 },
 };
 
 type DashboardMarket = Omit<Market, "shortCode" | "cols" | "rows" | "stage" | "previousStage" | "region" | "signal" | "collections" | "dataStatus" | "cryptoFreshness"> & {
@@ -247,6 +264,7 @@ const radarRuleIds: Record<RadarScanMode, TrendRadarRuleId[]> = {
 
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日韩股市", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日韩股市", "欧股", "大宗·宏观", "加密"];
+const crossMarketRegions: MarketRegion[] = ["加密与科技", "美股领导力", "中国与美国", "宏观资产轮动"];
 const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { mapKicker: "GLOBAL MARKET", mapTitle: "全球市场", regions, groups: marketRegions },
   crypto7: { mapKicker: "CRYPTO MARKET", mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
@@ -254,6 +272,7 @@ const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Reg
   usSelected: { mapKicker: "US MARKET", mapTitle: "美股市场", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { mapKicker: "CHINA MARKET", mapTitle: "A股市场", regions: ["全球", "A股"], groups: ["A股"] },
   hkSelected: { mapKicker: "HONG KONG MARKET", mapTitle: "港股市场", regions: ["全球", "港股"], groups: ["港股"] },
+  crossMarket: { mapKicker: "CROSS-MARKET STRENGTH", mapTitle: "跨市场强弱", regions: ["全球", ...crossMarketRegions], groups: crossMarketRegions },
 };
 const mapPageTitles: Record<View, string> = {
   global: "全球市场趋势地图",
@@ -262,6 +281,7 @@ const mapPageTitles: Record<View, string> = {
   hkSelected: "港股市场趋势地图",
   commodity: "商品市场趋势地图",
   crypto7: "加密市场趋势地图",
+  crossMarket: "跨市场强弱地图",
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "KOSPI", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
@@ -270,6 +290,7 @@ const collectionOrder: Partial<Record<View, string[]>> = {
   usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
   chinaIndices: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000984.SH", "SZ399006", "000688.SH", "000985.SH", "931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"],
   hkSelected: ["HSI", "HSTECH", "HSEWI", "700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK", "1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"],
+  crossMarket: ["BTC-SOXX", "BTC-QQQ", "SOXX-SPY", "RSP-SPY", "ASHR-SPY", "KTEC-QQQ", "BTC-GLD", "GLD-SPY"],
 };
 const usMapGroups = [
   { label: "市场", className: "map-us-market", codes: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX"] },
@@ -342,17 +363,20 @@ function HoverMarketCard({ market, point, touchMode, onClose }: { market: Market
         <div><dt>本阶段起始时间</dt><dd>{confirmationTime}</dd></div>
         <div><dt>{market.cryptoFreshness === "pending" ? "历史观察" : "本周观察"}</dt><dd style={{ color: observationColor }}>{observationLabel}{observationConfirmation && <> · {observationConfirmation}</>}</dd></div>
         <div><dt>30周均线：</dt><dd style={{ color: maColor }}>{maDirection} · 近5周 {market.momentum.toFixed(2)}%</dd></div>
+        {market.numeratorCode && market.denominatorCode && <div><dt>近13周相对收益</dt><dd>{market.relativeReturn13w == null ? "—" : `${market.relativeReturn13w >= 0 ? "+" : ""}${market.relativeReturn13w.toFixed(2)}%`}</dd></div>}
+        {market.numeratorCode && market.denominatorCode && <div><dt>绝对阶段</dt><dd>{market.numeratorCode} {market.numeratorStage}｜{market.denominatorCode} {market.denominatorStage}</dd></div>}
+        {market.basis && <div><dt>计算口径</dt><dd>{market.basis}</dd></div>}
         {market.cryptoFreshness === "pending" && <div><dt>数据待更新</dt><dd>保留上次完整结果；阶段数据截至：{confirmationTimeForTradingDate(market)}</dd></div>}
       </dl>
     </div>
   );
 }
 
-function MarketMapGroup({ group, className, items, stageFilter, compact, dense, onMarketMove, onMarketLeave, onMarketFocus, onMarketPointerDown, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketPointerDown: (pointerType: string) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
+function MarketMapGroup({ group, className, items, stageFilter, compact, dense, noun = "资产", onMarketMove, onMarketLeave, onMarketFocus, onMarketPointerDown, onMarketTap }: { group: string; className?: string; items: Market[]; stageFilter: Stage | "全部"; compact: boolean; dense: boolean; noun?: string; onMarketMove: (item: Market, event: PointerEvent<HTMLButtonElement>) => void; onMarketLeave: () => void; onMarketFocus: (item: Market, element: HTMLButtonElement) => void; onMarketPointerDown: (pointerType: string) => void; onMarketTap: (item: Market, event: ReactMouseEvent<HTMLButtonElement>) => void }) {
   if (!items.length) return null;
   return (
     <section className={`map-group ${className ?? `map-${group.replace("·", "-")}`} ${compact ? "map-group-full" : ""}`}>
-      <header><strong>{group}</strong><span>{items.length} 个资产</span></header>
+      <header><strong>{group}</strong><span>{items.length} 个{noun}</span></header>
       <div className="map-tiles">
         {items.map((item) => {
           const faded = stageFilter !== "全部" && item.stage !== stageFilter;
@@ -427,7 +451,7 @@ function GlobalStageMap({ source, region, stageFilter, view, onMarketMove, onMar
   }
   return (
     <div className={`market-map view-${view} ${region !== "全球" ? "single-map" : ""}`}>
-      {groups.map((group) => <MarketMapGroup key={group} group={displayRegionName(group)} className={`map-${group.replace("·", "-")}`} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
+      {groups.map((group) => <MarketMapGroup key={group} group={displayRegionName(group)} className={`map-${group.replace("·", "-")}`} items={source.filter((item) => item.region === group)} stageFilter={stageFilter} compact={region !== "全球"} dense={dense} noun={view === "crossMarket" ? "比率" : "资产"} onMarketMove={onMarketMove} onMarketLeave={onMarketLeave} onMarketFocus={onMarketFocus} onMarketPointerDown={onMarketPointerDown} onMarketTap={onMarketTap} />)}
     </div>
   );
 }
@@ -743,7 +767,7 @@ export default function Home() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [changingPassword, setChangingPassword] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<"market" | "tools" | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<"market" | "crossMarket" | "tools" | null>(null);
   const [loadingMemberView, setLoadingMemberView] = useState<ProtectedPage | null>(null);
   const [view, setView] = useState<View>("global");
   const [radarActive, setRadarActive] = useState(false);
@@ -1504,6 +1528,12 @@ export default function Home() {
                 <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7" ? "active" : ""}`} onClick={() => requestView("crypto7")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7"}><BarChart3 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}加密市场</span></button>
               </nav>
             </section>
+            <section className="side-nav-section" aria-labelledby="cross-market-navigation-title">
+              <h2 id="cross-market-navigation-title">跨市场地图</h2>
+              <nav className="side-nav" aria-label="跨市场地图">
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""}`} onClick={() => requestView("crossMarket")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket"}><Grid2X2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}跨市场强弱</span></button>
+              </nav>
+            </section>
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
               <h2 id="member-tools-navigation-title">阶段扫描</h2>
               <nav className="side-tools" aria-label="阶段扫描">
@@ -1517,7 +1547,7 @@ export default function Home() {
             <div className="mobile-nav-menu">
               <button
                 type="button"
-                className={`mobile-menu-trigger ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
+                className={`mobile-menu-trigger ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view !== "crossMarket" ? "active" : ""} ${mobileMenuOpen === "market" ? "open" : ""}`}
                 onClick={() => setMobileMenuOpen((current) => current === "market" ? null : "market")}
                 aria-label="手机端市场地图"
                 aria-haspopup="menu"
@@ -1534,6 +1564,24 @@ export default function Home() {
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "hkSelected" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("hkSelected"); }}><Building2 size={15} /><span>港股</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "commodity" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("commodity"); }}><Gem size={15} /><span>商品</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                   <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crypto7" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crypto7"); }}><BarChart3 size={15} /><span>加密</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                </div>
+              )}
+            </div>
+            <div className="mobile-nav-menu mobile-cross-market-menu">
+              <button
+                type="button"
+                className={`mobile-menu-trigger ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""} ${mobileMenuOpen === "crossMarket" ? "open" : ""}`}
+                onClick={() => setMobileMenuOpen((current) => current === "crossMarket" ? null : "crossMarket")}
+                aria-label="手机端跨市场地图"
+                aria-haspopup="menu"
+                aria-expanded={mobileMenuOpen === "crossMarket"}
+                aria-controls="mobile-cross-market-menu"
+              >
+                <Grid2X2 size={15} /><span>跨市场</span><ChevronDown size={13} aria-hidden="true" />
+              </button>
+              {mobileMenuOpen === "crossMarket" && (
+                <div className="mobile-dropdown-panel" id="mobile-cross-market-menu" role="menu" aria-label="跨市场地图">
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crossMarket"); }}><Grid2X2 size={15} /><span>跨市场强弱</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                 </div>
               )}
             </div>
@@ -1694,7 +1742,7 @@ export default function Home() {
 
           <section className="map-panel" id="stage-map">
             <div className="map-panel-head">
-              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>{mapDisplay === "trend" ? "底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换" : "横轴显示主阶段持续时间；纵轴显示当前阶段"}</p></div>
+              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>{view === "crossMarket" ? "比率上升表示分子跑赢分母，不代表分子资产一定上涨" : mapDisplay === "trend" ? "底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换" : "横轴显示主阶段持续时间；纵轴显示当前阶段"}</p></div>
               <div className="map-display-switch" role="group" aria-label="图表视图切换">
                 <button type="button" className={mapDisplay === "trend" ? "active" : ""} onClick={() => setMapDisplay("trend")} aria-pressed={mapDisplay === "trend"}><TrendingUp size={14} />趋势图</button>
                 <button type="button" className={mapDisplay === "quadrant" ? "active" : ""} onClick={() => { setMapDisplay("quadrant"); closeMarketCard(); }} aria-pressed={mapDisplay === "quadrant"}><Grid2X2 size={14} />象限图</button>
@@ -1709,7 +1757,7 @@ export default function Home() {
           </>}
 
           <footer>
-            <span>{introductionActive ? "LZ-4Stage Map · 四阶段说明" : myScanActive ? `LZ-4Stage Map · 自选阶段扫描 · ${myScanAssets.length}/20 个资产` : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage Map · 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage Map · 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4Stage Map · 四阶段分析 · ${activeUniverse.length} 个资产`}</span>
+            <span>{introductionActive ? "LZ-4Stage Map · 四阶段说明" : myScanActive ? `LZ-4Stage Map · 自选阶段扫描 · ${myScanAssets.length}/20 个资产` : stockRadarActive && stockRadarSnapshot ? `LZ-4Stage Map · 个股阶段扫描 · ${stockRadarSnapshot.universeSize} 只高流动性股票` : radarActive && radarSnapshot ? `LZ-4Stage Map · 全球阶段扫描 · ${radarSnapshot.universeSize} 个资产` : `LZ-4Stage Map · 四阶段分析 · ${activeUniverse.length} 个${view === "crossMarket" ? "比率" : "资产"}`}</span>
             <div className="footer-data-times">
               <span>{myScanActive
                 ? <>传统资产周六更新｜加密资产周一更新</>
@@ -1733,7 +1781,7 @@ export default function Home() {
             {memberDialog === "locked" ? (
               <>
                 <h2 id="access-gate-title">LZ会员专享</h2>
-                <p>{pendingView === "myScan" ? "登录会员账号后建立自己的阶段扫描列表" : pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : "登录会员账号后查看完整市场趋势地图"}</p>
+                <p>{pendingView === "myScan" ? "登录会员账号后建立自己的阶段扫描列表" : pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : pendingView === "crossMarket" ? "登录会员账号后查看跨市场强弱地图" : "登录会员账号后查看完整市场趋势地图"}</p>
                 <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
               </>
             ) : memberDialog === "dataError" ? (
