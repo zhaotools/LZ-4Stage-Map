@@ -46,7 +46,10 @@ test("stage summaries show only percentages and market structure centers the sta
 
 test("interpretation panel exports the same content and explicit confirmation dates", () => {
   assert.match(pageSource, /downloadMarketInterpretationImage\(interpretation, marketTitle, confirmationLabel\)/);
-  assert.match(pageSource, /"生成图片"/);
+  assert.match(pageSource, /downloadMarketQuadrantImage\(markets, view, marketTitle, confirmationLabel\)/);
+  assert.match(pageSource, /"生成趋势图"/);
+  assert.match(pageSource, /"生成象限图"/);
+  assert.match(pageSource, /markets=\{activeUniverse\} view=\{view\}/);
   assert.match(pageSource, /marketTitle=\{activeViewMeta\.mapTitle\}/);
   assert.match(pageSource, /confirmationLabel=\{interpretationConfirmationLabel\}/);
   assert.match(pageSource, /阶段数据截至：传统市场 \$\{traditionalInterpretationDate/);
