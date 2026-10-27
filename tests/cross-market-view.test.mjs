@@ -7,7 +7,7 @@ const cssSource = await readFile(new URL("../app/globals.css", import.meta.url),
 const quadrantSource = await readFile(new URL("../app/lib/market-quadrant-image.mjs", import.meta.url), "utf8");
 
 test("cross-market view renders four groups and relative-strength details", () => {
-  for (const label of ["加密与科技", "美股领导力", "中国与美国", "宏观资产轮动"]) {
+  for (const label of ["加密与科技", "美股内部结构", "区域市场对比", "宏观资产轮动"]) {
     assert.match(pageSource, new RegExp(label));
     assert.match(cssSource, new RegExp(`map-${label}`));
     assert.match(quadrantSource, new RegExp(label));

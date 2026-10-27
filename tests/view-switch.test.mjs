@@ -22,7 +22,7 @@ test("introduction diagram uses the agreed four-stage names without a fixed rout
   assert.doesNotMatch(frameworkSource, /marker-end|→|↗|↘/);
 });
 
-test("sidebar switches between market maps and cross-market strength", () => {
+test("sidebar switches between market maps and cross-market relative trend", () => {
   assert.match(pageSource, /id="market-map-navigation-title">市场地图<\/h2>/);
   assert.match(pageSource, /id="member-tools-navigation-title">阶段扫描<\/h2>/);
   assert.match(pageSource, /<nav className="side-tools" aria-label="阶段扫描">/);
@@ -36,7 +36,8 @@ test("sidebar switches between market maps and cross-market strength", () => {
   assert.match(pageSource, /requestView\("chinaIndices"\)/);
   assert.match(pageSource, /requestView\("hkSelected"\)/);
   assert.match(pageSource, /id="cross-market-navigation-title">跨市场地图<\/h2>/);
-  assert.match(pageSource, /requestView\("crossMarket"\)[^\n]+跨市场强弱<\/span>/);
+  assert.match(pageSource, /requestView\("crossMarket"\)[^\n]+相对趋势<\/span>/);
+  assert.match(pageSource, /mapTitle: "跨市场相对趋势"/);
   const desktopMarketMenu = pageSource.slice(pageSource.indexOf('<nav className="side-nav" aria-label="市场地图">'), pageSource.indexOf('</nav>', pageSource.indexOf('<nav className="side-nav" aria-label="市场地图">')));
   const mobileMarketMenu = pageSource.slice(pageSource.indexOf('id="mobile-market-menu"'), pageSource.indexOf('</div>', pageSource.indexOf('id="mobile-market-menu"')));
   const expectedMarketOrder = ["global", "usSelected", "chinaIndices", "hkSelected", "commodity", "crypto7"];

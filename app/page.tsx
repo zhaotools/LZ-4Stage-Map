@@ -83,7 +83,7 @@ function applyLocalMyScanOrder(assets: MyScanAsset[], userId?: string) {
   }
 }
 type RadarScanMode = "s2" | "s4";
-type Region = "全球" | "美股" | "A股" | "港股" | "日韩股市" | "欧股" | "大宗·宏观" | "加密" | "加密与科技" | "美股领导力" | "中国与美国" | "宏观资产轮动";
+type Region = "全球" | "美股" | "A股" | "港股" | "日韩股市" | "欧股" | "大宗·宏观" | "加密" | "加密与科技" | "美股内部结构" | "区域市场对比" | "宏观资产轮动";
 type MarketRegion = Exclude<Region, "全球">;
 
 type Market = {
@@ -264,7 +264,7 @@ const radarRuleIds: Record<RadarScanMode, TrendRadarRuleId[]> = {
 
 const regions: Region[] = ["全球", "美股", "A股", "港股", "日韩股市", "欧股", "大宗·宏观", "加密"];
 const marketRegions: MarketRegion[] = ["美股", "A股", "港股", "日韩股市", "欧股", "大宗·宏观", "加密"];
-const crossMarketRegions: MarketRegion[] = ["加密与科技", "美股领导力", "中国与美国", "宏观资产轮动"];
+const crossMarketRegions: MarketRegion[] = ["加密与科技", "美股内部结构", "区域市场对比", "宏观资产轮动"];
 const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Region[]; groups: MarketRegion[] }> = {
   global: { mapKicker: "GLOBAL MARKET", mapTitle: "全球市场", regions, groups: marketRegions },
   crypto7: { mapKicker: "CRYPTO MARKET", mapTitle: "加密市场", regions: ["全球", "美股", "加密"], groups: ["加密", "美股"] },
@@ -272,7 +272,7 @@ const viewMeta: Record<View, { mapKicker: string; mapTitle: string; regions: Reg
   usSelected: { mapKicker: "US MARKET", mapTitle: "美股市场", regions: ["全球", "美股", "大宗·宏观"], groups: ["美股", "大宗·宏观"] },
   chinaIndices: { mapKicker: "CHINA MARKET", mapTitle: "A股市场", regions: ["全球", "A股"], groups: ["A股"] },
   hkSelected: { mapKicker: "HONG KONG MARKET", mapTitle: "港股市场", regions: ["全球", "港股"], groups: ["港股"] },
-  crossMarket: { mapKicker: "CROSS-MARKET STRENGTH", mapTitle: "跨市场强弱", regions: ["全球", ...crossMarketRegions], groups: crossMarketRegions },
+  crossMarket: { mapKicker: "CROSS-MARKET RELATIVE TREND", mapTitle: "跨市场相对趋势", regions: ["全球", ...crossMarketRegions], groups: crossMarketRegions },
 };
 const mapPageTitles: Record<View, string> = {
   global: "全球市场趋势地图",
@@ -281,7 +281,7 @@ const mapPageTitles: Record<View, string> = {
   hkSelected: "港股市场趋势地图",
   commodity: "商品市场趋势地图",
   crypto7: "加密市场趋势地图",
-  crossMarket: "跨市场强弱地图",
+  crossMarket: "跨市场相对趋势",
 };
 const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "KOSPI", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
@@ -1531,7 +1531,7 @@ export default function Home() {
             <section className="side-nav-section" aria-labelledby="cross-market-navigation-title">
               <h2 id="cross-market-navigation-title">跨市场地图</h2>
               <nav className="side-nav" aria-label="跨市场地图">
-                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""}`} onClick={() => requestView("crossMarket")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket"}><Grid2X2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}跨市场强弱</span></button>
+                <button className={`nav-item ${!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""}`} onClick={() => requestView("crossMarket")} aria-pressed={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket"}><Grid2X2 size={18} /><span className="nav-label">{!isMember && <LockKeyhole className="nav-lock" size={11} aria-hidden="true" />}相对趋势</span></button>
               </nav>
             </section>
             <section className="side-nav-section" aria-labelledby="member-tools-navigation-title">
@@ -1581,7 +1581,7 @@ export default function Home() {
               </button>
               {mobileMenuOpen === "crossMarket" && (
                 <div className="mobile-dropdown-panel" id="mobile-cross-market-menu" role="menu" aria-label="跨市场地图">
-                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crossMarket"); }}><Grid2X2 size={15} /><span>跨市场强弱</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
+                  <button type="button" role="menuitem" className={!introductionActive && !radarActive && !stockRadarActive && !myScanActive && view === "crossMarket" ? "active" : ""} onClick={() => { setMobileMenuOpen(null); void requestView("crossMarket"); }}><Grid2X2 size={15} /><span>相对趋势</span>{!isMember && <LockKeyhole className="mobile-menu-lock" size={11} aria-hidden="true" />}</button>
                 </div>
               )}
             </div>
@@ -1781,7 +1781,7 @@ export default function Home() {
             {memberDialog === "locked" ? (
               <>
                 <h2 id="access-gate-title">LZ会员专享</h2>
-                <p>{pendingView === "myScan" ? "登录会员账号后建立自己的阶段扫描列表" : pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : pendingView === "crossMarket" ? "登录会员账号后查看跨市场强弱地图" : "登录会员账号后查看完整市场趋势地图"}</p>
+                <p>{pendingView === "myScan" ? "登录会员账号后建立自己的阶段扫描列表" : pendingView === "stockRadar" ? "登录会员账号后查看300只高流动性股票扫描结果" : pendingView === "trendRadar" ? "登录会员账号后查看全球阶段扫描结果" : pendingView === "crossMarket" ? "登录会员账号后查看跨市场相对趋势" : "登录会员账号后查看完整市场趋势地图"}</p>
                 <button className="member-login-cta" type="button" onClick={() => setMemberDialog("login")}>会员登录</button>
               </>
             ) : memberDialog === "dataError" ? (
