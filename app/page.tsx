@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, type FormEvent, type MouseEvent as ReactMouseEvent, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type FormEvent, type MouseEvent as ReactMouseEvent, type PointerEvent, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { createHoverResumeGuard } from "@/app/lib/hover-resume.mjs";
 import {
@@ -60,11 +60,14 @@ import {
   type TrendRadarSnapshot,
 } from "@/app/lib/member-api";
 import { isSupabaseConfigured } from "@/app/lib/supabase";
+
+const MarketQuadrantChart = lazy(() => import("@/app/components/market-quadrant-chart").then((module) => ({ default: module.MarketQuadrantChart })));
 type Stage = "S1" | "S2" | "S3" | "S4";
 type View = "global" | MemberView;
 type ProtectedPage = MemberView | "trendRadar" | "stockRadar" | "myScan";
 type RadarFilter = "all" | TrendRadarRuleId;
 type StockRadarFilter = "all" | StockRadarRuleId;
+type MapDisplay = "trend" | "quadrant";
 
 const myScanOrderStorageKey = (userId: string) => `lz4stage-my-scan-order:${userId}`;
 
@@ -754,6 +757,7 @@ export default function Home() {
   const [stockRadarRegion, setStockRadarRegion] = useState<"全部" | "美股" | "A股" | "港股">("全部");
   const [region, setRegion] = useState<Region>("全球");
   const [stageFilter, setStageFilter] = useState<Stage | "全部">("全部");
+  const [mapDisplay, setMapDisplay] = useState<MapDisplay>("trend");
   const [hoveredMarket, setHoveredMarket] = useState<Market | null>(null);
   const hoverResumeGuard = useRef(createHoverResumeGuard());
   const lastMarketPointerType = useRef("");
@@ -1690,9 +1694,15 @@ export default function Home() {
 
           <section className="map-panel" id="stage-map">
             <div className="map-panel-head">
-              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换</p></div>
+              <div><span className="section-kicker">{activeViewMeta.mapKicker}</span><h2>{activeViewMeta.mapTitle}</h2><p>{mapDisplay === "trend" ? "底色显示已确认阶段；外框提示待确认变化，不代表阶段已切换" : "横轴显示主阶段持续时间；纵轴显示当前阶段"}</p></div>
+              <div className="map-display-switch" role="group" aria-label="图表视图切换">
+                <button type="button" className={mapDisplay === "trend" ? "active" : ""} onClick={() => setMapDisplay("trend")} aria-pressed={mapDisplay === "trend"}><TrendingUp size={14} />趋势图</button>
+                <button type="button" className={mapDisplay === "quadrant" ? "active" : ""} onClick={() => { setMapDisplay("quadrant"); closeMarketCard(); }} aria-pressed={mapDisplay === "quadrant"}><Grid2X2 size={14} />象限图</button>
+              </div>
             </div>
-            <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketPointerDown={handleMarketPointerDown} onMarketTap={handleMarketTap} />
+            {mapDisplay === "trend"
+              ? <GlobalStageMap source={regionData} region={region} stageFilter={stageFilter} view={view} onMarketMove={handleMarketMove} onMarketLeave={() => { if (!touchCardOpen) setHoveredMarket(null); }} onMarketFocus={handleMarketFocus} onMarketPointerDown={handleMarketPointerDown} onMarketTap={handleMarketTap} />
+              : <Suspense fallback={<div className="market-quadrant-empty">象限图加载中…</div>}><MarketQuadrantChart markets={regionData} view={view} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} stageFilter={stageFilter} /></Suspense>}
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的阶段观察变化</span>}</div>
           </section>
           {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} markets={activeUniverse} view={view} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} />}
