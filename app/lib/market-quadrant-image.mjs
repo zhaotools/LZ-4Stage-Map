@@ -2,6 +2,7 @@ import { STAGE_PRESENTATION } from "./stage-presentation.mjs";
 
 const FONT_FAMILY = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif';
 const STAGES = ["S1", "S2", "S3", "S4"];
+const STAGE_AXIS_LABELS = { S1: "早期", S2: "发展期", S3: "观察期", S4: "下降期" };
 
 const GROUPS = {
   global: [
@@ -151,6 +152,7 @@ export function buildMarketQuadrantModel(markets, viewKey, marketTitle, confirma
       value: Number(stage.slice(1)),
       title: STAGE_PRESENTATION[stage].title,
       season: STAGE_PRESENTATION[stage].season,
+      axisLabel: STAGE_AXIS_LABELS[stage],
       color: STAGE_PRESENTATION[stage].color,
       background: STAGE_PRESENTATION[stage].background,
     })),
@@ -289,7 +291,7 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
     context.fillText(stage.stage, plot.x - 40, bandY + plot.bandHeight / 2 - 7);
     context.fillStyle = "#5c6f89";
     context.font = `600 17px ${FONT_FAMILY}`;
-    context.fillText(`${stage.title}｜${stage.season}`, plot.x - 40, bandY + plot.bandHeight / 2 + 26);
+    context.fillText(`（${stage.axisLabel}）`, plot.x - 40, bandY + plot.bandHeight / 2 + 26);
   });
 
   context.setLineDash([6, 6]);

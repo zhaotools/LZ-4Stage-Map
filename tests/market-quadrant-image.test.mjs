@@ -23,6 +23,7 @@ test("quadrant model maps duration to X, stages to Y and preserves page groups",
   assert.equal(model.xAxis.max, 70);
   assert.deepEqual(model.xAxis.ticks, [0, 10, 20, 30, 40, 50, 60, 70]);
   assert.deepEqual(model.stages.map((stage) => stage.stage), ["S4", "S3", "S2", "S1"]);
+  assert.deepEqual(model.stages.map((stage) => stage.axisLabel), ["下降期", "观察期", "发展期", "早期"]);
 });
 
 test("quadrant export paints a 4:3 PNG and starts the browser download", async () => {
