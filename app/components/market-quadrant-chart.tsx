@@ -30,9 +30,18 @@ type QuadrantPoint = {
 const chartWidth = 1600;
 const chartHeight = 920;
 const plot = { x: 154, y: 50, width: 1376, height: 760, bandHeight: 190 };
+let textMeasurementContext: CanvasRenderingContext2D | null | undefined;
 
-function approximateTextWidth(text: string) {
-  return Array.from(text).reduce((width, character) => width + (/^[\x20-\x7E]$/u.test(character) ? 9.5 : 18), 0);
+function chartTextWidth(text: string) {
+  if (typeof document !== "undefined") {
+    if (textMeasurementContext === undefined) {
+      const canvas = document.createElement("canvas");
+      textMeasurementContext = canvas.getContext("2d");
+      if (textMeasurementContext) textMeasurementContext.font = '700 18px "MiSans", "PingFang SC", "Microsoft YaHei", Arial, sans-serif';
+    }
+    if (textMeasurementContext) return textMeasurementContext.measureText(text).width;
+  }
+  return Array.from(text).reduce((width, character) => width + (/^[\x20-\x7E]$/u.test(character) ? 11.5 : 18), 0);
 }
 
 export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLabel, stageFilter }: {
@@ -50,7 +59,7 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
     pixelX: plot.x + point.weeks / model.xAxis.max * plot.width,
     pixelY: plot.y + (4.5 - point.yValue) / 4 * plot.height,
   })).sort((left: QuadrantPoint, right: QuadrantPoint) => right.stageValue - left.stageValue || left.weeks - right.weeks);
-  const points = layoutMarketQuadrantLabels(pointsWithPixels, plot, (label: string) => ({ width: approximateTextWidth(label) })) as QuadrantPoint[];
+  const points = layoutMarketQuadrantLabels(pointsWithPixels, plot, (label: string) => ({ width: chartTextWidth(label) })) as QuadrantPoint[];
 
   return (
     <div className="market-quadrant-chart">
@@ -70,7 +79,7 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
           {model.xAxis.ticks.map((tick: number) => {
             const x = plot.x + tick / model.xAxis.max * plot.width;
             return <g key={tick}>
-              <line x1={x} y1={plot.y} x2={x} y2={plot.y + plot.height} stroke={tick === 0 ? "#203a60" : "#cbd5e1"} strokeWidth={tick === 0 ? 2 : 1} strokeDasharray={tick === 0 ? undefined : "6 6"} />
+              <line x1={x} y1={plot.y} x2={x} y2={plot.y + plot.height} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="6 6" />
               <text x={x} y={plot.y + plot.height + 34} fill="#263b59" fontSize="18" fontWeight="600" textAnchor="middle">{tick}</text>
             </g>;
           })}
@@ -78,7 +87,6 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
             const y = plot.y + (4.5 - stage) / 4 * plot.height;
             return <line key={stage} x1={plot.x} y1={y} x2={plot.x + plot.width} y2={y} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="6 6" />;
           })}
-          <path d={`M ${plot.x} ${plot.y} V ${plot.y + plot.height} H ${plot.x + plot.width}`} fill="none" stroke="#203a60" strokeWidth="2" />
           <text x={plot.x + plot.width / 2} y={plot.y + plot.height + 78} fill="#263b59" fontSize="22" fontWeight="700" textAnchor="middle">主阶段持续时间（周）</text>
           <text x="38" y={plot.y + plot.height / 2} fill="#263b59" fontSize="22" fontWeight="700" textAnchor="middle" transform={`rotate(-90 38 ${plot.y + plot.height / 2})`}>当前阶段</text>
 

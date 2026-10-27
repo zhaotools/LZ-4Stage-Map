@@ -249,7 +249,7 @@ export function layoutMarketQuadrantLabels(points, plot, measureText) {
   }));
   const occupied = [];
   return points.map((point) => {
-    const labelWidth = Math.min(260, Math.max(124, measureText(point.label).width + 26));
+    const labelWidth = Math.min(300, Math.max(124, measureText(point.label).width + 26));
     return { ...point, labelBox: placeLabel(point, labelWidth, plot, occupied, markerBoxes) };
   });
 }
@@ -348,7 +348,7 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
   context.lineWidth = 1;
   model.xAxis.ticks.forEach((tick) => {
     const x = plot.x + tick / model.xAxis.max * plot.width;
-    context.strokeStyle = tick === 0 ? "#203a60" : "#cbd5e1";
+    context.strokeStyle = "#cbd5e1";
     context.beginPath();
     context.moveTo(x, plot.y);
     context.lineTo(x, plot.y + plot.height);
@@ -367,13 +367,6 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
     context.stroke();
   }
   context.setLineDash([]);
-  context.strokeStyle = "#203a60";
-  context.lineWidth = 2;
-  context.beginPath();
-  context.moveTo(plot.x, plot.y);
-  context.lineTo(plot.x, plot.y + plot.height);
-  context.lineTo(plot.x + plot.width, plot.y + plot.height);
-  context.stroke();
 
   context.fillStyle = "#263b59";
   context.font = `700 22px ${FONT_FAMILY}`;

@@ -4,6 +4,7 @@ import test from "node:test";
 
 const pageSource = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
 const chartSource = readFileSync(new URL("../app/components/market-quadrant-chart.tsx", import.meta.url), "utf8");
+const imageSource = readFileSync(new URL("../app/lib/market-quadrant-image.mjs", import.meta.url), "utf8");
 const cssSource = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
 
 test("market pages switch between the trend map and the responsive quadrant chart", () => {
@@ -24,4 +25,15 @@ test("web quadrant reuses the export model, collision layout and active stage fi
   assert.match(chartSource, /阶段分析仅供市场观察，不构成任何投资建议/);
   assert.match(cssSource, /\.market-quadrant-svg \{[^}]*min-width: 920px/);
   assert.match(cssSource, /\.market-quadrant-scroll \{[^}]*overflow-x: auto/);
+});
+
+test("web and downloaded quadrant charts omit dark axis lines", () => {
+  assert.doesNotMatch(chartSource, /tick === 0 \? "#203a60"/);
+  assert.doesNotMatch(chartSource, /<path d=\{`M \$\{plot\.x\} \$\{plot\.y\} V/);
+  assert.doesNotMatch(imageSource, /context\.moveTo\(plot\.x, plot\.y\);\s*context\.lineTo\(plot\.x, plot\.y \+ plot\.height\)/);
+});
+
+test("web labels use real browser text measurements and allow wider boxes", () => {
+  assert.match(chartSource, /textMeasurementContext\.measureText\(text\)\.width/);
+  assert.match(imageSource, /Math\.min\(300, Math\.max\(124, measureText\(point\.label\)\.width \+ 26\)\)/);
 });
