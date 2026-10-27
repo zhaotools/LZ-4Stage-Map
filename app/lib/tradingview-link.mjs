@@ -38,8 +38,12 @@ const tradingViewExchange = {
   NYSEARCA: "AMEX",
 };
 
+function normalizeTradingViewSymbol(symbol) {
+  return symbol.replaceAll("AMEX:SOXX", "NASDAQ:SOXX");
+}
+
 export function tradingViewSymbolFor(market) {
-  if (market.tradingviewSymbol) return market.tradingviewSymbol;
+  if (market.tradingviewSymbol) return normalizeTradingViewSymbol(market.tradingviewSymbol);
   if (specialSymbols[market.code]) return specialSymbols[market.code];
 
   if (market.region === "港股") {

@@ -56,6 +56,32 @@ test("member-selected assets use the server-validated TradingView identity", () 
   assert.equal(tradingViewChartUrlFor(selected), "https://cn.tradingview.com/chart/?symbol=OKX%3AABCUSDT&interval=D");
 });
 
+test("cross-market ratios use valid TradingView formula symbols", () => {
+  const formulas = [
+    "BINANCE:BTCUSDT/NASDAQ:SOXX",
+    "BINANCE:BTCUSDT/NASDAQ:QQQ",
+    "NASDAQ:SOXX/AMEX:SPY",
+    "AMEX:RSP/AMEX:SPY",
+    "AMEX:ASHR/AMEX:SPY",
+    "AMEX:KTEC/NASDAQ:QQQ",
+    "BINANCE:BTCUSDT/AMEX:GLD",
+    "AMEX:GLD/AMEX:SPY",
+  ];
+  for (const [index, formula] of formulas.entries()) {
+    const ratio = { ...market(`RATIO-${index}`, "跨市场", "SYNTHETIC"), tradingviewSymbol: formula };
+    const url = new URL(tradingViewChartUrlFor(ratio));
+    assert.equal(url.searchParams.get("symbol"), formula);
+    assert.equal(url.searchParams.get("interval"), "D");
+  }
+});
+
+test("legacy SOXX formulas are repaired before opening TradingView", () => {
+  const btcSoxx = { ...market("BTC-SOXX", "跨市场", "SYNTHETIC"), tradingviewSymbol: "BINANCE:BTCUSDT/AMEX:SOXX" };
+  const soxxSpy = { ...market("SOXX-SPY", "跨市场", "SYNTHETIC"), tradingviewSymbol: "AMEX:SOXX/AMEX:SPY" };
+  assert.equal(tradingViewSymbolFor(btcSoxx), "BINANCE:BTCUSDT/NASDAQ:SOXX");
+  assert.equal(tradingViewSymbolFor(soxxSpy), "NASDAQ:SOXX/AMEX:SPY");
+});
+
 test("HYPE opens TradingView Chinese daily chart with Hyperliquid spot feed", () => {
   const hype = market("HYPE-USD", "加密", "CRYPTO");
   assert.equal(tradingViewChartUrlFor(hype), "https://cn.tradingview.com/chart/?symbol=HYPERLIQUID%3AHYPEUSDC&interval=D");
