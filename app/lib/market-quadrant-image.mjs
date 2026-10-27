@@ -3,6 +3,9 @@ import { STAGE_PRESENTATION } from "./stage-presentation.mjs";
 const FONT_FAMILY = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif';
 const STAGES = ["S1", "S2", "S3", "S4"];
 const STAGE_AXIS_LABELS = { S1: "早期", S2: "发展期", S3: "观察期", S4: "下降期" };
+const ASSET_NAME_OVERRIDES = new Map([
+  ["NDQ", "纳斯达克100指数"],
+]);
 
 const GROUPS = {
   global: [
@@ -75,6 +78,8 @@ function groupIdFor(market, viewKey) {
 }
 
 function compactAssetName(market) {
+  const override = ASSET_NAME_OVERRIDES.get(market.code);
+  if (override) return override;
   if (market.region === "加密") return market.shortCode || market.code.replace(/-USD$/u, "");
   const name = String(market.name || "")
     .replace(/（[^）]+）/gu, "")

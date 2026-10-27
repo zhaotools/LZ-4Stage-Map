@@ -30,6 +30,17 @@ test("quadrant model maps duration to X, stages to Y and preserves page groups",
   assert.deepEqual(model.stages.map((stage) => stage.axisLabel), ["下降期", "观察期", "发展期", "早期"]);
 });
 
+test("Nasdaq 100 uses its market name instead of the NDX short code", () => {
+  const model = buildMarketQuadrantModel([
+    { code: "GSPC.INDEX", shortCode: "SPX", name: "标普500指数", region: "美股", stage: "S2", subStage: "S2-", weeks: 27, stageAsOf: "2026-10-23" },
+    { code: "NDQ", shortCode: "NDX", name: "纳斯达克100指数", region: "美股", stage: "S2", subStage: "S2-", weeks: 27, stageAsOf: "2026-10-23" },
+  ], "global", "全球市场", "阶段数据截至：2026-10-23");
+
+  assert.match(model.points.find((point) => point.code === "GSPC.INDEX")?.label || "", /^标普500指数｜/u);
+  assert.match(model.points.find((point) => point.code === "NDQ")?.label || "", /^纳斯达克100指数｜/u);
+  assert.doesNotMatch(model.points.find((point) => point.code === "NDQ")?.label || "", /^NDX｜/u);
+});
+
 test("dense assets in one stage receive non-overlapping labels", () => {
   const plot = { x: 154, y: 168, width: 1376, height: 760, bandHeight: 190 };
   const weeks = [1, 6, 8, 10, 10, 10, 14, 14, 14, 15, 15, 20, 34, 43];
