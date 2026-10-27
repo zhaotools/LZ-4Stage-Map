@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildMarketQuadrantModel, downloadMarketQuadrantImage } from "../app/lib/market-quadrant-image.mjs";
+import {
+  buildMarketQuadrantModel,
+  downloadMarketQuadrantImage,
+  layoutMarketQuadrantLabels,
+} from "../app/lib/market-quadrant-image.mjs";
 
 const markets = [
   { code: "000300.SH", shortCode: "000300", name: "沪深300指数", region: "A股", stage: "S4", subStage: "S4", weeks: 6, stageAsOf: "2026-10-23" },
@@ -24,6 +28,35 @@ test("quadrant model maps duration to X, stages to Y and preserves page groups",
   assert.deepEqual(model.xAxis.ticks, [0, 10, 20, 30, 40, 50, 60, 70]);
   assert.deepEqual(model.stages.map((stage) => stage.stage), ["S4", "S3", "S2", "S1"]);
   assert.deepEqual(model.stages.map((stage) => stage.axisLabel), ["下降期", "观察期", "发展期", "早期"]);
+});
+
+test("dense assets in one stage receive non-overlapping labels", () => {
+  const plot = { x: 154, y: 168, width: 1376, height: 760, bandHeight: 190 };
+  const weeks = [1, 6, 8, 10, 10, 10, 14, 14, 14, 15, 15, 20, 34, 43];
+  const points = weeks.map((week, index) => ({
+    code: `dense-${index}`,
+    label: `密集资产${index + 1}｜S4｜${week}周`,
+    stageValue: 4,
+    pixelX: plot.x + week / 70 * plot.width,
+    pixelY: plot.y + 95 + ((index % 5) - 2) * 9,
+  }));
+  const laidOut = layoutMarketQuadrantLabels(points, plot, (text) => ({ width: Array.from(text).length * 18 }));
+
+  for (let index = 0; index < laidOut.length; index += 1) {
+    const box = laidOut[index].labelBox;
+    assert.ok(box.x >= plot.x + 6);
+    assert.ok(box.x + box.width <= plot.x + plot.width - 6);
+    assert.ok(box.y >= plot.y + 6);
+    assert.ok(box.y + box.height <= plot.y + plot.bandHeight - 6);
+    for (let otherIndex = index + 1; otherIndex < laidOut.length; otherIndex += 1) {
+      const other = laidOut[otherIndex].labelBox;
+      const overlaps = box.x < other.x + other.width + 7
+        && box.x + box.width + 7 > other.x
+        && box.y < other.y + other.height + 7
+        && box.y + box.height + 7 > other.y;
+      assert.equal(overlaps, false, `${laidOut[index].code} overlaps ${laidOut[otherIndex].code}`);
+    }
+  }
 });
 
 test("quadrant export paints a 4:3 PNG and starts the browser download", async () => {

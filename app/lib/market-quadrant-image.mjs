@@ -181,27 +181,77 @@ function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
-function placeLabel(point, labelWidth, plot, occupied) {
+function overlapArea(left, right, padding = 7) {
+  const width = Math.max(0, Math.min(left.x + left.width + padding, right.x + right.width + padding)
+    - Math.max(left.x - padding, right.x - padding));
+  const height = Math.max(0, Math.min(left.y + left.height + padding, right.y + right.height + padding)
+    - Math.max(left.y - padding, right.y - padding));
+  return width * height;
+}
+
+function placeLabel(point, labelWidth, plot, occupied, markerBoxes) {
   const bandTop = plot.y + (4 - point.stageValue) * plot.bandHeight;
   const bandBottom = bandTop + plot.bandHeight;
-  const height = 40;
-  const offsets = [
-    [18, -58], [18, 20], [-labelWidth - 18, -58], [-labelWidth - 18, 20],
-    [54, -96], [54, 58], [-labelWidth - 54, -96], [-labelWidth - 54, 58],
+  const height = 38;
+  const inset = 6;
+  const collisionPadding = 7;
+  const minX = plot.x + inset;
+  const maxX = plot.x + plot.width - labelWidth - inset;
+  const minY = bandTop + inset;
+  const maxY = bandBottom - height - inset;
+  const rowGap = collisionPadding;
+  const rowCount = Math.max(1, Math.floor((maxY - minY + height + rowGap) / (height + rowGap)));
+  const rowYs = Array.from({ length: rowCount }, (_, index) => minY + index * (height + rowGap));
+  const preferredXs = [
+    point.pixelX + 18,
+    point.pixelX - labelWidth - 18,
+    point.pixelX - labelWidth / 2,
   ];
-  const candidates = offsets.map(([dx, dy]) => ({
-    x: clamp(point.pixelX + dx, plot.x + 6, plot.x + plot.width - labelWidth - 6),
-    y: clamp(point.pixelY + dy, bandTop + 6, bandBottom - height - 6),
-    width: labelWidth,
-    height,
-  }));
-  for (let y = bandTop + 6; y <= bandBottom - height - 6; y += height + 7) {
-    candidates.push({ x: clamp(point.pixelX + 24, plot.x + 6, plot.x + plot.width - labelWidth - 6), y, width: labelWidth, height });
-    candidates.push({ x: clamp(point.pixelX - labelWidth - 24, plot.x + 6, plot.x + plot.width - labelWidth - 6), y, width: labelWidth, height });
-  }
-  const placed = candidates.find((candidate) => occupied.every((box) => !intersects(candidate, box))) || candidates[0];
+  const xSeeds = [minX, maxX, ...preferredXs];
+  occupied.forEach((box) => {
+    xSeeds.push(box.x + box.width + collisionPadding, box.x - labelWidth - collisionPadding);
+  });
+  for (let x = minX; x <= maxX; x += 8) xSeeds.push(x);
+  const uniqueXs = [...new Set(xSeeds.map((x) => Math.round(clamp(x, minX, maxX))))];
+  const candidates = rowYs.flatMap((y) => uniqueXs.map((x) => {
+    const anchorX = clamp(point.pixelX, x, x + labelWidth);
+    const anchorY = clamp(point.pixelY, y, y + height);
+    const connectorLength = Math.hypot(point.pixelX - anchorX, point.pixelY - anchorY);
+    const centerDistance = Math.abs(point.pixelX - (x + labelWidth / 2));
+    const box = { x, y, width: labelWidth, height };
+    const markerPenalty = markerBoxes.reduce((sum, marker) => sum + overlapArea(box, marker, 3), 0);
+    const coversOwnPoint = point.pixelX >= x && point.pixelX <= x + labelWidth
+      && point.pixelY >= y && point.pixelY <= y + height;
+    return {
+      ...box,
+      score: connectorLength * 10 + centerDistance + markerPenalty * 4 + (coversOwnPoint ? 10000 : 0),
+    };
+  })).sort((left, right) => left.score - right.score || left.y - right.y || left.x - right.x);
+  const placed = candidates.find((candidate) => occupied.every((box) => !intersects(candidate, box, collisionPadding)))
+    || candidates.reduce((best, candidate) => {
+      const collisionScore = occupied.reduce((sum, box) => sum + overlapArea(candidate, box, collisionPadding), 0);
+      if (!best || collisionScore < best.collisionScore
+        || (collisionScore === best.collisionScore && candidate.score < best.candidate.score)) {
+        return { candidate, collisionScore };
+      }
+      return best;
+    }, null).candidate;
   occupied.push(placed);
   return placed;
+}
+
+export function layoutMarketQuadrantLabels(points, plot, measureText) {
+  const markerBoxes = points.map((point) => ({
+    x: point.pixelX - 14,
+    y: point.pixelY - 14,
+    width: 28,
+    height: 28,
+  }));
+  const occupied = [];
+  return points.map((point) => {
+    const labelWidth = Math.min(260, Math.max(124, measureText(point.label).width + 26));
+    return { ...point, labelBox: placeLabel(point, labelWidth, plot, occupied, markerBoxes) };
+  });
 }
 
 function drawConnector(context, point, box) {
@@ -335,26 +385,15 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
   context.fillText("当前阶段", 0, 0);
   context.restore();
 
-  const occupied = [];
-  const points = model.points.map((point) => ({
+  const pointsWithPixels = model.points.map((point) => ({
     ...point,
     pixelX: plot.x + point.weeks / model.xAxis.max * plot.width,
     pixelY: plot.y + (4.5 - point.yValue) / 4 * plot.height,
   })).sort((left, right) => right.stageValue - left.stageValue || left.weeks - right.weeks);
   context.font = `700 18px ${FONT_FAMILY}`;
-  points.forEach((point) => {
-    const labelWidth = Math.min(260, Math.max(124, context.measureText(point.label).width + 26));
-    point.labelBox = placeLabel(point, labelWidth, plot, occupied);
-  });
+  const points = layoutMarketQuadrantLabels(pointsWithPixels, plot, (label) => context.measureText(label));
   points.forEach((point) => drawConnector(context, point, point.labelBox));
   points.forEach((point) => {
-    context.fillStyle = point.color;
-    context.strokeStyle = "#ffffff";
-    context.lineWidth = 4;
-    context.beginPath();
-    context.arc(point.pixelX, point.pixelY, 12, 0, Math.PI * 2);
-    context.fill();
-    context.stroke();
     roundRect(context, point.labelBox.x, point.labelBox.y, point.labelBox.width, point.labelBox.height, 9);
     context.fillStyle = "rgba(255,255,255,0.94)";
     context.fill();
@@ -365,6 +404,15 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
     context.font = `700 18px ${FONT_FAMILY}`;
     context.textAlign = "left";
     context.fillText(point.label, point.labelBox.x + 13, point.labelBox.y + 27);
+  });
+  points.forEach((point) => {
+    context.fillStyle = point.color;
+    context.strokeStyle = "#ffffff";
+    context.lineWidth = 4;
+    context.beginPath();
+    context.arc(point.pixelX, point.pixelY, 12, 0, Math.PI * 2);
+    context.fill();
+    context.stroke();
   });
 
   drawLegend(context, model.groups, width, 1064);
