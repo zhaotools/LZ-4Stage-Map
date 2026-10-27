@@ -337,11 +337,11 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
     context.fillRect(plot.x, bandY, plot.width, plot.bandHeight);
     context.fillStyle = stage.color;
     context.font = `800 34px ${FONT_FAMILY}`;
-    context.textAlign = "right";
-    context.fillText(stage.stage, plot.x - 40, bandY + plot.bandHeight / 2 - 7);
+    context.textAlign = "center";
+    context.fillText(stage.stage, plot.x - 58, bandY + plot.bandHeight / 2 - 7);
     context.fillStyle = "#5c6f89";
     context.font = `600 17px ${FONT_FAMILY}`;
-    context.fillText(`（${stage.axisLabel}）`, plot.x - 40, bandY + plot.bandHeight / 2 + 26);
+    context.fillText(`（${stage.axisLabel}）`, plot.x - 58, bandY + plot.bandHeight / 2 + 26);
   });
 
   context.setLineDash([6, 6]);

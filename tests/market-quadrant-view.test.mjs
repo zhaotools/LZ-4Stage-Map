@@ -37,3 +37,10 @@ test("web labels use real browser text measurements and allow wider boxes", () =
   assert.match(chartSource, /textMeasurementContext\.measureText\(text\)\.width/);
   assert.match(imageSource, /Math\.min\(300, Math\.max\(124, measureText\(point\.label\)\.width \+ 26\)\)/);
 });
+
+test("all stage names and descriptions share the same centered axis position", () => {
+  assert.match(chartSource, /x=\{plot\.x - 58\}[\s\S]*?textAnchor="middle">\{stage\.stage\}/);
+  assert.match(chartSource, /x=\{plot\.x - 58\}[\s\S]*?textAnchor="middle">（\{stage\.axisLabel\}）/);
+  assert.match(imageSource, /context\.textAlign = "center";\s*context\.fillText\(stage\.stage, plot\.x - 58/);
+  assert.match(imageSource, /context\.fillText\(`（\$\{stage\.axisLabel\}）`, plot\.x - 58/);
+});

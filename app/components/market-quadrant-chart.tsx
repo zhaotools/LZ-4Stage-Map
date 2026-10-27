@@ -72,8 +72,8 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
             const bandY = plot.y + index * plot.bandHeight;
             return <g key={stage.stage}>
               <rect x={plot.x} y={bandY} width={plot.width} height={plot.bandHeight} fill={stage.background} />
-              <text x={plot.x - 40} y={bandY + plot.bandHeight / 2 - 7} fill={stage.color} fontSize="34" fontWeight="800" textAnchor="end">{stage.stage}</text>
-              <text x={plot.x - 40} y={bandY + plot.bandHeight / 2 + 26} fill="#5c6f89" fontSize="17" fontWeight="600" textAnchor="end">（{stage.axisLabel}）</text>
+              <text x={plot.x - 58} y={bandY + plot.bandHeight / 2 - 7} fill={stage.color} fontSize="34" fontWeight="800" textAnchor="middle">{stage.stage}</text>
+              <text x={plot.x - 58} y={bandY + plot.bandHeight / 2 + 26} fill="#5c6f89" fontSize="17" fontWeight="600" textAnchor="middle">（{stage.axisLabel}）</text>
             </g>;
           })}
           {model.xAxis.ticks.map((tick: number) => {
