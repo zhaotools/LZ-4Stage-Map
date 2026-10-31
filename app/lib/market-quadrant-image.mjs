@@ -53,7 +53,7 @@ const GROUPS = {
 
 const US_MARKET = new Set(["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX"]);
 const US_SECTOR = new Set(["SOXX", "XLF", "XLE", "XLV", "XLI", "XLY"]);
-const US_LEADERS = new Set(["NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT"]);
+const US_LEADERS = new Set(["NVDA", "MSFT", "AAPL", "AMZN", "GOOGL", "META", "TSLA", "BRK.B", "WMT"]);
 const CHINA_MARKET = new Set(["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000984.SH", "SZ399006", "000688.SH", "000985.SH"]);
 const HK_INDEX = new Set(["HSI", "HSTECH", "HSEWI"]);
 const HK_MEGA = new Set(["700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK"]);

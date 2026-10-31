@@ -9,6 +9,8 @@ const market = (code, region, exchange) => ({ code, region, exchange });
 test("maps every market family to its TradingView symbol", () => {
   assert.equal(tradingViewSymbolFor(market("GSPC.INDEX", "美股", "NYSE")), "SP:SPX");
   assert.equal(tradingViewSymbolFor(market("SOXX", "美股", "NASDAQ")), "NASDAQ:SOXX");
+  assert.equal(tradingViewSymbolFor(market("GOOGL", "美股", "NASDAQ")), "NASDAQ:GOOGL");
+  assert.equal(tradingViewSymbolFor(market("META", "美股", "NASDAQ")), "NASDAQ:META");
   assert.equal(tradingViewSymbolFor(market("IWM", "美股", "NYSEARCA")), "AMEX:IWM");
   assert.equal(tradingViewSymbolFor(market("BRK.B", "美股", "NYSE")), "NYSE:BRK.B");
   assert.equal(tradingViewSymbolFor(market("000300.SH", "A股", "CSI")), "SSE:000300");

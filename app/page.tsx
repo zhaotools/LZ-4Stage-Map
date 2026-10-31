@@ -287,7 +287,7 @@ const collectionOrder: Partial<Record<View, string[]>> = {
   global: ["GSPC.INDEX", "NDQ", "SOXX", "VIX", "000300.SH", "SZ399006", "HSI", "HSTECH", "N225", "KOSPI", "STOXX50E", "DXY", "US10Y", "XAU", "CL", "BTC-USD", "ETH-USD"],
   crypto7: ["HOOD", "CRCL", "COIN", "MSTR", "BTC-USD", "ETH-USD", "SOL-USD", "HYPE-USD"],
   commodity: ["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"],
-  usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
+  usSelected: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "GOOGL", "META", "TSLA", "BRK.B", "WMT", "DXY", "US10Y"],
   chinaIndices: ["000510.SH", "000300.SH", "000905.SH", "000852.SH", "000984.SH", "SZ399006", "000688.SH", "000985.SH", "931865.CSI", "930651.CSI", "399975.SZ", "399986.SZ", "930708.CSI", "399933.SZ", "399997.SZ", "930997.CSI"],
   hkSelected: ["HSI", "HSTECH", "HSEWI", "700.HK", "9988.HK", "5.HK", "1299.HK", "388.HK", "939.HK", "1810.HK", "3690.HK", "941.HK", "883.HK", "1211.HK", "16.HK", "2.HK", "1093.HK"],
   crossMarket: ["BTC-SOXX", "BTC-QQQ", "SOXX-SPY", "RSP-SPY", "ASHR-SPY", "KTEC-QQQ", "BTC-GLD", "GLD-SPY"],
@@ -295,7 +295,7 @@ const collectionOrder: Partial<Record<View, string[]>> = {
 const usMapGroups = [
   { label: "市场", className: "map-us-market", codes: ["GSPC.INDEX", "NDQ", "RSP", "IWM", "VIX"] },
   { label: "行业", className: "map-us-sector", codes: ["SOXX", "XLF", "XLE", "XLV", "XLI", "XLY"] },
-  { label: "核心资产", className: "map-us-leaders", codes: ["NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK.B", "WMT"] },
+  { label: "核心资产", className: "map-us-leaders", codes: ["NVDA", "MSFT", "AAPL", "AMZN", "GOOGL", "META", "TSLA", "BRK.B", "WMT"] },
 ] as const;
 const usMacroCodes = ["DXY", "US10Y"];
 const chinaMapGroups = [
@@ -390,7 +390,7 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
           return (
             <button
               key={item.code}
-              className={`map-tile tile-${item.stage.toLowerCase()} ${item.cryptoFreshness === "unavailable" ? "tile-unavailable" : ""} ${observationChanged ? "tile-observation-change" : ""} ${faded ? "tile-faded" : ""}`}
+              className={`map-tile tile-${item.stage.toLowerCase()} ${group === "核心资产" && item.code === "BRK.B" ? "tile-leader-break" : ""} ${item.cryptoFreshness === "unavailable" ? "tile-unavailable" : ""} ${observationChanged ? "tile-observation-change" : ""} ${faded ? "tile-faded" : ""}`}
               style={{
                 gridColumn: `span ${tileCols}`,
                 gridRow: `span ${tileRows}`,

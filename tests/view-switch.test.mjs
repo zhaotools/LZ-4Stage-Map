@@ -250,7 +250,7 @@ test("sidebar switches between market maps and cross-market relative trend", () 
   assert.match(pageSource, /commodity: \["DJP", "XAU", "XAG", "HG", "ALI", "CL", "NG", "ZC", "ZW", "ZS"\]/);
   assert.match(pageSource, /"SOL-USD": \{ shortCode: "SOL", cols: 3, rows: 2 \}/);
   assert.doesNotMatch(pageSource, /item\.code === "BTC-USD" \? 6/);
-  assert.match(pageSource, /usSelected: \["GSPC\.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "TSLA", "BRK\.B", "WMT", "DXY", "US10Y"\]/);
+  assert.match(pageSource, /usSelected: \["GSPC\.INDEX", "NDQ", "RSP", "IWM", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY", "NVDA", "MSFT", "AAPL", "AMZN", "GOOGL", "META", "TSLA", "BRK\.B", "WMT", "DXY", "US10Y"\]/);
   assert.match(pageSource, /label: "市场", className: "map-us-market"/);
   assert.match(pageSource, /label: "行业", className: "map-us-sector"/);
   assert.match(pageSource, /label: "核心资产", className: "map-us-leaders"/);
@@ -309,7 +309,11 @@ test("sidebar switches between market maps and cross-market relative trend", () 
   assert.match(cssSource, /\.view-usSelected \.map-us-macro \{ grid-area: 1 \/ 11 \/ 10 \/ 13; \}/);
   assert.match(cssSource, /\.view-usSelected \.map-us-market \.map-tiles \{ grid-template-columns: repeat\(5,/);
   assert.match(cssSource, /\.view-usSelected \.map-us-sector \.map-tiles \{ grid-template-columns: repeat\(6,/);
-  assert.match(cssSource, /\.view-usSelected \.map-us-leaders \.map-tiles \{ grid-template-columns: repeat\(7,/);
+  assert.match(cssSource, /\.view-usSelected \.map-us-leaders \.map-tiles \{ grid-template-columns: repeat\(9,/);
+  assert.match(pageSource, /codes: \["NVDA", "MSFT", "AAPL", "AMZN", "GOOGL", "META", "TSLA", "BRK\.B", "WMT"\]/);
+  assert.match(pageSource, /group === "核心资产" && item\.code === "BRK\.B" \? "tile-leader-break"/);
+  assert.match(cssSource, /@media \(min-width: 781px\) and \(max-width: 1180px\)[\s\S]*?\.view-usSelected \.map-us-leaders \.map-tiles \{ grid-template-columns: repeat\(3,/);
+  assert.match(cssSource, /@media \(max-width: 780px\)[\s\S]*?\.view-usSelected \.map-us-macro \.map-tiles \{ grid-template-columns: repeat\(2,/);
   assert.match(cssSource, /\.view-usSelected\.single-map \.map-大宗-宏观 \.map-tiles \{ grid-template-columns: repeat\(2,/);
   assert.match(cssSource, /\.view-chinaIndices \.map-china-market \{ grid-area: 1 \/ 1 \/ 5 \/ 13; \}/);
   assert.match(cssSource, /\.view-chinaIndices \.map-china-sector \{ grid-area: 5 \/ 1 \/ 9 \/ 13; \}/);
