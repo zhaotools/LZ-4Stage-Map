@@ -119,6 +119,8 @@ test("quadrant export paints a 4:3 PNG and starts the browser download", async (
     assert.ok(paintedText.includes("市场（2个）"));
     assert.ok(paintedText.includes("行业（2个）"));
     assert.ok(paintedText.includes("沪深300指数｜S4｜6周"));
+    assert.ok(paintedText.includes("阶段数据截至：2026-10-23"));
+    assert.ok(paintedText.includes("阶段分析仅供市场观察，不构成任何投资建议"));
   } finally {
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;

@@ -19,10 +19,15 @@ test("market pages switch between the trend map and the responsive quadrant char
 
 test("web quadrant reuses the export model, collision layout and active stage filter", () => {
   assert.match(chartSource, /buildMarketQuadrantModel\(markets, view, marketTitle, confirmationLabel\)/);
+  assert.match(chartSource, /downloadMarketQuadrantImage\(markets, view, marketTitle, confirmationLabel\)/);
   assert.match(chartSource, /layoutMarketQuadrantLabels\(pointsWithPixels, plot/);
   assert.match(chartSource, /stageFilter === "全部" \|\| point\.stage === stageFilter/);
+  assert.match(chartSource, /<h3>\{model\.title\}<\/h3>/);
+  assert.match(chartSource, /className="market-quadrant-download"/);
+  assert.match(chartSource, /aria-label=\{downloadLabel\}/);
   assert.match(chartSource, /主阶段持续时间（周）/);
   assert.match(chartSource, /阶段分析仅供市场观察，不构成任何投资建议/);
+  assert.match(cssSource, /\.market-quadrant-download \{[^}]*position: absolute;[^}]*right: 13px/);
   assert.match(cssSource, /\.market-quadrant-svg \{[^}]*min-width: 920px/);
   assert.match(cssSource, /\.market-quadrant-scroll \{[^}]*overflow-x: auto/);
 });

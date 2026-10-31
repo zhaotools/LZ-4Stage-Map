@@ -645,9 +645,8 @@ function StockRadarPage({
   );
 }
 
-function MarketInterpretationPanel({ interpretation, markets, view, marketTitle, confirmationLabel }: { interpretation: MarketInterpretation; markets: Market[]; view: View; marketTitle: string; confirmationLabel: string }) {
+function MarketInterpretationPanel({ interpretation, marketTitle, confirmationLabel }: { interpretation: MarketInterpretation; marketTitle: string; confirmationLabel: string }) {
   const [interpretationImageStatus, setInterpretationImageStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
-  const [quadrantImageStatus, setQuadrantImageStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
   const presentation = buildInterpretationImageModel(interpretation, marketTitle, confirmationLabel);
   const handleGenerateInterpretationImage = async () => {
     setInterpretationImageStatus("generating");
@@ -657,17 +656,6 @@ function MarketInterpretationPanel({ interpretation, markets, view, marketTitle,
       window.setTimeout(() => setInterpretationImageStatus("idle"), 1800);
     } catch {
       setInterpretationImageStatus("error");
-    }
-  };
-  const handleGenerateQuadrantImage = async () => {
-    setQuadrantImageStatus("generating");
-    try {
-      const { downloadMarketQuadrantImage } = await import("@/app/lib/market-quadrant-image.mjs");
-      await downloadMarketQuadrantImage(markets, view, marketTitle, confirmationLabel);
-      setQuadrantImageStatus("done");
-      window.setTimeout(() => setQuadrantImageStatus("idle"), 1800);
-    } catch {
-      setQuadrantImageStatus("error");
     }
   };
   return (
@@ -681,9 +669,6 @@ function MarketInterpretationPanel({ interpretation, markets, view, marketTitle,
           <span className="market-interpretation-date">{presentation.confirmationLabel}</span>
           <button className="market-interpretation-image-button" type="button" onClick={handleGenerateInterpretationImage} disabled={interpretationImageStatus === "generating"}>
             <ImageDown size={15} />{interpretationImageStatus === "generating" ? "生成中" : interpretationImageStatus === "done" ? "已生成" : interpretationImageStatus === "error" ? "重试生成" : "生成趋势图"}
-          </button>
-          <button className="market-interpretation-image-button market-quadrant-image-button" type="button" onClick={handleGenerateQuadrantImage} disabled={quadrantImageStatus === "generating"}>
-            <Grid2X2 size={15} />{quadrantImageStatus === "generating" ? "生成中" : quadrantImageStatus === "done" ? "已生成" : quadrantImageStatus === "error" ? "重试生成" : "生成象限图"}
           </button>
         </div>
       </div>
@@ -1753,7 +1738,7 @@ export default function Home() {
               : <Suspense fallback={<div className="market-quadrant-empty">象限图加载中…</div>}><MarketQuadrantChart markets={regionData} view={view} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} stageFilter={stageFilter} /></Suspense>}
             <div className="map-foot" id="personal-watch">{watches.length ? watches.map((item) => <span key={item.code}>{item.shortCode}：{item.observation}</span>) : <span>本周暂无新的阶段观察变化</span>}</div>
           </section>
-          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} markets={activeUniverse} view={view} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} />}
+          {activeInterpretation && <MarketInterpretationPanel interpretation={activeInterpretation} marketTitle={activeViewMeta.mapTitle} confirmationLabel={interpretationConfirmationLabel} />}
           </>}
 
           <footer>

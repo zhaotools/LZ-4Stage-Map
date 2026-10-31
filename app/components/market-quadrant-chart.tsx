@@ -1,4 +1,8 @@
-import { buildMarketQuadrantModel, layoutMarketQuadrantLabels } from "@/app/lib/market-quadrant-image.mjs";
+"use client";
+
+import { useState } from "react";
+import { Download } from "lucide-react";
+import { buildMarketQuadrantModel, downloadMarketQuadrantImage, layoutMarketQuadrantLabels } from "@/app/lib/market-quadrant-image.mjs";
 
 type Stage = "S1" | "S2" | "S3" | "S4";
 
@@ -51,9 +55,28 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
   confirmationLabel: string;
   stageFilter: Stage | "全部";
 }) {
+  const [downloadStatus, setDownloadStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
   const model = buildMarketQuadrantModel(markets, view, marketTitle, confirmationLabel);
   const noun = view === "crossMarket" ? "比率" : "资产";
   if (!model.points.length) return <div className="market-quadrant-empty">当前没有可用于象限图的阶段数据</div>;
+
+  const handleDownload = async () => {
+    setDownloadStatus("generating");
+    try {
+      await downloadMarketQuadrantImage(markets, view, marketTitle, confirmationLabel);
+      setDownloadStatus("done");
+      window.setTimeout(() => setDownloadStatus("idle"), 1800);
+    } catch {
+      setDownloadStatus("error");
+    }
+  };
+  const downloadLabel = downloadStatus === "generating"
+    ? "正在生成象限图"
+    : downloadStatus === "done"
+      ? "象限图已下载"
+      : downloadStatus === "error"
+        ? "下载失败，点击重试"
+        : `下载${model.title}`;
 
   const pointsWithPixels = model.points.map((point: Omit<QuadrantPoint, "pixelX" | "pixelY" | "labelBox">) => ({
     ...point,
@@ -64,12 +87,18 @@ export function MarketQuadrantChart({ markets, view, marketTitle, confirmationLa
 
   return (
     <div className="market-quadrant-chart">
-      <p className="market-quadrant-subtitle">{model.subtitle}</p>
+      <div className="market-quadrant-head">
+        <h3>{model.title}</h3>
+        <p className="market-quadrant-subtitle">{model.subtitle}</p>
+        <button className="market-quadrant-download" type="button" onClick={handleDownload} disabled={downloadStatus === "generating"} aria-label={downloadLabel} title={downloadLabel}>
+          <Download size={17} aria-hidden="true" />
+        </button>
+      </div>
       <div className="market-quadrant-scroll">
         <svg className="market-quadrant-svg" viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-labelledby="market-quadrant-title market-quadrant-description">
           <title id="market-quadrant-title">{model.title}</title>
           <desc id="market-quadrant-description">横轴为主阶段持续时间，纵轴为当前阶段；每个{noun}用带标签的圆点表示。</desc>
-          {model.stages.map((stage: { stage: Stage; axisLabel: string; color: string; background: string }, index: number) => {
+          {model.stages.map((stage, index: number) => {
             const bandY = plot.y + index * plot.bandHeight;
             return <g key={stage.stage}>
               <rect x={plot.x} y={bandY} width={plot.width} height={plot.bandHeight} fill={stage.background} />
