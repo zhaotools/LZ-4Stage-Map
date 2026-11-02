@@ -83,7 +83,8 @@ function groupIdFor(market, viewKey) {
   return market.region || "other";
 }
 
-function compactAssetName(market) {
+function compactAssetName(market, viewKey) {
+  if (viewKey === "crossMarket" && market.name?.trim()) return market.name.trim();
   const override = ASSET_NAME_OVERRIDES.get(market.code);
   if (override) return override;
   if (market.region === "加密") return market.shortCode || market.code.replace(/-USD$/u, "");
@@ -128,16 +129,17 @@ export function buildMarketQuadrantModel(markets, viewKey, marketTitle, confirma
     stageSlots.set(market.stage, index + 1);
     const jitter = [0, 0.1, -0.1, 0.19, -0.19, 0.145, -0.145, 0.05, -0.05][index % 9];
     const weeks = Math.max(0, Math.round(Number(market.weeks)));
+    const name = compactAssetName(market, viewKey);
     return {
       code: market.code,
-      name: compactAssetName(market),
+      name,
       shortCode: market.shortCode || market.code,
       stage: market.stage,
       subStage: market.subStage || market.stage,
       stageValue: Number(market.stage.slice(1)),
       yValue: Number(market.stage.slice(1)) + jitter,
       weeks,
-      label: `${compactAssetName(market)}｜${market.subStage || market.stage}｜${weeks}周`,
+      label: `${name}｜${market.subStage || market.stage}｜${weeks}周`,
       groupId: group.id,
       groupLabel: group.label,
       color: group.color,
@@ -260,7 +262,7 @@ export function layoutMarketQuadrantLabels(points, plot, measureText) {
   }));
   const occupied = [];
   return points.map((point) => {
-    const labelWidth = Math.min(300, Math.max(124, measureText(point.label).width + 26));
+    const labelWidth = Math.min(460, Math.max(124, measureText(point.label).width + 26));
     return { ...point, labelBox: placeLabel(point, labelWidth, plot, occupied, markerBoxes) };
   });
 }

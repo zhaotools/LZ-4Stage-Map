@@ -41,6 +41,45 @@ test("Nasdaq 100 uses its market name instead of the NDX short code", () => {
   assert.doesNotMatch(model.points.find((point) => point.code === "NDQ")?.label || "", /^NDX｜/u);
 });
 
+test("cross-market quadrant labels use ratio names and fit their frames", () => {
+  const ratios = [
+    ["BTC-SOXX", "BTC/SOXX", "比特币 / 美国半导体", "S4", "S4B-", 61, "加密与科技"],
+    ["BTC-QQQ", "BTC/QQQ", "比特币 / 纳斯达克100", "S1", "S1", 4, "加密与科技"],
+    ["SOXX-SPY", "SOXX/SPY", "美国半导体 / 标普500", "S2", "S2B-", 58, "美股内部结构"],
+    ["RSP-SPY", "RSP/SPY", "标普500等权 / 标普500", "S4", "S4-", 4, "美股内部结构"],
+    ["ASHR-SPY", "ASHR/SPY", "沪深300 / 标普500", "S4", "S4", 15, "区域市场对比"],
+    ["KTEC-QQQ", "KTEC/QQQ", "恒生科技 / 纳斯达克100", "S4", "S4B", 60, "区域市场对比"],
+    ["BTC-GLD", "BTC/GLD", "比特币 / 黄金", "S2", "S2", 9, "宏观资产轮动"],
+    ["GLD-SPY", "GLD/SPY", "黄金 / 标普500", "S4", "S4", 24, "宏观资产轮动"],
+  ].map(([code, shortCode, name, stage, subStage, weeks, region]) => ({ code, shortCode, name, stage, subStage, weeks, region, stageAsOf: "2026-10-30" }));
+  const model = buildMarketQuadrantModel(ratios, "crossMarket", "跨市场相对趋势", "阶段数据截至：2026-10-30");
+  const plot = { x: 154, y: 50, width: 1376, height: 760, bandHeight: 190 };
+  const measureText = (label) => ({ width: Array.from(label).reduce((width, character) => width + (/^[\x20-\x7E]$/u.test(character) ? 11.5 : 18), 0) });
+  const laidOut = layoutMarketQuadrantLabels(model.points.map((point) => ({
+    ...point,
+    pixelX: plot.x + point.weeks / model.xAxis.max * plot.width,
+    pixelY: plot.y + (4.5 - point.yValue) / 4 * plot.height,
+  })), plot, measureText);
+
+  for (const [index, point] of laidOut.entries()) {
+    const ratio = ratios[index];
+    assert.equal(point.name, ratio.name);
+    assert.ok(point.label.startsWith(`${ratio.name}｜`), point.label);
+    assert.ok(point.labelBox.width >= measureText(point.label).width + 26, point.label);
+    assert.ok(point.labelBox.x >= plot.x + 6);
+    assert.ok(point.labelBox.x + point.labelBox.width <= plot.x + plot.width - 6);
+    for (const other of laidOut.slice(index + 1)) {
+      const left = point.labelBox;
+      const right = other.labelBox;
+      const overlaps = left.x < right.x + right.width + 7
+        && left.x + left.width + 7 > right.x
+        && left.y < right.y + right.height + 7
+        && left.y + left.height + 7 > right.y;
+      assert.equal(overlaps, false, `${point.code} overlaps ${other.code}`);
+    }
+  }
+});
+
 test("dense assets in one stage receive non-overlapping labels", () => {
   const plot = { x: 154, y: 168, width: 1376, height: 760, bandHeight: 190 };
   const weeks = [1, 6, 8, 10, 10, 10, 14, 14, 14, 15, 15, 20, 34, 43];
