@@ -40,7 +40,7 @@ test("web and downloaded quadrant charts omit dark axis lines", () => {
 
 test("web labels use real browser text measurements and allow wider boxes", () => {
   assert.match(chartSource, /textMeasurementContext\.measureText\(text\)\.width/);
-  assert.match(imageSource, /Math\.min\(300, Math\.max\(124, measureText\(point\.label\)\.width \+ 26\)\)/);
+  assert.match(imageSource, /Math\.min\(460, Math\.max\(124, measureText\(point\.label\)\.width \+ 26\)\)/);
 });
 
 test("all stage names and descriptions share the same centered axis position", () => {

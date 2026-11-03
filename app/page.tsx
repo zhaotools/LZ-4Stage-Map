@@ -32,6 +32,7 @@ import { tradingViewChartUrlFor, chartLinkTitleFor } from "@/app/lib/tradingview
 import { buildInterpretationImageModel, downloadMarketInterpretationImage } from "@/app/lib/market-interpretation-image.mjs";
 import { scrollPageToTop } from "@/app/lib/page-scroll.mjs";
 import { STAGE_PRESENTATION } from "@/app/lib/stage-presentation.mjs";
+import { INDEX_SCAN_VIEWS, selectIndexScanMarkets } from "@/app/lib/index-scan.mjs";
 import {
   getMemberProfile,
   getMemberSession,
@@ -52,6 +53,7 @@ import {
   type MemberSnapshot,
   type MemberView,
   type MyScanAsset,
+  type MyScanIndexMarket,
   type MyScanLookupAsset,
   type MyScanRegion,
   type StockRadarRuleId,
@@ -738,6 +740,8 @@ export default function Home() {
   const [myScanAssets, setMyScanAssets] = useState<MyScanAsset[]>([]);
   const [myScanLoaded, setMyScanLoaded] = useState(false);
   const [myScanLoadError, setMyScanLoadError] = useState<string | null>(null);
+  const [myScanIndexLoading, setMyScanIndexLoading] = useState(false);
+  const [myScanIndexError, setMyScanIndexError] = useState<string | null>(null);
   const [memberDialog, setMemberDialog] = useState<"locked" | "login" | "dataError" | "password" | "passwordChanged" | null>(null);
   const [pendingView, setPendingView] = useState<ProtectedPage | null>(null);
   const [memberEmail, setMemberEmail] = useState("");
@@ -1022,6 +1026,26 @@ export default function Home() {
     }
   };
 
+  const loadMyScanIndexes = async () => {
+    setMyScanIndexLoading(true);
+    setMyScanIndexError(null);
+    try {
+      const results = await Promise.allSettled((INDEX_SCAN_VIEWS as MemberView[]).map((key) => getMemberSnapshot<DashboardMarket>(key)));
+      let failed = 0;
+      results.forEach((result, index) => {
+        if (result.status === "rejected") { failed += 1; return; }
+        try {
+          validateSnapshot(result.value, "markets");
+          const key = INDEX_SCAN_VIEWS[index] as MemberView;
+          setMemberSnapshots((current) => ({ ...current, [key]: newerSnapshot(current[key], result.value) }));
+        } catch { failed += 1; }
+      });
+      if (failed) setMyScanIndexError(failed === INDEX_SCAN_VIEWS.length ? "指数阶段数据暂时无法读取，请重试。" : "部分市场的指数数据未能更新，已显示可用结果。");
+    } finally {
+      setMyScanIndexLoading(false);
+    }
+  };
+
   const handleMyScanLookup = (region: MyScanRegion, code: string): Promise<MyScanLookupAsset> => lookupMyScanAsset(region, code);
   const handleMyScanAdd = async (assetKey: string) => {
     await addMyScanAsset(assetKey);
@@ -1133,6 +1157,9 @@ export default function Home() {
     ...hydrateMarkets([item as DashboardMarket])[0],
     matchRules: item.matchRules,
   })), [radarSnapshot]);
+  const myScanIndexMarkets = useMemo<MyScanIndexMarket[]>(() => (INDEX_SCAN_VIEWS as MemberView[]).flatMap((key) =>
+    hydrateMarkets(selectIndexScanMarkets(key, memberSnapshots[key]?.markets ?? [])) as MyScanIndexMarket[]
+  ), [memberSnapshots]);
   const regionData = useMemo(() => activeUniverse.filter((item) => region === "全球" || item.region === region), [activeUniverse, region]);
   const counts = useMemo(() => {
     const result: Record<Stage, number> = { S1: 0, S2: 0, S3: 0, S4: 0 };
@@ -1246,6 +1273,7 @@ export default function Home() {
     setIntroductionActive(false);
     closeMarketCard();
     scrollPageToTop();
+    void loadMyScanIndexes();
   };
   const requestTrendRadar = async () => {
     if (!isMember) {
@@ -1686,6 +1714,10 @@ export default function Home() {
           ) : myScanActive ? (
             <MyScanPage
               assets={myScanAssets}
+              indexMarkets={myScanIndexMarkets}
+              indexLoading={myScanIndexLoading}
+              indexError={myScanIndexError}
+              onLoadIndexes={loadMyScanIndexes}
               loading={loadingMemberView === "myScan"}
               loadError={myScanLoadError}
               onReload={async () => { await loadMyScan(true); }}

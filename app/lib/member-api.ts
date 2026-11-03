@@ -66,6 +66,25 @@ export type MyScanAsset = {
   result: MyScanStageResult | null;
 };
 
+export type MyScanIndexMarket = {
+  code: string;
+  providerSymbol: string;
+  name: string;
+  region: "美股" | "A股" | "港股";
+  exchange: string;
+  stage: "S1" | "S2" | "S3" | "S4";
+  subStage: string;
+  stageDetail: string;
+  weeks: number;
+  observationStage: string;
+  observation: string;
+  momentum: number;
+  stageAsOf: string;
+  marketAsOf: string;
+  dataStatus: "live" | "cache";
+  tradingviewSymbol?: string;
+};
+
 export type MarketInterpretation = {
   schemaVersion: "lz-market-interpretation-v1" | "lz-market-interpretation-v2";
   viewKey: "global" | MemberView;
