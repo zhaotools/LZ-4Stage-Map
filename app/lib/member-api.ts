@@ -1,6 +1,8 @@
 import type { Session } from "@supabase/supabase-js";
 
 import { supabase } from "./supabase";
+import { resolveMapIndexLookup } from "./index-scan.mjs";
+import { tradingViewSymbolFor } from "./tradingview-link.mjs";
 
 export type MemberView = "crypto7" | "commodity" | "usSelected" | "chinaIndices" | "hkSelected" | "crossMarket";
 export type MarketView = "global" | MemberView;
@@ -34,7 +36,7 @@ export type MyScanStageResult = {
   category: string;
   tradingviewSymbol: string;
   source: string;
-  dataStatus: "live";
+  dataStatus: "live" | "cache";
   stage: "S1" | "S2" | "S3" | "S4";
   subStage: string;
   stageDetail: string;
@@ -263,6 +265,26 @@ async function functionErrorMessage(error: unknown, data: unknown) {
 }
 
 export async function lookupMyScanAsset(region: MyScanRegion, code: string): Promise<MyScanLookupAsset> {
+  const index = resolveMapIndexLookup(region, code);
+  if (index) {
+    const snapshot = await getMemberSnapshot<MyScanIndexMarket>(index.viewKey as MemberView);
+    const market = snapshot.markets.find((item) => item.code === index.code);
+    if (!market) throw new Error("该指数暂时没有可用的阶段数据，请稍后重试");
+    return {
+      assetKey: index.assetKey,
+      region: market.region,
+      code: market.code,
+      displayCode: index.displayCode,
+      providerSymbol: market.providerSymbol,
+      name: market.name,
+      exchange: market.exchange,
+      assetType: "equity",
+      primaryProvider: "会员市场地图",
+      fallbackProviders: [],
+      tradingviewSymbol: tradingViewSymbolFor(market),
+      currency: region === "A股" ? "CNY" : region === "港股" ? "HKD" : "USD",
+    };
+  }
   const { data, error } = await requireClient().functions.invoke("lookup-watchlist-asset", {
     body: { region, code },
   });

@@ -5,24 +5,20 @@ import { ChevronLeft, ChevronRight, Clock3, Plus, Search, Trash2 } from "lucide-
 
 import { stageConfirmationTimeFor } from "@/app/lib/confirmation-time.mjs";
 import { STAGE_PRESENTATION } from "@/app/lib/stage-presentation.mjs";
-import { matchS2ScanRules } from "@/app/lib/index-scan.mjs";
+import { indexCodeOptionsFor, matchS2ScanRules } from "@/app/lib/index-scan.mjs";
 import { tradingViewChartUrlFor } from "@/app/lib/tradingview-link.mjs";
-import type { MyScanAsset, MyScanIndexMarket, MyScanLookupAsset, MyScanRegion, StockRadarRuleId } from "@/app/lib/member-api";
+import type { MyScanAsset, MyScanLookupAsset, MyScanRegion, StockRadarRuleId } from "@/app/lib/member-api";
 
 const regions: MyScanRegion[] = ["美股", "A股", "港股", "加密"];
 const placeholders: Record<MyScanRegion, string> = {
-  美股: "例如 AAPL 或 BRK.B",
-  A股: "例如 600519 或 000001",
-  港股: "例如 0700 或 9988",
+  美股: "例如 AAPL、SPX、NDX 或 SOXX",
+  A股: "例如 600519、000300 或 399006",
+  港股: "例如 0700、HSI 或 HSTECH",
   加密: "例如 BTC、ETH、SOL 或 HYPE",
 };
 
 type Props = {
   assets: MyScanAsset[];
-  indexMarkets: MyScanIndexMarket[];
-  indexLoading: boolean;
-  indexError: string | null;
-  onLoadIndexes: () => Promise<void>;
   loading: boolean;
   loadError: string | null;
   onReload: () => Promise<void>;
@@ -48,17 +44,8 @@ const matchRules: Array<{ id: StockRadarRuleId; label: string; description: stri
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
 }
-function indexKind(market: MyScanIndexMarket) {
-  if (market.region !== "美股") return `${market.region}指数`;
-  if (["SOXX", "XLF", "XLE", "XLV", "XLI", "XLY"].includes(market.code)) return "美股·行业ETF";
-  if (["IWM", "RSP"].includes(market.code)) return "美股·宽基ETF";
-  return "美股指数";
-}
-
-export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onLoadIndexes, loading, loadError, onReload, onLookup, onAdd, onRemove, onReorder }: Props) {
-  const [mode, setMode] = useState<"watchlist" | "index">("watchlist");
+export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove, onReorder }: Props) {
   const [region, setRegion] = useState<MyScanRegion>("美股");
-  const [indexRegion, setIndexRegion] = useState<"全部" | MyScanIndexMarket["region"]>("全部");
   const [matchFilter, setMatchFilter] = useState<StockRadarRuleId | "matched" | null>(null);
   const [stageFilter, setStageFilter] = useState<(typeof stages)[number] | "全部">("全部");
   const [code, setCode] = useState("");
@@ -74,20 +61,18 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
     if (asset.result) counts[asset.result.stage] += 1;
     return counts;
   }, { S1: 0, S2: 0, S3: 0, S4: 0 });
-  const regionIndexes = indexRegion === "全部" ? indexMarkets : indexMarkets.filter((market) => market.region === indexRegion);
-  const scanResults = mode === "watchlist" ? assets.filter((asset) => asset.scanStatus === "fresh").map((asset) => asset.result).filter((result): result is NonNullable<typeof result> => Boolean(result)) : regionIndexes;
+  const scanResults = assets.filter((asset) => asset.scanStatus === "fresh").map((asset) => asset.result).filter((result): result is NonNullable<typeof result> => Boolean(result));
   const matchCount = (rule: StockRadarRuleId | "matched") => scanResults.filter((result) => {
     const matched = matchS2ScanRules(result);
     return rule === "matched" ? matched.length > 0 : matched.includes(rule);
   }).length;
-  const matchesFilter = (result: NonNullable<MyScanAsset["result"]> | MyScanIndexMarket | null) => {
+  const matchesFilter = (result: MyScanAsset["result"]) => {
     if (!matchFilter) return true;
     if (!result) return false;
     const matched = matchS2ScanRules(result);
     return matchFilter === "matched" ? matched.length > 0 : matched.includes(matchFilter);
   };
   const filteredAssets = assets.filter((asset) => (stageFilter === "全部" || asset.result?.stage === stageFilter) && (!matchFilter || asset.scanStatus === "fresh") && matchesFilter(asset.result));
-  const filteredIndexes = regionIndexes.filter(matchesFilter);
 
   const reorderAssets = async (sourceKey: string, targetKey: string) => {
     if (stageFilter !== "全部") {
@@ -142,7 +127,7 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
     setMessage(null);
     try {
       await onAdd(candidate.assetKey);
-      setMessage(`已加入 ${candidate.displayCode}。已有阶段结果会立即显示，新代码将在下一次周度计算后显示。`);
+      setMessage(candidate.assetKey.startsWith("MAP:") ? `已加入 ${candidate.displayCode}，阶段结果已同步至自选列表。` : `已加入 ${candidate.displayCode}。已有阶段结果会立即显示，新代码将在下一次周度计算后显示。`);
       setCandidate(null);
       setCode("");
     } catch (error) {
@@ -167,11 +152,6 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
 
   return (
     <section className="my-scan-page" aria-labelledby="my-scan-title">
-      <div className="my-scan-mode-switch" role="group" aria-label="选择扫描分类">
-        <button type="button" className={mode === "watchlist" ? "active" : ""} aria-pressed={mode === "watchlist"} onClick={() => { setMode("watchlist"); setMatchFilter(null); setStageFilter("全部"); }}>自选资产</button>
-        <button type="button" className={mode === "index" ? "active" : ""} aria-pressed={mode === "index"} onClick={() => { setMode("index"); setMatchFilter(null); }}>指数扫描</button>
-      </div>
-      {mode === "watchlist" ? (
       <div className="my-scan-head">
         <span className="section-kicker">STAGE SCAN · WATCHLIST</span>
         <div className="my-scan-toolbar">
@@ -182,7 +162,8 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
             ))}
           </div>
           <form className="my-scan-search" onSubmit={submitLookup}>
-            <input aria-label="资产代码" value={code} onChange={(event) => setCode(event.target.value)} placeholder={placeholders[region]} autoComplete="off" maxLength={20} disabled={querying} />
+            <input aria-label="资产代码" list="my-scan-index-code-options" value={code} onChange={(event) => setCode(event.target.value)} placeholder={placeholders[region]} autoComplete="off" maxLength={20} disabled={querying} />
+            <datalist id="my-scan-index-code-options">{indexCodeOptionsFor(region).map((indexCode: string) => <option key={indexCode} value={indexCode} />)}</datalist>
             <button type="submit" disabled={querying || !code.trim()}><Search size={16} />{querying ? "验证中…" : "查询"}</button>
           </form>
           <div className="my-scan-count"><strong>{assets.length}</strong><span>/ 20</span></div>
@@ -195,23 +176,13 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
         )}
         {message && <p className="my-scan-message" role="status">{message}</p>}
       </div>
-      ) : (
-        <div className="my-scan-index-head">
-          <div><span className="section-kicker">STAGE SCAN · INDEX</span><h2 id="my-scan-title">指数阶段扫描</h2></div>
-          <div className="my-scan-index-regions" role="group" aria-label="指数市场筛选">
-            {(["全部", "A股", "港股", "美股"] as const).map((item) => <button key={item} type="button" className={indexRegion === item ? "active" : ""} aria-pressed={indexRegion === item} onClick={() => { setIndexRegion(item); setMatchFilter(null); }}>{item === "全部" ? "全部" : `${item}指数`}</button>)}
-          </div>
-          <span className="my-scan-index-count">{regionIndexes.length} 个指数及行业 ETF</span>
-        </div>
-      )}
 
       <div className="my-scan-match-head"><h3>阶段匹配</h3><button type="button" onClick={() => setMatchFilter(null)} aria-pressed={matchFilter === null}>全部结果</button></div>
       <div className="my-scan-match-summary" aria-label="S2阶段匹配结果">
-        <button type="button" className={`radar-rule-card radar-rule-all ${matchFilter === "matched" ? "selected" : ""}`} aria-pressed={matchFilter === "matched"} onClick={() => setMatchFilter(matchFilter === "matched" ? null : "matched")}><span>本周匹配</span><strong>{matchCount("matched")}</strong><small>不重复{mode === "index" ? "指数" : "资产"}</small></button>
+        <button type="button" className={`radar-rule-card radar-rule-all ${matchFilter === "matched" ? "selected" : ""}`} aria-pressed={matchFilter === "matched"} onClick={() => setMatchFilter(matchFilter === "matched" ? null : "matched")}><span>本周匹配</span><strong>{matchCount("matched")}</strong><small>不重复资产</small></button>
         {matchRules.map((rule) => <button key={rule.id} type="button" className={`radar-rule-card radar-rule-${rule.id} ${matchFilter === rule.id ? "selected" : ""}`} aria-pressed={matchFilter === rule.id} onClick={() => setMatchFilter(matchFilter === rule.id ? null : rule.id)}><span>{rule.label}</span><strong>{matchCount(rule.id)}</strong><small>{rule.description}</small></button>)}
       </div>
 
-      {mode === "watchlist" ? (
       <div className="my-scan-list-head">
         <div><h3>资产列表</h3><p>使用卡片右上角的箭头调整显示顺序；相同代码在全站只计算一次。</p></div>
         <section className="stage-distribution my-scan-stage-distribution" aria-label={`我的扫描四阶段占比分布，按 ${analyzedTotal} 个已有结果的资产计算`}>
@@ -239,36 +210,8 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
           </div>
         </section>
       </div>
-      ) : <div className="my-scan-index-list-head"><h3>指数列表</h3><span>阶段结果来自各市场会员地图 · 点击卡片查看行情</span></div>}
 
-      {mode === "index" ? (
-        indexError && !indexMarkets.length ? <div className="my-scan-empty error"><p>{indexError}</p><button type="button" onClick={() => void onLoadIndexes()}>重新读取</button></div>
-        : indexLoading && !indexMarkets.length ? <div className="my-scan-empty"><p>正在读取指数阶段结果…</p></div>
-        : !filteredIndexes.length ? <div className="my-scan-empty"><Search size={26} /><h3>当前没有匹配的指数</h3><p>{indexError || "可切换市场或阶段匹配条件。"}</p></div>
-        : <>
-          {indexError && <p className="my-scan-message" role="status">{indexError} <button type="button" onClick={() => void onLoadIndexes()}>重试</button></p>}
-          <div className="my-scan-grid">
-            {filteredIndexes.map((market) => {
-              const matches = matchS2ScanRules(market);
-              const maDirection = momentumDirection(market.momentum);
-              const observationColor = stageColors[market.observationStage.match(/^S[1-4]/)?.[0] as keyof typeof stageColors] ?? undefined;
-              return <a key={market.code} className={`my-scan-card stage-${market.stage.toLowerCase()} clickable`} href={tradingViewChartUrlFor(market)} target="_blank" rel="noopener noreferrer" aria-label={`${market.name}，在TradingView新标签页打开`}>
-                <div className="my-scan-card-head"><div><span>{indexKind(market)}</span><small>{market.exchange}</small></div><small>截至 {market.stageAsOf}</small></div>
-                <div className="my-scan-card-title"><strong>{market.code === "GSPC.INDEX" ? "SPX" : market.code === "NDQ" ? "NDX" : market.code.replace(/^SZ/, "").replace(/\.(SH|SZ|CSI)$/, "")}</strong><span>{market.name}</span></div>
-                {matches.length > 0 && <div className="my-scan-match-badges">{matchRules.filter((rule) => matches.includes(rule.id)).map((rule) => <span key={rule.id}>{rule.label}</span>)}</div>}
-                <dl className="my-scan-card-meta">
-                  <div><dt>当前阶段</dt><dd><b style={{ color: stageColors[market.stage] }}>{market.subStage}</b> · {market.stageDetail}</dd></div>
-                  <div><dt>主阶段持续</dt><dd>{market.weeks}周</dd></div>
-                  <div><dt>本阶段起始时间</dt><dd>{stageConfirmationTimeFor(market)}</dd></div>
-                  <div><dt>本周观察</dt><dd style={{ color: observationColor }}>{market.observationStage === "UNCONFIRMED" ? market.observation : market.observationStage}</dd></div>
-                  <div><dt>30周均线：</dt><dd style={{ color: maDirection === "上升" ? stageColors.S2 : maDirection === "下降" ? stageColors.S4 : undefined }}>{maDirection} · 近5周 {market.momentum.toFixed(2)}%</dd></div>
-                </dl>
-                {market.dataStatus === "cache" && <p className="my-scan-status warning">沿用缓存阶段结果</p>}
-              </a>;
-            })}
-          </div>
-        </>
-      ) : loadError ? (
+      {loadError ? (
         <div className="my-scan-empty error"><p>{loadError}</p><button type="button" onClick={() => void onReload()}>重新读取</button></div>
       ) : loading && !assets.length ? (
         <div className="my-scan-empty"><p>正在读取我的扫描…</p></div>
@@ -326,6 +269,7 @@ export function MyScanPage({ assets, indexMarkets, indexLoading, indexError, onL
                       <div><dt>30周均线：</dt><dd style={{ color: maColor }}>{maDirection} · 近5周 {result.momentum.toFixed(2)}%</dd></div>
                     </dl>
                     {staleAfterFailure && <p className="my-scan-status warning">本次更新失败，保留上期结果</p>}
+                    {result.dataStatus === "cache" && <p className="my-scan-status warning">沿用市场地图缓存阶段结果</p>}
                   </>
                 ) : asset.scanStatus === "error" ? (
                   <div className="my-scan-pending error"><Clock3 size={18} /><strong>数据暂不可用</strong><span>本次计算失败，将在下次周度任务中重试。</span></div>

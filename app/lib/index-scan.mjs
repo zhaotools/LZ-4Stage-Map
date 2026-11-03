@@ -9,12 +9,38 @@ const INDEX_CODES = {
   usSelected: new Set(["GSPC.INDEX", "NDQ", "IWM", "RSP", "VIX", "SOXX", "XLF", "XLE", "XLV", "XLI", "XLY"]),
 };
 
-export const INDEX_SCAN_VIEWS = ["chinaIndices", "hkSelected", "usSelected"];
+const VIEW_BY_REGION = { A股: "chinaIndices", 港股: "hkSelected", 美股: "usSelected" };
 
-export function selectIndexScanMarkets(viewKey, markets) {
-  const codes = INDEX_CODES[viewKey];
-  if (!codes || !Array.isArray(markets)) return [];
-  return markets.filter((market) => codes.has(market.code));
+export function resolveMapIndexLookup(region, input) {
+  const viewKey = VIEW_BY_REGION[region];
+  if (!viewKey) return null;
+  const raw = String(input || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (!raw) return null;
+  let code;
+  if (region === "A股") {
+    const digits = raw.replace(/^(SH|SZ)/, "").replace(/\.(SH|SZ|CSI)$/, "");
+    code = [...INDEX_CODES.chinaIndices].find((item) => item.replace(/^SZ/, "").replace(/\.(SH|SZ|CSI)$/, "") === digits
+      && (raw === digits || raw === item || raw === `SH${digits}` && item.endsWith(".SH") || raw === `SZ${digits}` && (item === `SZ${digits}` || item.endsWith(".SZ")) || raw === `${digits}.SZ` && (item === `SZ${digits}` || item.endsWith(".SZ"))));
+  } else if (region === "港股") {
+    code = [...INDEX_CODES.hkSelected].find((item) => raw === item || raw === `^${item}`);
+  } else {
+    const aliases = { SPX: "GSPC.INDEX", GSPC: "GSPC.INDEX", "^GSPC": "GSPC.INDEX", "SP:SPX": "GSPC.INDEX", NDX: "NDQ", "^NDX": "NDQ", "NASDAQ:NDX": "NDQ" };
+    const candidate = aliases[raw] || raw;
+    code = INDEX_CODES.usSelected.has(candidate) ? candidate : null;
+  }
+  if (!code) return null;
+  return {
+    viewKey,
+    code,
+    assetKey: `MAP:${code}`,
+    displayCode: code === "GSPC.INDEX" ? "SPX" : code === "NDQ" ? "NDX" : code.replace(/^SZ/, "").replace(/\.(SH|SZ|CSI)$/, ""),
+  };
+}
+
+export function indexCodeOptionsFor(region) {
+  const codes = INDEX_CODES[VIEW_BY_REGION[region]];
+  if (!codes) return [];
+  return [...codes].map((code) => resolveMapIndexLookup(region, code).displayCode);
 }
 
 // Match the S2 rules used by the existing trend and stock scans.
