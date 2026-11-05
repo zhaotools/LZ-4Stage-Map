@@ -29,7 +29,8 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
   assert.match(component, /<h3>资产列表<\/h3>/);
   assert.match(component, /\{assets\.length\}<\/strong><span>\/ 20/);
   assert.match(component, /已达20个上限/);
-  assert.match(component, /等待周度首次计算/);
+  assert.match(component, /等待首次计算/);
+  assert.match(component, /立即计算/);
   assert.match(component, /本次更新失败，保留上期结果/);
   assert.match(component, /window\.open\(tradingViewChartUrlFor\(result\), "_blank", "noopener,noreferrer"\)/);
   assert.match(component, /role=\{result \? "link" : undefined\}/);
@@ -67,6 +68,8 @@ test("My Scan UI supports exact lookup, four markets, 20 assets and retained res
 
 test("My Scan API never exposes direct table writes or provider requests in the browser", () => {
   assert.match(api, /functions\.invoke\("lookup-watchlist-asset"/);
+  assert.match(api, /functions\.invoke\("scan-watchlist-asset"/);
+  assert.match(page, /await addMyScanAsset\(assetKey\);[\s\S]*await scanMyScanAsset\(assetKey\);[\s\S]*await loadMyScan\(true\)/);
   assert.match(api, /rpc\("add_my_scan_asset"/);
   assert.match(api, /rpc\("remove_my_scan_asset"/);
   assert.match(api, /rpc\("get_my_scan_assets"/);

@@ -304,6 +304,15 @@ export async function addMyScanAsset(assetKey: string) {
   return data as { ok: boolean; created: boolean; count: number; limit: number };
 }
 
+export async function scanMyScanAsset(assetKey: string): Promise<"fresh" | "waiting"> {
+  const { data, error } = await requireClient().functions.invoke("scan-watchlist-asset", {
+    body: { assetKey },
+  });
+  if (error || data?.error) throw new Error(await functionErrorMessage(error, data));
+  if (data?.status !== "fresh" && data?.status !== "waiting") throw new Error("即时计算没有返回有效结果");
+  return data.status;
+}
+
 export async function removeMyScanAsset(assetKey: string) {
   const { data, error } = await requireClient().rpc("remove_my_scan_asset", { p_asset_key: assetKey });
   if (error) throw error;

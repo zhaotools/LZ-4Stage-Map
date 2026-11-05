@@ -44,6 +44,7 @@ import {
   lookupMyScanAsset,
   removeMyScanAsset,
   reorderMyScanAssets,
+  scanMyScanAsset,
   signInMember,
   signOutMember,
   updateMemberPassword,
@@ -1027,6 +1028,20 @@ export default function Home() {
     await addMyScanAsset(assetKey);
     const refreshed = await loadMyScan(true);
     if (!refreshed) throw new Error("资产已加入，但列表刷新失败，请重新读取");
+    if (assetKey.startsWith("MAP:")) return "fresh" as const;
+    try {
+      const status = await scanMyScanAsset(assetKey);
+      await loadMyScan(true);
+      return status;
+    } catch (error) {
+      await loadMyScan(true);
+      return { error: error instanceof Error ? error.message : "即时计算失败，请稍后重试" };
+    }
+  };
+  const handleMyScanScan = async (assetKey: string) => {
+    const status = await scanMyScanAsset(assetKey);
+    await loadMyScan(true);
+    return status;
   };
   const handleMyScanRemove = async (assetKey: string) => {
     await removeMyScanAsset(assetKey);
@@ -1691,6 +1706,7 @@ export default function Home() {
               onReload={async () => { await loadMyScan(true); }}
               onLookup={handleMyScanLookup}
               onAdd={handleMyScanAdd}
+              onScan={handleMyScanScan}
               onRemove={handleMyScanRemove}
               onReorder={handleMyScanReorder}
             />

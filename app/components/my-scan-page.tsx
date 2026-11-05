@@ -23,7 +23,8 @@ type Props = {
   loadError: string | null;
   onReload: () => Promise<void>;
   onLookup: (region: MyScanRegion, code: string) => Promise<MyScanLookupAsset>;
-  onAdd: (assetKey: string) => Promise<void>;
+  onAdd: (assetKey: string) => Promise<"fresh" | "waiting" | { error: string }>;
+  onScan: (assetKey: string) => Promise<"fresh" | "waiting">;
   onRemove: (assetKey: string) => Promise<void>;
   onReorder: (assetKeys: string[]) => Promise<void>;
 };
@@ -44,7 +45,7 @@ const matchRules: Array<{ id: StockRadarRuleId; label: string; description: stri
 function momentumDirection(momentum: number) {
   return momentum > 0 ? "上升" : momentum < 0 ? "下降" : "持平";
 }
-export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onRemove, onReorder }: Props) {
+export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onAdd, onScan, onRemove, onReorder }: Props) {
   const [region, setRegion] = useState<MyScanRegion>("美股");
   const [matchFilter, setMatchFilter] = useState<StockRadarRuleId | "matched" | null>(null);
   const [stageFilter, setStageFilter] = useState<(typeof stages)[number] | "全部">("全部");
@@ -55,6 +56,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const [reordering, setReordering] = useState(false);
+  const [scanning, setScanning] = useState<string | null>(null);
   const atLimit = assets.length >= 20;
   const analyzedTotal = assets.reduce((total, asset) => total + (asset.result ? 1 : 0), 0);
   const stageCounts = assets.reduce<Record<(typeof stages)[number], number>>((counts, asset) => {
@@ -126,14 +128,31 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
     setAdding(true);
     setMessage(null);
     try {
-      await onAdd(candidate.assetKey);
-      setMessage(candidate.assetKey.startsWith("MAP:") ? `已加入 ${candidate.displayCode}，阶段结果已同步至自选列表。` : `已加入 ${candidate.displayCode}。已有阶段结果会立即显示，新代码将在下一次周度计算后显示。`);
+      const status = await onAdd(candidate.assetKey);
+      setMessage(typeof status === "object"
+        ? `已加入 ${candidate.displayCode}，但即时计算未完成：${status.error}`
+        : status === "waiting"
+          ? `已加入 ${candidate.displayCode}，该资产正在计算，请稍后刷新。`
+          : `已加入 ${candidate.displayCode}，阶段结果已更新。`);
       setCandidate(null);
       setCode("");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "加入失败，请稍后重试");
     } finally {
       setAdding(false);
+    }
+  };
+
+  const scanAsset = async (asset: MyScanAsset) => {
+    setScanning(asset.assetKey);
+    setMessage(null);
+    try {
+      const status = await onScan(asset.assetKey);
+      setMessage(status === "fresh" ? `${asset.displayCode} 的阶段结果已更新。` : `${asset.displayCode} 正在计算，请稍后刷新。`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "即时计算失败，请稍后重试");
+    } finally {
+      setScanning(null);
     }
   };
 
@@ -171,7 +190,7 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
         {candidate && (
           <div className="my-scan-candidate" aria-live="polite">
             <div><strong>{candidate.displayCode}</strong><span>{candidate.name}</span><small>{candidate.region} · {candidate.exchange} · {candidate.primaryProvider}</small></div>
-            <button type="button" onClick={addCandidate} disabled={adding || atLimit}><Plus size={16} />{atLimit ? "已达20个上限" : adding ? "加入中…" : "加入我的扫描"}</button>
+            <button type="button" onClick={addCandidate} disabled={adding || atLimit}><Plus size={16} />{atLimit ? "已达20个上限" : adding ? "加入并计算中…" : "加入我的扫描"}</button>
           </div>
         )}
         {message && <p className="my-scan-message" role="status">{message}</p>}
@@ -268,13 +287,13 @@ export function MyScanPage({ assets, loading, loadError, onReload, onLookup, onA
                       <div><dt>本周观察</dt><dd style={{ color: observationStage ? stageColors[observationStage] : undefined }}>{observationLabel}</dd></div>
                       <div><dt>30周均线：</dt><dd style={{ color: maColor }}>{maDirection} · 近5周 {result.momentum.toFixed(2)}%</dd></div>
                     </dl>
-                    {staleAfterFailure && <p className="my-scan-status warning">本次更新失败，保留上期结果</p>}
+                    {staleAfterFailure && <p className="my-scan-status warning">本次更新失败，保留上期结果 <button type="button" onClick={(event) => { event.stopPropagation(); void scanAsset(asset); }} disabled={scanning === asset.assetKey}>{scanning === asset.assetKey ? "计算中…" : "立即重试"}</button></p>}
                     {result.dataStatus === "cache" && <p className="my-scan-status warning">沿用市场地图缓存阶段结果</p>}
                   </>
                 ) : asset.scanStatus === "error" ? (
-                  <div className="my-scan-pending error"><Clock3 size={18} /><strong>数据暂不可用</strong><span>本次计算失败，将在下次周度任务中重试。</span></div>
+                  <div className="my-scan-pending error"><Clock3 size={18} /><strong>数据暂不可用</strong><span>可以立即重试计算。</span><button type="button" onClick={() => void scanAsset(asset)} disabled={scanning === asset.assetKey}>{scanning === asset.assetKey ? "计算中…" : "立即计算"}</button></div>
                 ) : (
-                  <div className="my-scan-pending"><Clock3 size={18} /><strong>等待周度首次计算</strong><span>传统资产周六更新，加密资产周一更新。</span></div>
+                  <div className="my-scan-pending"><Clock3 size={18} /><strong>{scanning === asset.assetKey ? "正在计算阶段" : "等待首次计算"}</strong><span>新增资产会即时计算；已有资产可点击下方按钮。</span><button type="button" onClick={() => void scanAsset(asset)} disabled={scanning === asset.assetKey}>{scanning === asset.assetKey ? "计算中…" : "立即计算"}</button></div>
                 )}
               </article>
             );
