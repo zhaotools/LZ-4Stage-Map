@@ -113,10 +113,11 @@ test("quadrant export paints a 4:3 PNG and starts the browser download", async (
   let clicked = false;
   let downloadedAs = "";
   let revoked = "";
+  let exportScale = 0;
   const paintedText = [];
   const context = {
     beginPath() {}, moveTo() {}, lineTo() {}, arcTo() {}, closePath() {}, fill() {}, stroke() {}, fillRect() {}, arc() {},
-    save() {}, restore() {}, translate() {}, rotate() {}, setLineDash() {},
+    save() {}, restore() {}, translate() {}, rotate() {}, setLineDash() {}, scale(value) { exportScale = value; },
     fillText(text) { paintedText.push(text); },
     measureText(text) { return { width: Array.from(text).length * 18 }; },
     createLinearGradient() { return { addColorStop() {} }; },
@@ -150,8 +151,9 @@ test("quadrant export paints a 4:3 PNG and starts the browser download", async (
     assert.equal(downloadedAs, fileName);
     assert.equal(revoked, "blob:quadrant-image");
     assert.match(fileName, /^LZ-4Stage-Map-A股市场-阶段象限图-2026-10-23\.png$/u);
-    assert.equal(canvas.width, 1600);
-    assert.equal(canvas.height, 1200);
+    assert.equal(canvas.width, 2560);
+    assert.equal(canvas.height, 1920);
+    assert.equal(exportScale, 1.6);
     assert.equal(canvas.width / canvas.height, 4 / 3);
     assert.ok(paintedText.includes("A股市场4个资产阶段象限图"));
     assert.ok(paintedText.includes("X轴：主阶段持续时间（周）｜Y轴：当前阶段（S1–S4）"));

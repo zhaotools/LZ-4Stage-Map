@@ -321,12 +321,14 @@ export async function downloadMarketQuadrantImage(markets, viewKey, marketTitle,
 
   const width = 1600;
   const height = 1200;
+  const exportScale = 1.6;
   const plot = { x: 154, y: 168, width: 1376, height: 760, bandHeight: 190 };
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = Math.round(width * exportScale);
+  canvas.height = Math.round(height * exportScale);
   const context = canvas.getContext("2d");
   if (!context) throw new Error("浏览器不支持象限图生成");
+  context.scale(exportScale, exportScale);
 
   context.fillStyle = "#ffffff";
   context.fillRect(0, 0, width, height);
