@@ -16,4 +16,6 @@ test("cross-market view renders four groups and relative-strength details", () =
   assert.match(pageSource, /绝对阶段/);
   assert.match(pageSource, /比率上升表示分子跑赢分母，不代表分子资产一定上涨/);
   assert.match(quadrantSource, /相对比率/);
+  for (const ratio of ["BTC-SMH", "SMH-QQQ", "SMH-SOXX"]) assert.match(pageSource, new RegExp(ratio));
+  assert.match(cssSource, /\.view-crossMarket \.map-tiles \{[^}]*repeat\(2, minmax\(0, 1fr\)\)[^}]*repeat\(2, minmax\(0, 1fr\)\)/);
 });

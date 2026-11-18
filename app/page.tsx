@@ -212,8 +212,11 @@ const displayMeta: Record<string, { shortCode: string; cols: number; rows: numbe
   MSTR: { shortCode: "MSTR", cols: 3, rows: 2 },
   "BTC-SOXX": { shortCode: "BTC/SOXX", cols: 3, rows: 4 },
   "BTC-QQQ": { shortCode: "BTC/QQQ", cols: 3, rows: 4 },
+  "BTC-SMH": { shortCode: "BTC/SMH", cols: 3, rows: 4 },
   "SOXX-SPY": { shortCode: "SOXX/SPY", cols: 3, rows: 4 },
   "RSP-SPY": { shortCode: "RSP/SPY", cols: 3, rows: 4 },
+  "SMH-QQQ": { shortCode: "SMH/QQQ", cols: 3, rows: 4 },
+  "SMH-SOXX": { shortCode: "SMH/SOXX", cols: 3, rows: 4 },
   "ASHR-SPY": { shortCode: "ASHR/SPY", cols: 3, rows: 4 },
   "KTEC-QQQ": { shortCode: "KTEC/QQQ", cols: 3, rows: 4 },
   "BTC-GLD": { shortCode: "BTC/GLD", cols: 3, rows: 4 },
@@ -379,15 +382,16 @@ function MarketMapGroup({ group, className, items, stageFilter, compact, dense, 
     <section className={`map-group ${className ?? `map-${group.replace("·", "-")}`} ${compact ? "map-group-full" : ""}`}>
       <header><strong>{group}</strong><span>{items.length} 个{noun}</span></header>
       <div className="map-tiles">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const faded = stageFilter !== "全部" && item.stage !== stageFilter;
           const observationStage = observationStageFor(item);
           const observationChanged = Boolean(observationStage && observationStage !== item.stage && (!item.cryptoFreshness || item.cryptoFreshness === "fresh"));
+          const ratioLayout = ["加密与科技", "美股内部结构", "区域市场对比", "宏观资产轮动"].includes(group);
           const multiCryptoLayout = group === "加密" && items.length > 1;
-          const tileCols = dense ? 1 : multiCryptoLayout
+          const tileCols = ratioLayout ? (items.length === 3 && index === 2 ? 2 : 1) : dense ? 1 : multiCryptoLayout
             ? 3
             : compact ? Math.max(2, item.cols) : item.cols;
-          const tileRows = dense ? 1 : multiCryptoLayout ? (items.length === 2 ? 4 : 2) : item.rows;
+          const tileRows = ratioLayout ? 1 : dense ? 1 : multiCryptoLayout ? (items.length === 2 ? 4 : 2) : item.rows;
           return (
             <button
               key={item.code}

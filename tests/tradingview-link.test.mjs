@@ -62,8 +62,11 @@ test("cross-market ratios use valid TradingView formula symbols", () => {
   const formulas = [
     "BINANCE:BTCUSDT/NASDAQ:SOXX",
     "BINANCE:BTCUSDT/NASDAQ:QQQ",
+    "BINANCE:BTCUSDT/NASDAQ:SMH",
     "NASDAQ:SOXX/AMEX:SPY",
     "AMEX:RSP/AMEX:SPY",
+    "NASDAQ:SMH/NASDAQ:QQQ",
+    "NASDAQ:SMH/NASDAQ:SOXX",
     "AMEX:ASHR/AMEX:SPY",
     "AMEX:KTEC/NASDAQ:QQQ",
     "BINANCE:BTCUSDT/AMEX:GLD",
